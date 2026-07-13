@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Informe Técnico — vetlain.cl</title>
+<style>
+  :root {
+    --rojo: #c0392b;
+    --rojo-bg: #fdf0ee;
+    --naranja: #b9770e;
+    --naranja-bg: #fef7e8;
+    --verde: #1e7e46;
+    --verde-bg: #edf7f1;
+    --azul: #1b4f72;
+    --gris: #5d6d7e;
+    --borde: #d5dbdb;
+    --texto: #212f3d;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", -apple-system, Arial, sans-serif;
+    color: var(--texto);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 40px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  /* ── Cabecera ── */
+  header {
+    border-bottom: 3px solid var(--azul);
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  header h1 { font-size: 24px; color: var(--azul); letter-spacing: -0.3px; }
+  header .sub { color: var(--gris); font-size: 13px; margin-top: 4px; }
+  .nota-global {
+    text-align: center;
+    background: var(--rojo-bg);
+    border: 2px solid var(--rojo);
+    border-radius: 10px;
+    padding: 10px 22px;
+  }
+  .nota-global .num { font-size: 30px; font-weight: 700; color: var(--rojo); line-height: 1.1; }
+  .nota-global .lbl { font-size: 11px; color: var(--gris); text-transform: uppercase; letter-spacing: 0.5px; }
+
+  h2 {
+    font-size: 16px;
+    color: var(--azul);
+    margin: 26px 0 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--borde);
+  }
+
+  /* ── Alerta crítica ── */
+  .alerta {
+    background: var(--rojo-bg);
+    border-left: 5px solid var(--rojo);
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin-bottom: 8px;
+  }
+  .alerta h2 {
+    color: var(--rojo);
+    border: none;
+    margin: 0 0 8px;
+    font-size: 17px;
+  }
+  .alerta p { margin-bottom: 8px; }
+  .alerta code {
+    background: #fff;
+    border: 1px solid #e6b0aa;
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-size: 12px;
+    font-family: Consolas, monospace;
+  }
+
+  /* ── Checklist prioridades ── */
+  ol.prioridades { counter-reset: paso; list-style: none; margin: 12px 0; }
+  ol.prioridades li {
+    counter-increment: paso;
+    display: flex;
+    gap: 12px;
+    padding: 9px 0;
+    border-bottom: 1px dashed var(--borde);
+    align-items: flex-start;
+  }
+  ol.prioridades li::before {
+    content: counter(paso);
+    flex: 0 0 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--azul);
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+  ol.prioridades li.critico::before { background: var(--rojo); }
+  ol.prioridades li strong { display: block; }
+  ol.prioridades li .detalle { color: var(--gris); font-size: 12.5px; }
+
+  /* ── Tablas ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 12.5px;
+  }
+  th {
+    background: var(--azul);
+    color: #fff;
+    text-align: left;
+    padding: 7px 10px;
+    font-weight: 600;
+  }
+  td { padding: 6px 10px; border-bottom: 1px solid var(--borde); vertical-align: top; }
+  tr:nth-child(even) td { background: #f8f9fa; }
+  td.et { font-weight: 600; width: 32%; }
+
+  .badge {
+    display: inline-block;
+    border-radius: 20px;
+    padding: 1px 10px;
+    font-weight: 700;
+    font-size: 12px;
+  }
+  .b-rojo { background: var(--rojo-bg); color: var(--rojo); border: 1px solid var(--rojo); }
+  .b-naranja { background: var(--naranja-bg); color: var(--naranja); border: 1px solid var(--naranja); }
+  .b-verde { background: var(--verde-bg); color: var(--verde); border: 1px solid var(--verde); }
+
+  /* ── Hallazgos en dos columnas ── */
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px; }
+  .card {
+    border: 1px solid var(--borde);
+    border-radius: 8px;
+    padding: 12px 14px;
+    break-inside: avoid;
+  }
+  .card h3 { font-size: 13.5px; margin-bottom: 6px; }
+  .card ul { margin-left: 16px; }
+  .card li { margin-bottom: 4px; font-size: 12.5px; }
+  .card.mal h3 { color: var(--rojo); }
+  .card.regular h3 { color: var(--naranja); }
+  .card.bien h3 { color: var(--verde); }
+
+  footer {
+    margin-top: 30px;
+    padding-top: 10px;
+    border-top: 1px solid var(--borde);
+    color: var(--gris);
+    font-size: 11px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  @media print {
+    body { padding: 0; font-size: 12px; }
+    .grid { gap: 10px; }
+    h2 { page-break-after: avoid; }
+    .card, .alerta, table { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Informe Técnico — vetlain.cl</h1>
+    <div class="sub">Auditoría previa al rediseño &nbsp;·&nbsp; 10 de julio de 2026 &nbsp;·&nbsp; Página analizada: /productos</div>
+  </div>
+  <div class="nota-global">
+    <div class="num">3<span style="font-size:16px; color:var(--gris);">/10</span></div>
+    <div class="lbl">Nota global</div>
+  </div>
+</header>
+
+<div class="alerta">
+  <h2>⚠ Hallazgo crítico: la portada no está caída, está hackeada</h2>
+  <p><code>www.vetlain.cl</code> y <code>vetlain.cl</code> responden un redirect <strong>301 hacia <code>fkworld.in/ftx</code></strong>, un dominio ajeno asociado a spam. El redirect lo emite Apache <em>antes</em> de que cargue WordPress (sin header PHP, charset <code>iso-8859-1</code>), lo que apunta a <strong>reglas maliciosas inyectadas en el <code>.htaccess</code></strong> de la raíz del hosting. Solo afecta a la portada: las páginas internas (/productos, /servicios, /contacto) funcionan con normalidad y el DNS y el certificado SSL están sanos.</p>
+  <p><strong>Riesgo:</strong> Google puede marcar el dominio como engañoso y hundir el posicionamiento antes de que el rediseño vea la luz.</p>
+</div>
+
+<h2>Qué revisar primero (en este orden)</h2>
+<ol class="prioridades">
+  <li class="critico"><div><strong>Limpiar el .htaccess de la raíz del hosting</strong><span class="detalle">Entrar por FTP/cPanel, eliminar las reglas de redirección a fkworld.in y revisar si hay archivos index sustituidos o PHP desconocidos en la raíz.</span></div></li>
+  <li class="critico"><div><strong>Escanear malware en todo el sitio</strong><span class="detalle">Wordfence o Sucuri sobre WordPress completo: temas, plugins y uploads. El listado de directorios abierto en /wp-content/uploads/ facilita que se alojen archivos maliciosos.</span></div></li>
+  <li class="critico"><div><strong>Cambiar todas las credenciales</strong><span class="detalle">Hosting/cPanel, FTP, usuarios administradores de WordPress y contraseña de la base de datos. Revisar si existen usuarios admin desconocidos.</span></div></li>
+  <li><div><strong>Revisar Google Search Console</strong><span class="detalle">Verificar acciones manuales o avisos de "sitio engañoso" y solicitar revisión tras la limpieza.</span></div></li>
+  <li><div><strong>Evaluar cambio de hosting</strong><span class="detalle">El actual sirve HTTP/1.1 sin compresión, con TTFB de 3,3 s, PHP 8.1 envejecido y listado de directorios habilitado. Un hosting moderno resuelve la mitad de los problemas de rendimiento sin tocar código.</span></div></li>
+  <li><div><strong>Recién entonces, iniciar el rediseño</strong><span class="detalle">Rediseñar sobre un sitio comprometido significa heredar la infección. Limpiar primero, migrar después.</span></div></li>
+</ol>
+
+<h2>Puntuación por área</h2>
+<table>
+  <tr><th>Área</th><th style="width:90px;">Nota</th><th>Justificación</th></tr>
+  <tr><td class="et">Seguridad</td><td><span class="badge b-rojo">1 / 10</span></td><td>Sitio activamente comprometido; sin ningún header de seguridad; listado de directorios abierto; versiones expuestas.</td></tr>
+  <tr><td class="et">Rendimiento</td><td><span class="badge b-rojo">2 / 10</span></td><td>6,5 MB en 127 recursos, TTFB de 3,3 s, sin gzip/brotli, sin HTTP/2, imágenes PNG sin optimizar.</td></tr>
+  <tr><td class="et">SEO técnico</td><td><span class="badge b-naranja">5 / 10</span></td><td>Buena base (Yoast, canonical, sitemap, Open Graph), pero tres &lt;h1&gt; por página y portada redirigiendo a spam.</td></tr>
+  <tr><td class="et">Contenido y estructura</td><td><span class="badge b-verde">6 / 10</span></td><td>Catálogo ordenado: 17 productos en 3 categorías con descripciones y datos de contacto completos. Sitio mínimo (4 páginas).</td></tr>
+  <tr><td class="et">Stack y mantenibilidad</td><td><span class="badge b-naranja">5 / 10</span></td><td>WordPress 7.0.1 y Elementor 4.1.4 al día, pero PHP 8.1 sin soporte activo y hosting descuidado.</td></tr>
+</table>
+
+<h2>Ficha técnica</h2>
+<table>
+  <tr><td class="et">CMS</td><td>WordPress 7.0.1 (versión expuesta en meta generator)</td></tr>
+  <tr><td class="et">Constructor / Tema</td><td>Elementor 4.1.4 + Elementor Pro · Tema Astra</td></tr>
+  <tr><td class="et">Plugins detectados</td><td>Yoast SEO, Site Kit by Google 1.182, jQuery 3.7.1 + jQuery Migrate</td></tr>
+  <tr><td class="et">Servidor</td><td>Apache · PHP 8.1.33 · HTTP/1.1 · sin compresión gzip/brotli</td></tr>
+  <tr><td class="et">DNS / IP</td><td>vetlain.cl → 138.117.148.159 (www es alias del mismo host)</td></tr>
+  <tr><td class="et">Certificado SSL</td><td>Let's Encrypt wildcard *.vetlain.cl, válido hasta el 12-sep-2026</td></tr>
+  <tr><td class="et">Peso de página</td><td>≈ 6,5 MB · 127 recursos · 28 scripts · 24 hojas de estilo</td></tr>
+  <tr><td class="et">Imágenes</td><td>27 JPG + 20 PNG (solo 2 WebP) · PNGs de hasta 320 KB · 19 con lazy loading</td></tr>
+  <tr><td class="et">TTFB</td><td>3,3 segundos (aceptable: &lt; 0,8 s)</td></tr>
+  <tr><td class="et">Páginas del sitio</td><td>4 según sitemap: inicio, productos, servicios, contacto</td></tr>
+</table>
+
+<h2>Resumen de hallazgos</h2>
+<div class="grid">
+  <div class="card mal">
+    <h3>✗ Crítico</h3>
+    <ul>
+      <li>Redirect malicioso 301 en la portada hacia fkworld.in/ftx</li>
+      <li>Cero headers de seguridad (HSTS, CSP, X-Frame-Options…)</li>
+      <li>Listado de directorios abierto en /wp-content/uploads/</li>
+      <li>TTFB de 3,3 s y página de 6,5 MB sin compresión</li>
+    </ul>
+  </div>
+  <div class="card regular">
+    <h3>△ A corregir en el rediseño</h3>
+    <ul>
+      <li>Tres &lt;h1&gt; por página (deberían ser &lt;h2&gt; bajo un único h1)</li>
+      <li>Imágenes PNG pesadas: migrar a WebP/AVIF</li>
+      <li>HTTP/1.1 sin CDN: activar HTTP/2 o CDN (p. ej. Cloudflare)</li>
+      <li>PHP 8.1 sin soporte activo: actualizar a 8.3+</li>
+      <li>Ocultar versiones de WordPress/plugins y proteger wp-login</li>
+    </ul>
+  </div>
+  <div class="card bien">
+    <h3>✓ Base rescatable</h3>
+    <ul>
+      <li>Catálogo completo: 17 productos con descripciones y dimensiones</li>
+      <li>SEO on-page razonable: canonical, meta description, OG, sitemap</li>
+      <li>WordPress y Elementor actualizados</li>
+      <li>SSL válido y DNS correcto</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>Datos del negocio (verificados en el sitio)</h3>
+    <ul>
+      <li>Rubro: control de plagas (roedores, insectos, aves)</li>
+      <li>Dirección: Juana Canales 987, Talagante</li>
+      <li>Teléfonos: +56 2 2815 3975 · +56 9 6830 2857</li>
+      <li>Correo: vetlain@vetlain.cl · Facebook e Instagram</li>
+    </ul>
+  </div>
+</div>
+
+<footer>
+  <span>Informe generado a partir de mediciones directas (HTTP, DNS, SSL, análisis de HTML) el 10-jul-2026.</span>
+  <span>vetlain.cl · auditoría pre-rediseño</span>
+</footer>
+
+</body>
+</html>

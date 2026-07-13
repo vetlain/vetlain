@@ -1,0 +1,19 @@
+node_modules
+dist
+dist-ssr
+*.local
+.vercel
+*.tsbuildinfo
+
+# Claude Code local settings (permisos + hooks con rutas absolutas, no portable)
+.claude/settings.local.json
+
+# editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

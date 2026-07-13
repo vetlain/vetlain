@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Segoe UI', -apple-system, Arial, sans-serif;
+}
+
+/* ── Prototipo 1 · Confianza Corporativa (ui-ux-pro-max) ─────────── */
+.p1 {
+  font-family: 'Source Sans 3', -apple-system, system-ui, sans-serif;
+}
+.p1-display {
+  font-family: 'Lexend', 'Source Sans 3', system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+@keyframes p1-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.p1-rise {
+  animation: p1-rise 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .p1-rise {
+    animation: none;
+  }
+}
+
+/* ── Prototipo 2 · Catálogo técnico ──────────────────────────────── */
+.p2 {
+  font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+}
+.p2-mono {
+  font-family: 'Martian Mono', ui-monospace, 'SFMono-Regular', monospace;
+}
+
+@keyframes p2-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.p2-row {
+  animation: p2-row-in 460ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .p2-row {
+    animation: none;
+  }
+}
+
+/* ── Prototipo 3 · Terreno Rápido (hazard / angular) ─────────────── */
+.p3 {
+  font-family: 'Barlow', ui-sans-serif, system-ui, sans-serif;
+}
+.p3-display {
+  font-family: 'Anton', 'Barlow', system-ui, sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+/* Cinta de precaución diagonal (negro/amarillo) */
+.p3-tape {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    #f7c600 0,
+    #f7c600 18px,
+    #0c0c0c 18px,
+    #0c0c0c 36px
+  );
+}
+/* Cortes angulares reutilizables */
+.p3-clip-tag {
+  clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+}
+.p3-clip-slash {
+  clip-path: polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
+}
+
+@keyframes p3-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.p3-rise {
+  animation: p3-rise 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .p3-rise {
+    animation: none;
+  }
+}
