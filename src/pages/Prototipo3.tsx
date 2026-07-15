@@ -112,7 +112,7 @@ function WhatsappBtn({ className = '', children }: { className?: string; childre
       href={WHATSAPP}
       target="_blank"
       rel="noopener noreferrer"
-      className={`inline-flex items-center justify-center gap-2 bg-hazard-red px-6 py-3.5 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-hazard-red-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-hazard-yellow ${className}`}
+      className={`inline-flex items-center justify-center gap-2 bg-vetlain-green-dark px-6 py-3.5 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-vetlain-green-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vetlain-green ${className}`}
     >
       <WhatsappGlyph className="h-5 w-5" />
       {children}
@@ -124,7 +124,7 @@ function WhatsappBtn({ className = '', children }: { className?: string; childre
 
 function Header() {
   return (
-    <header className="sticky top-0 z-40 border-b-2 border-hazard-yellow bg-hazard-black">
+    <header className="sticky top-0 z-40 border-b-2 border-vetlain-green bg-vetlain-ink">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3">
         <a href="#top" className="flex items-center" aria-label="Vetlain, inicio">
           <img src={A + 'brand/logo-recortado.png'} alt="Vetlain" className="h-9 w-auto brightness-0 invert" width={327} height={107} />
@@ -132,7 +132,7 @@ function Header() {
         <div className="flex items-center gap-2">
           <a
             href={TEL_MOVIL}
-            className="hidden items-center gap-2 border-2 border-white px-4 py-2 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-white hover:text-hazard-black sm:inline-flex"
+            className="hidden items-center gap-2 border-2 border-white px-4 py-2 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-white hover:text-vetlain-ink sm:inline-flex"
           >
             <PhoneGlyph className="h-4 w-4" />
             Llamar
@@ -148,15 +148,15 @@ function Header() {
 
 function Hero() {
   return (
-    <section id="top" className="relative overflow-hidden bg-hazard-black">
+    <section id="top" className="relative overflow-hidden bg-vetlain-ink">
       <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-14 sm:py-20 md:grid-cols-[1.1fr_0.9fr] lg:gap-14">
         <div className="p3-rise">
-          <span className="p3-clip-slash inline-block bg-hazard-yellow px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-hazard-black">
+          <span className="p3-clip-slash inline-block bg-vetlain-green-tint px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-vetlain-green-deep">
             Control de plagas · Talagante
           </span>
           <h1 className="p3-display mt-5 text-[clamp(2.8rem,9vw,5.5rem)] uppercase leading-[0.92] text-white">
             Plagas fuera.{' '}
-            <span className="text-hazard-yellow">rápido y en serio.</span>
+            <span className="text-vetlain-green">rápido y en serio.</span>
           </h1>
           <p className="mt-5 max-w-lg text-base leading-relaxed text-neutral-300 sm:text-lg">
             Ratas, insectos y aves fuera de tu casa o negocio. Evaluación en
@@ -166,21 +166,21 @@ function Hero() {
             <WhatsappBtn className="px-6 py-4 text-base">Escríbenos por WhatsApp</WhatsappBtn>
             <a
               href={TEL_MOVIL}
-              className="inline-flex items-center justify-center gap-2 border-2 border-white px-6 py-4 text-base font-bold uppercase tracking-wide text-white transition-colors hover:bg-hazard-yellow hover:border-hazard-yellow hover:text-hazard-black"
+              className="inline-flex items-center justify-center gap-2 border-2 border-white px-6 py-4 text-base font-bold uppercase tracking-wide text-white transition-colors hover:bg-white hover:text-vetlain-ink"
             >
               <PhoneGlyph className="h-5 w-5" />
               Llamar ahora
             </a>
           </div>
-          <p className="mt-5 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-hazard-yellow">
-            <ShieldGlyph className="h-4 w-4" />
+          <p className="mt-5 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-neutral-200">
+            <ShieldGlyph className="h-4 w-4 text-vetlain-green" />
             Sin costo de visita · cotización al toque
           </p>
         </div>
 
         {/* Angular photo */}
         <div className="relative p3-rise" style={{ animationDelay: '120ms' }}>
-          <div className="absolute inset-0 translate-x-3 translate-y-3 bg-hazard-yellow" aria-hidden="true" />
+          <div className="absolute inset-0 translate-x-3 translate-y-3 bg-vetlain-green" aria-hidden="true" />
           <div
             className="relative border-2 border-white"
             style={{ clipPath: 'polygon(0 0, 100% 0, 100% 92%, 0 100%)' }}
@@ -192,9 +192,9 @@ function Hero() {
               width={976}
               height={720}
             />
-            <div className="absolute inset-0 bg-hazard-black/25" aria-hidden="true" />
+            <div className="absolute inset-0 bg-vetlain-ink/25" aria-hidden="true" />
           </div>
-          <span className="absolute bottom-4 left-0 -translate-x-2 bg-hazard-red px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-white">
+          <span className="absolute bottom-4 left-0 -translate-x-2 bg-vetlain-green-dark px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-white">
             Respuesta el mismo día
           </span>
         </div>
@@ -208,11 +208,11 @@ function Hero() {
 
 function Trust() {
   return (
-    <section className="bg-hazard-ink">
+    <section className="bg-vetlain-ink-soft">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-8 gap-y-3 px-5 py-5 sm:justify-between">
         {trust.map((t) => (
           <span key={t} className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-neutral-200 sm:text-sm">
-            <CheckGlyph className="h-4 w-4 text-hazard-yellow" />
+            <CheckGlyph className="h-4 w-4 text-vetlain-green" />
             {t}
           </span>
         ))}
@@ -225,13 +225,13 @@ function Trust() {
 
 function Services() {
   return (
-    <section id="servicios" className="scroll-mt-20 bg-hazard-black">
+    <section id="servicios" className="scroll-mt-20 bg-vetlain-ink">
       <div className="mx-auto max-w-6xl px-5 py-16 sm:py-20">
         <div className="flex items-end justify-between gap-6">
           <h2 className="p3-display text-[clamp(2rem,5vw,3.25rem)] uppercase leading-none text-white">
-            Qué <span className="text-hazard-red">eliminamos</span>
+            Qué <span className="text-vetlain-green">eliminamos</span>
           </h2>
-          <span className="hidden text-sm font-bold uppercase tracking-wide text-neutral-500 sm:block">
+          <span className="hidden text-sm font-bold uppercase tracking-wide text-neutral-400 sm:block">
             06 servicios
           </span>
         </div>
@@ -240,9 +240,9 @@ function Services() {
           {servicios.map(({ glyph: G, title, desc }) => (
             <div
               key={title}
-              className="group border-2 border-neutral-800 bg-hazard-ink p-6 transition-colors hover:border-hazard-yellow"
+              className="group border-2 border-neutral-700 bg-vetlain-ink-soft p-6 transition-colors hover:border-vetlain-green"
             >
-              <div className="flex h-12 w-12 items-center justify-center bg-hazard-yellow text-hazard-black">
+              <div className="flex h-12 w-12 items-center justify-center bg-vetlain-green text-white">
                 <G className="h-6 w-6" />
               </div>
               <h3 className="p3-display mt-5 text-xl uppercase text-white">{title}</h3>
@@ -259,15 +259,15 @@ function Services() {
 
 function Steps() {
   return (
-    <section className="bg-hazard-ink">
+    <section className="bg-vetlain-ink-soft">
       <div className="mx-auto max-w-6xl px-5 py-16 sm:py-20">
         <h2 className="p3-display text-[clamp(2rem,5vw,3.25rem)] uppercase leading-none text-white">
-          Cómo <span className="text-hazard-yellow">trabajamos</span>
+          Cómo <span className="text-vetlain-green">trabajamos</span>
         </h2>
         <div className="mt-10 grid gap-6 md:grid-cols-3">
           {pasos.map((p) => (
             <div key={p.n} className="border-t-2 border-neutral-700 pt-5">
-              <span className="p3-clip-tag inline-block bg-hazard-red px-4 py-2 font-bold text-white">
+              <span className="p3-clip-tag inline-block bg-vetlain-green-dark px-4 py-2 font-bold text-white">
                 <span className="p3-display text-2xl">{p.n}</span>
               </span>
               <h3 className="p3-display mt-4 text-xl uppercase text-white">{p.title}</h3>
@@ -284,7 +284,7 @@ function Steps() {
 
 function Urgency() {
   return (
-    <section className="bg-hazard-red">
+    <section className="bg-vetlain-green-dark">
       <Tape />
       <div className="mx-auto flex max-w-6xl flex-col items-start gap-6 px-5 py-14 md:flex-row md:items-center md:justify-between">
         <div>
@@ -300,7 +300,7 @@ function Urgency() {
           href={WHATSAPP}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex shrink-0 items-center justify-center gap-2 bg-hazard-black px-7 py-4 text-base font-bold uppercase tracking-wide text-white transition-colors hover:bg-hazard-yellow hover:text-hazard-black"
+          className="inline-flex shrink-0 items-center justify-center gap-2 bg-vetlain-ink px-7 py-4 text-base font-bold uppercase tracking-wide text-white transition-colors hover:bg-white hover:text-vetlain-ink"
         >
           <WhatsappGlyph className="h-5 w-5" />
           Escríbenos ahora
@@ -314,7 +314,7 @@ function Urgency() {
 /* ── Contact ──────────────────────────────────────────────────────── */
 
 const inputClass =
-  'w-full border-2 border-neutral-700 bg-hazard-ink px-3.5 py-2.5 text-sm text-white placeholder:text-neutral-500 transition-colors focus:border-hazard-yellow focus:outline-none'
+  'w-full border-2 border-neutral-600 bg-vetlain-ink px-3.5 py-2.5 text-sm text-white placeholder:text-neutral-400 transition-colors focus:border-vetlain-green focus:outline-none'
 
 function Contact() {
   const [sent, setSent] = useState(false)
@@ -323,11 +323,11 @@ function Contact() {
     setSent(true)
   }
   return (
-    <section id="contacto" className="scroll-mt-20 bg-hazard-black">
+    <section id="contacto" className="scroll-mt-20 bg-vetlain-ink">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 sm:py-20 md:grid-cols-2 lg:gap-14">
         <div>
           <h2 className="p3-display text-[clamp(2rem,5vw,3.25rem)] uppercase leading-none text-white">
-            Contáctanos<br /><span className="text-hazard-yellow">ahora</span>
+            Contáctanos<br /><span className="text-vetlain-green">ahora</span>
           </h2>
           <p className="mt-5 max-w-md text-neutral-300">
             La forma más rápida es WhatsApp o teléfono. También puedes dejarnos
@@ -338,7 +338,7 @@ function Contact() {
             <WhatsappBtn className="px-6 py-4 text-base">Escríbenos por WhatsApp</WhatsappBtn>
             <a
               href={TEL_MOVIL}
-              className="inline-flex items-center justify-center gap-2 border-2 border-white px-6 py-4 text-base font-bold uppercase tracking-wide text-white transition-colors hover:bg-hazard-yellow hover:border-hazard-yellow hover:text-hazard-black"
+              className="inline-flex items-center justify-center gap-2 border-2 border-white px-6 py-4 text-base font-bold uppercase tracking-wide text-white transition-colors hover:bg-white hover:text-vetlain-ink"
             >
               <PhoneGlyph className="h-5 w-5" />
               +56 9 6830 2857
@@ -352,10 +352,10 @@ function Contact() {
           </ul>
         </div>
 
-        <div className="border-2 border-neutral-800 bg-hazard-ink p-6 sm:p-8">
+        <div className="border-2 border-neutral-700 bg-vetlain-ink-soft p-6 sm:p-8">
           {sent ? (
             <div className="flex h-full flex-col items-start justify-center py-6">
-              <span className="flex h-12 w-12 items-center justify-center bg-hazard-yellow text-hazard-black">
+              <span className="flex h-12 w-12 items-center justify-center bg-vetlain-green text-white">
                 <CheckGlyph className="h-6 w-6" />
               </span>
               <h3 className="p3-display mt-4 text-2xl uppercase text-white">¡Recibido!</h3>
@@ -363,7 +363,7 @@ function Contact() {
                 Gracias. Te contactamos a la brevedad. Si es urgente, escríbenos
                 directo por WhatsApp.
               </p>
-              <button type="button" onClick={() => setSent(false)} className="mt-6 text-sm font-bold uppercase tracking-wide text-hazard-yellow hover:underline">
+              <button type="button" onClick={() => setSent(false)} className="mt-6 text-sm font-bold uppercase tracking-wide text-vetlain-green-tint hover:underline">
                 Enviar otro
               </button>
             </div>
@@ -389,7 +389,7 @@ function Contact() {
               </label>
               <button
                 type="submit"
-                className="inline-flex w-full items-center justify-center gap-2 bg-hazard-red px-6 py-4 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-hazard-red-dark"
+                className="inline-flex w-full items-center justify-center gap-2 bg-vetlain-green-dark px-6 py-4 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-vetlain-green-deep"
               >
                 Quiero que me llamen
                 <ArrowGlyph className="h-4 w-4" />
@@ -406,12 +406,12 @@ function Contact() {
 
 function Footer() {
   return (
-    <footer className="bg-hazard-black">
+    <footer className="bg-vetlain-ink">
       <Tape />
       <div className="mx-auto flex max-w-6xl flex-col gap-6 px-5 py-10 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <img src={A + 'brand/logo-recortado.png'} alt="Vetlain" className="h-9 w-auto brightness-0 invert" width={327} height={107} />
-          <p className="mt-3 max-w-xs text-sm text-neutral-500">
+          <p className="mt-3 max-w-xs text-sm text-neutral-400">
             Control y mantención ambiental · Talagante y alrededores.
           </p>
         </div>
@@ -424,9 +424,9 @@ function Footer() {
         </div>
       </div>
       <div className="border-t border-neutral-800">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 text-xs uppercase tracking-wide text-neutral-500">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 text-xs uppercase tracking-wide text-neutral-400">
           <span>© {new Date().getFullYear()} Vetlain</span>
-          <Link to="/" className="font-bold transition-colors hover:text-hazard-yellow">← Panel</Link>
+          <Link to="/" className="font-bold transition-colors hover:text-vetlain-green-tint">← Panel</Link>
         </div>
       </div>
     </footer>
@@ -437,12 +437,12 @@ function Footer() {
 
 function StickyCta() {
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-2 border-t-2 border-hazard-yellow md:hidden">
-      <a href={TEL_MOVIL} className="flex items-center justify-center gap-2 bg-hazard-black py-3.5 text-sm font-bold uppercase tracking-wide text-white">
+    <div className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-2 border-t-2 border-vetlain-green md:hidden">
+      <a href={TEL_MOVIL} className="flex items-center justify-center gap-2 bg-vetlain-ink py-3.5 text-sm font-bold uppercase tracking-wide text-white">
         <PhoneGlyph className="h-5 w-5" />
         Llamar
       </a>
-      <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 bg-hazard-red py-3.5 text-sm font-bold uppercase tracking-wide text-white">
+      <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 bg-vetlain-green-dark py-3.5 text-sm font-bold uppercase tracking-wide text-white">
         <WhatsappGlyph className="h-5 w-5" />
         WhatsApp
       </a>
@@ -454,7 +454,7 @@ function StickyCta() {
 
 export default function Prototipo3() {
   return (
-    <div className="p3 min-h-screen bg-hazard-black text-white">
+    <div className="p3 min-h-screen bg-vetlain-ink text-white">
       <Header />
       <main className="pb-14 md:pb-0">
         <Hero />

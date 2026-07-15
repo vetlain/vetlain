@@ -1,6 +1,7 @@
 # Prototipo 3 — Terreno Rápido · DESIGN.md
 
-**Landing de conversión rápida, estética de señalética de peligro.** Para
+**Landing de conversión rápida, estética angular de señalética** (ahora en
+verde/carbón, la colorimetría real de la marca). Para
 clientes residenciales y pymes que tienen una plaga *ahora* y quieren
 resolverla ya. Mobile-first, urgencia, CTA de WhatsApp/llamada omnipresente.
 
@@ -11,31 +12,37 @@ resolverla ya. Mobile-first, urgencia, CTA de WhatsApp/llamada omnipresente.
 
 ---
 
-## Paleta — colorimetría clásica de control de plagas (hazard)
+## Paleta — colorimetría del Prototipo 2 (verde + carbón, identidad real)
 
-Negro + rojo + amarillo: el código cromático de la señalética de peligro y las
-cintas de precaución. Tokens propios en `tailwind.config.js` (grupo `hazard`),
-distintos de P1 (azul) y P2 (verde/carbón).
+> **Decisión del cliente (jul 2026):** conservar el formato de P3 pero con la
+> colorimetría de P2. La paleta hazard original (negro/rojo/amarillo) quedó
+> registrada en el historial de git. Los tokens son los del grupo `vetlain.*`
+> compartido con P2; los roles se mapean así sobre la estructura angular:
 
 | Rol | Token | Hex | Uso |
 |-----|-------|-----|-----|
-| Negro base | `hazard-black` | `#0c0c0c` | Fondo dominante. |
-| Negro superficie | `hazard-ink` | `#171717` | Tarjetas/superficies. |
-| Rojo peligro | `hazard-red` | `#e11414` | CTAs, acción, urgencia. Texto blanco encima (≈4.6:1). |
-| Rojo oscuro | `hazard-red-dark` | `#a10f0f` | Hover de CTA. |
-| Amarillo caución | `hazard-yellow` | `#f7c600` | Acentos, cintas, highlights. **Texto negro encima.** |
-| Amarillo brillante | `hazard-yellow-bright` | `#ffd21a` | Realces puntuales. |
-| Texto claro | `neutral-100/300` | — | Cuerpo sobre negro. |
+| Carbón base | `vetlain-ink` | `#1a1a1a` | Fondo dominante (reemplaza al negro hazard). |
+| Carbón superficie | `vetlain-ink-soft` | `#2e2e2e` | Tarjetas/superficies, con borde `neutral-700`. |
+| Verde acción | `vetlain-green-dark` | `#2c6a31` | CTAs y banda de urgencia. Texto blanco encima (5.4:1). |
+| Verde acción hover | `vetlain-green-deep` | `#1e4d24` | Hover de CTA. |
+| Verde marca | `vetlain-green` | `#3d8b40` | Acentos display grandes, cintas, glifos, bordes activos. **No** para texto pequeño sobre carbón (4.1:1, solo ≥3:1). |
+| Verde tinte | `vetlain-green-tint` | `#eef4ec` | Chips claros (texto `green-deep`, 8.8:1) y links de acento pequeños sobre carbón. |
+| Texto claro | `neutral-100/300/400` | — | Cuerpo sobre carbón (piso: `neutral-400`). |
 
-**Contraste:** amarillo SIEMPRE con texto negro; rojo con texto blanco;
-cuerpo en gris claro sobre negro. Nunca amarillo sobre blanco.
+**Contraste:** CTAs siempre en `green-dark` con texto blanco (regla del P2);
+`vetlain-green` solo en display grande, iconos o decoración sobre carbón;
+texto pequeño de acento en `green-tint`; cuerpo en gris claro (mínimo
+`neutral-400`) sobre carbón.
+
+**Motivo cinta:** la cinta diagonal pasa de negro/amarillo a
+**verde `#3d8b40` / carbón `#1a1a1a`** (`.p3-tape`).
 
 ## Estética angular (regla dura)
 
 - **Cero border-radius.** Nada de `rounded-*`. Esquinas rectas siempre.
 - Cortes en ángulo con `clip-path` (tags, chevrons, badges, bordes de sección).
 - Bordes sólidos gruesos (2–4px).
-- **Motivo hazard:** cinta diagonal negro/amarillo
+- **Motivo cinta:** cinta diagonal verde/carbón
   (`repeating-linear-gradient(45deg, …)`) como divisores y acentos.
 
 ## Tipografía
@@ -71,6 +78,6 @@ cuerpo en gris claro sobre negro. Nunca amarillo sobre blanco.
 ## Anti-patrones (prohibido)
 
 - Cualquier `rounded-*` o esquina redondeada.
-- Reusar azul (P1) o verde (P2).
-- Amarillo como texto sobre fondo claro (falla contraste).
+- Reusar el azul (P1) o la paleta hazard original (negro/rojo/amarillo).
+- `vetlain-green` como texto pequeño sobre carbón o sobre blanco (falla contraste).
 - Gradient text, glassmorphism, side-stripe borders (usar borde completo o cinta).

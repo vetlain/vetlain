@@ -14,14 +14,17 @@ distintas y competidoras. Por eso cada uno tiene su archivo de diseño:
 |-----------|------|-----------|-----------|
 | 1 · Confianza Corporativa | `/prototipo-1` | _(sin doc formal)_ | Azul corporativo B2B |
 | 2 · Sitio Vetlain (identidad real) | `/prototipo-2` | [`prototipo-2.design.md`](./prototipo-2.design.md) | Verde + carbón (marca real) |
-| 3 · Terreno Rápido | `/prototipo-3` | [`prototipo-3.design.md`](./prototipo-3.design.md) | **Por definir — debe ser distinta** |
+| 3 · Terreno Rápido | `/prototipo-3` | [`prototipo-3.design.md`](./prototipo-3.design.md) | Angular, verde + carbón (formato P3 + colorimetría P2, pedido del cliente) |
 
 ### Reglas de la convención
 
 1. **Antes de construir un prototipo, se define/lee su `*.design.md`.**
    El documento fija paleta, tipografía y componentes ANTES de escribir UI.
-2. **Ninguna paleta se repite entre prototipos.** El prototipo 3 no puede
-   usar el azul del 1 ni el verde del 2; elige su propio sistema cromático.
+2. **Ninguna paleta se repite entre prototipos** (regla original de la fase
+   de exploración). *Excepción posterior:* tras revisar los 3 demos, el
+   cliente pidió el formato de P3 con la colorimetría de P2, así que P3 hoy
+   comparte los tokens verdes/carbón de P2 (la paleta hazard original quedó
+   en el historial de git).
 3. **Los tokens viven en `tailwind.config.js` con prefijo/comentario por
    prototipo**, para que no se mezclen (`vetlain.blue*` = P1, `vetlain.green*`
    / `vetlain.ink` = P2, etc.).

@@ -61,7 +61,7 @@ body {
   }
 }
 
-/* ── Prototipo 3 · Terreno Rápido (hazard / angular) ─────────────── */
+/* ── Prototipo 3 · Terreno Rápido (angular, verde/carbón) ────────── */
 .p3 {
   font-family: 'Barlow', ui-sans-serif, system-ui, sans-serif;
 }
@@ -70,14 +70,14 @@ body {
   font-weight: 400;
   letter-spacing: 0.01em;
 }
-/* Cinta de precaución diagonal (negro/amarillo) */
+/* Cinta diagonal de marca (verde/carbón — colorimetría P2, pedido del cliente) */
 .p3-tape {
   background-image: repeating-linear-gradient(
     -45deg,
-    #f7c600 0,
-    #f7c600 18px,
-    #0c0c0c 18px,
-    #0c0c0c 36px
+    #3d8b40 0,
+    #3d8b40 18px,
+    #1a1a1a 18px,
+    #1a1a1a 36px
   );
 }
 /* Cortes angulares reutilizables */

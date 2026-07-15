@@ -14,7 +14,7 @@ const prototipos = [
   {
     to: '/prototipo-3',
     title: 'Prototipo 3',
-    desc: 'Terreno Rápido — hazard negro/rojo/amarillo, angular',
+    desc: 'Terreno Rápido — angular, verde/carbón (formato P3 + colorimetría P2)',
   },
 ]
 
