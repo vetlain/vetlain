@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import type { FormEvent, ReactNode, SVGProps } from 'react'
 
 const WHATSAPP = 'https://wa.me/56968302857'
@@ -124,15 +123,15 @@ function WhatsappBtn({ className = '', children }: { className?: string; childre
 
 function Header() {
   return (
-    <header className="sticky top-0 z-40 border-b-2 border-vetlain-green bg-vetlain-ink">
+    <header className="sticky top-0 z-40 border-b-2 border-vetlain-green bg-white">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3">
         <a href="#top" className="flex items-center" aria-label="Vetlain, inicio">
-          <img src={A + 'brand/logo-recortado.png'} alt="Vetlain" className="h-9 w-auto brightness-0 invert" width={327} height={107} />
+          <img src={A + 'brand/logo-recortado.png'} alt="Vetlain" className="h-9 w-auto" width={327} height={107} />
         </a>
         <div className="flex items-center gap-2">
           <a
             href={TEL_MOVIL}
-            className="hidden items-center gap-2 border-2 border-white px-4 py-2 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-white hover:text-vetlain-ink sm:inline-flex"
+            className="hidden items-center gap-2 border-2 border-vetlain-ink px-4 py-2 text-sm font-bold uppercase tracking-wide text-vetlain-ink transition-colors hover:bg-vetlain-ink hover:text-white sm:inline-flex"
           >
             <PhoneGlyph className="h-4 w-4" />
             Llamar
@@ -148,17 +147,17 @@ function Header() {
 
 function Hero() {
   return (
-    <section id="top" className="relative overflow-hidden bg-vetlain-ink">
+    <section id="top" className="relative overflow-hidden bg-white">
       <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-14 sm:py-20 md:grid-cols-[1.1fr_0.9fr] lg:gap-14">
         <div className="p3-rise">
           <span className="p3-clip-slash inline-block bg-vetlain-green-tint px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-vetlain-green-deep">
             Control de plagas · Talagante
           </span>
-          <h1 className="p3-display mt-5 text-[clamp(2.8rem,9vw,5.5rem)] uppercase leading-[0.92] text-white">
+          <h1 className="p3-display mt-5 text-[clamp(2.8rem,9vw,5.5rem)] uppercase leading-[0.92] text-vetlain-ink">
             Plagas fuera.{' '}
             <span className="text-vetlain-green">rápido y en serio.</span>
           </h1>
-          <p className="mt-5 max-w-lg text-base leading-relaxed text-neutral-300 sm:text-lg">
+          <p className="mt-5 max-w-lg text-base leading-relaxed text-neutral-600 sm:text-lg">
             Ratas, insectos y aves fuera de tu casa o negocio. Evaluación en
             terreno el mismo día, con garantía y certificación ISO 9001.
           </p>
@@ -166,13 +165,13 @@ function Hero() {
             <WhatsappBtn className="px-6 py-4 text-base">Escríbenos por WhatsApp</WhatsappBtn>
             <a
               href={TEL_MOVIL}
-              className="inline-flex items-center justify-center gap-2 border-2 border-white px-6 py-4 text-base font-bold uppercase tracking-wide text-white transition-colors hover:bg-white hover:text-vetlain-ink"
+              className="inline-flex items-center justify-center gap-2 border-2 border-vetlain-ink px-6 py-4 text-base font-bold uppercase tracking-wide text-vetlain-ink transition-colors hover:bg-vetlain-ink hover:text-white"
             >
               <PhoneGlyph className="h-5 w-5" />
               Llamar ahora
             </a>
           </div>
-          <p className="mt-5 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-neutral-200">
+          <p className="mt-5 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-vetlain-green-deep">
             <ShieldGlyph className="h-4 w-4 text-vetlain-green" />
             Sin costo de visita · cotización al toque
           </p>
@@ -182,7 +181,7 @@ function Hero() {
         <div className="relative p3-rise" style={{ animationDelay: '120ms' }}>
           <div className="absolute inset-0 translate-x-3 translate-y-3 bg-vetlain-green" aria-hidden="true" />
           <div
-            className="relative border-2 border-white"
+            className="relative border-2 border-vetlain-ink"
             style={{ clipPath: 'polygon(0 0, 100% 0, 100% 92%, 0 100%)' }}
           >
             <img
@@ -192,7 +191,6 @@ function Hero() {
               width={976}
               height={720}
             />
-            <div className="absolute inset-0 bg-vetlain-ink/25" aria-hidden="true" />
           </div>
           <span className="absolute bottom-4 left-0 -translate-x-2 bg-vetlain-green-dark px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-white">
             Respuesta el mismo día
@@ -208,11 +206,11 @@ function Hero() {
 
 function Trust() {
   return (
-    <section className="bg-vetlain-ink-soft">
+    <section className="bg-vetlain-green-tint">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-8 gap-y-3 px-5 py-5 sm:justify-between">
         {trust.map((t) => (
-          <span key={t} className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-neutral-200 sm:text-sm">
-            <CheckGlyph className="h-4 w-4 text-vetlain-green" />
+          <span key={t} className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-vetlain-ink sm:text-sm">
+            <CheckGlyph className="h-4 w-4 text-vetlain-green-dark" />
             {t}
           </span>
         ))}
@@ -225,13 +223,13 @@ function Trust() {
 
 function Services() {
   return (
-    <section id="servicios" className="scroll-mt-20 bg-vetlain-ink">
+    <section id="servicios" className="scroll-mt-20 bg-white">
       <div className="mx-auto max-w-6xl px-5 py-16 sm:py-20">
         <div className="flex items-end justify-between gap-6">
-          <h2 className="p3-display text-[clamp(2rem,5vw,3.25rem)] uppercase leading-none text-white">
+          <h2 className="p3-display text-[clamp(2rem,5vw,3.25rem)] uppercase leading-none text-vetlain-ink">
             Qué <span className="text-vetlain-green">eliminamos</span>
           </h2>
-          <span className="hidden text-sm font-bold uppercase tracking-wide text-neutral-400 sm:block">
+          <span className="hidden text-sm font-bold uppercase tracking-wide text-neutral-500 sm:block">
             06 servicios
           </span>
         </div>
@@ -240,13 +238,13 @@ function Services() {
           {servicios.map(({ glyph: G, title, desc }) => (
             <div
               key={title}
-              className="group border-2 border-neutral-700 bg-vetlain-ink-soft p-6 transition-colors hover:border-vetlain-green"
+              className="group border-2 border-neutral-200 bg-white p-6 transition-colors hover:border-vetlain-green"
             >
               <div className="flex h-12 w-12 items-center justify-center bg-vetlain-green text-white">
                 <G className="h-6 w-6" />
               </div>
-              <h3 className="p3-display mt-5 text-xl uppercase text-white">{title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-neutral-400">{desc}</p>
+              <h3 className="p3-display mt-5 text-xl uppercase text-vetlain-ink">{title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-neutral-600">{desc}</p>
             </div>
           ))}
         </div>
@@ -259,19 +257,19 @@ function Services() {
 
 function Steps() {
   return (
-    <section className="bg-vetlain-ink-soft">
+    <section className="bg-vetlain-green-tint">
       <div className="mx-auto max-w-6xl px-5 py-16 sm:py-20">
-        <h2 className="p3-display text-[clamp(2rem,5vw,3.25rem)] uppercase leading-none text-white">
+        <h2 className="p3-display text-[clamp(2rem,5vw,3.25rem)] uppercase leading-none text-vetlain-ink">
           Cómo <span className="text-vetlain-green">trabajamos</span>
         </h2>
         <div className="mt-10 grid gap-6 md:grid-cols-3">
           {pasos.map((p) => (
-            <div key={p.n} className="border-t-2 border-neutral-700 pt-5">
+            <div key={p.n} className="border-t-2 border-vetlain-green/40 pt-5">
               <span className="p3-clip-tag inline-block bg-vetlain-green-dark px-4 py-2 font-bold text-white">
                 <span className="p3-display text-2xl">{p.n}</span>
               </span>
-              <h3 className="p3-display mt-4 text-xl uppercase text-white">{p.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-neutral-400">{p.desc}</p>
+              <h3 className="p3-display mt-4 text-xl uppercase text-vetlain-ink">{p.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-neutral-600">{p.desc}</p>
             </div>
           ))}
         </div>
@@ -314,7 +312,7 @@ function Urgency() {
 /* ── Contact ──────────────────────────────────────────────────────── */
 
 const inputClass =
-  'w-full border-2 border-neutral-600 bg-vetlain-ink px-3.5 py-2.5 text-sm text-white placeholder:text-neutral-400 transition-colors focus:border-vetlain-green focus:outline-none'
+  'w-full border-2 border-neutral-300 bg-white px-3.5 py-2.5 text-sm text-vetlain-ink placeholder:text-neutral-400 transition-colors focus:border-vetlain-green focus:outline-none'
 
 function Contact() {
   const [sent, setSent] = useState(false)
@@ -323,13 +321,13 @@ function Contact() {
     setSent(true)
   }
   return (
-    <section id="contacto" className="scroll-mt-20 bg-vetlain-ink">
+    <section id="contacto" className="scroll-mt-20 bg-white">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 sm:py-20 md:grid-cols-2 lg:gap-14">
         <div>
-          <h2 className="p3-display text-[clamp(2rem,5vw,3.25rem)] uppercase leading-none text-white">
+          <h2 className="p3-display text-[clamp(2rem,5vw,3.25rem)] uppercase leading-none text-vetlain-ink">
             Contáctanos<br /><span className="text-vetlain-green">ahora</span>
           </h2>
-          <p className="mt-5 max-w-md text-neutral-300">
+          <p className="mt-5 max-w-md text-neutral-600">
             La forma más rápida es WhatsApp o teléfono. También puedes dejarnos
             tus datos y te llamamos.
           </p>
@@ -338,53 +336,53 @@ function Contact() {
             <WhatsappBtn className="px-6 py-4 text-base">Escríbenos por WhatsApp</WhatsappBtn>
             <a
               href={TEL_MOVIL}
-              className="inline-flex items-center justify-center gap-2 border-2 border-white px-6 py-4 text-base font-bold uppercase tracking-wide text-white transition-colors hover:bg-white hover:text-vetlain-ink"
+              className="inline-flex items-center justify-center gap-2 border-2 border-vetlain-ink px-6 py-4 text-base font-bold uppercase tracking-wide text-vetlain-ink transition-colors hover:bg-vetlain-ink hover:text-white"
             >
               <PhoneGlyph className="h-5 w-5" />
               +56 9 6830 2857
             </a>
           </div>
 
-          <ul className="mt-8 space-y-2 text-sm text-neutral-400">
+          <ul className="mt-8 space-y-2 text-sm text-neutral-600">
             <li>Juana Canales 987, Talagante</li>
             <li>Fijo: +56 2 2815 3975 · vetlain@vetlain.cl</li>
             <li>Lun a Vie · 09:00 – 18:00</li>
           </ul>
         </div>
 
-        <div className="border-2 border-neutral-700 bg-vetlain-ink-soft p-6 sm:p-8">
+        <div className="border-2 border-neutral-200 bg-white p-6 sm:p-8">
           {sent ? (
             <div className="flex h-full flex-col items-start justify-center py-6">
               <span className="flex h-12 w-12 items-center justify-center bg-vetlain-green text-white">
                 <CheckGlyph className="h-6 w-6" />
               </span>
-              <h3 className="p3-display mt-4 text-2xl uppercase text-white">¡Recibido!</h3>
-              <p className="mt-1 text-sm text-neutral-300">
+              <h3 className="p3-display mt-4 text-2xl uppercase text-vetlain-ink">¡Recibido!</h3>
+              <p className="mt-1 text-sm text-neutral-600">
                 Gracias. Te contactamos a la brevedad. Si es urgente, escríbenos
                 directo por WhatsApp.
               </p>
-              <button type="button" onClick={() => setSent(false)} className="mt-6 text-sm font-bold uppercase tracking-wide text-vetlain-green-tint hover:underline">
+              <button type="button" onClick={() => setSent(false)} className="mt-6 text-sm font-bold uppercase tracking-wide text-vetlain-green-dark hover:underline">
                 Enviar otro
               </button>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <label htmlFor="p3-nombre" className="block">
-                <span className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-neutral-400">Nombre</span>
+                <span className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-neutral-600">Nombre</span>
                 <input id="p3-nombre" name="nombre" type="text" required autoComplete="name" placeholder="Tu nombre" className={inputClass} />
               </label>
               <div className="grid gap-4 sm:grid-cols-2">
                 <label htmlFor="p3-tel" className="block">
-                  <span className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-neutral-400">Teléfono</span>
+                  <span className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-neutral-600">Teléfono</span>
                   <input id="p3-tel" name="telefono" type="tel" required autoComplete="tel" placeholder="+56 9 …" className={inputClass} />
                 </label>
                 <label htmlFor="p3-comuna" className="block">
-                  <span className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-neutral-400">Comuna</span>
+                  <span className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-neutral-600">Comuna</span>
                   <input id="p3-comuna" name="comuna" type="text" placeholder="Talagante…" className={inputClass} />
                 </label>
               </div>
               <label htmlFor="p3-msg" className="block">
-                <span className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-neutral-400">¿Qué viste?</span>
+                <span className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-neutral-600">¿Qué viste?</span>
                 <textarea id="p3-msg" name="mensaje" required rows={3} placeholder="Ratones en la cocina, cucarachas en la bodega…" className={`${inputClass} resize-none`} />
               </label>
               <button
@@ -424,9 +422,8 @@ function Footer() {
         </div>
       </div>
       <div className="border-t border-neutral-800">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 text-xs uppercase tracking-wide text-neutral-400">
+        <div className="mx-auto max-w-6xl px-5 py-4 text-xs uppercase tracking-wide text-neutral-400">
           <span>© {new Date().getFullYear()} Vetlain</span>
-          <Link to="/" className="font-bold transition-colors hover:text-vetlain-green-tint">← Panel</Link>
         </div>
       </div>
     </footer>
@@ -454,7 +451,7 @@ function StickyCta() {
 
 export default function Prototipo3() {
   return (
-    <div className="p3 min-h-screen bg-vetlain-ink text-white">
+    <div className="p3 min-h-screen bg-white text-vetlain-ink">
       <Header />
       <main className="pb-14 md:pb-0">
         <Hero />

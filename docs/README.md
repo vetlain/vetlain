@@ -1,8 +1,13 @@
 # Sistema de diseño — Prototipos Vetlain
 
-Este repositorio contiene **3 prototipos de rediseño independientes** para
-vetlain.cl (control de plagas / control y mantención ambiental, Talagante).
-Se acceden desde la vista raíz (`/`) mediante 3 botones.
+Este repositorio contiene **3 prototipos de rediseño** para vetlain.cl
+(control de plagas / control y mantención ambiental, Talagante).
+
+**Estado (jul 2026):** el cliente eligió el **Prototipo 3** (formato angular
++ colorimetría verde/carbón de P2 sobre blanco). La **URL raíz (`/`) ahora
+muestra el P3** directamente; P1 y P2 quedaron fuera de la navegación (siguen
+accesibles solo escribiendo `/#/prototipo-1` o `/#/prototipo-2`). El antiguo
+panel de selección (`Home.tsx`) ya no se rutea.
 
 ## Principio: cada prototipo es una identidad propia
 
@@ -14,7 +19,7 @@ distintas y competidoras. Por eso cada uno tiene su archivo de diseño:
 |-----------|------|-----------|-----------|
 | 1 · Confianza Corporativa | `/prototipo-1` | _(sin doc formal)_ | Azul corporativo B2B |
 | 2 · Sitio Vetlain (identidad real) | `/prototipo-2` | [`prototipo-2.design.md`](./prototipo-2.design.md) | Verde + carbón (marca real) |
-| 3 · Terreno Rápido | `/prototipo-3` | [`prototipo-3.design.md`](./prototipo-3.design.md) | Angular, verde + carbón (formato P3 + colorimetría P2, pedido del cliente) |
+| 3 · Terreno Rápido **(elegido, en `/`)** | `/` y `/prototipo-3` | [`prototipo-3.design.md`](./prototipo-3.design.md) | Angular, verde + carbón sobre blanco (formato P3 + colorimetría P2) |
 
 ### Reglas de la convención
 
