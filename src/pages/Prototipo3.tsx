@@ -1,22 +1,20 @@
 import { useState } from 'react'
 import type { FormEvent, ReactNode, SVGProps } from 'react'
+import {
+  A,
+  WHATSAPP,
+  TEL_MOVIL,
+  Glyph,
+  PhoneGlyph,
+  WhatsappGlyph,
+  Tape,
+  WhatsappBtn,
+  Header,
+  Footer,
+  StickyCta,
+} from '../site/chrome'
 
-const WHATSAPP = 'https://wa.me/56968302857'
-const TEL_MOVIL = 'tel:+56968302857'
-// Prefijo de assets públicos (respeta el `base` de Vite: / en dev, /vetlain/ en prod)
-const A = import.meta.env.BASE_URL
-
-/* ── Icons ────────────────────────────────────────────────────────── */
-
-function Glyph(props: SVGProps<SVGSVGElement> & { children: ReactNode }) {
-  const { children, ...rest } = props
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}
-      strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...rest}>
-      {children}
-    </svg>
-  )
-}
+/* ── Icons (específicos de esta página) ───────────────────────────── */
 
 const RodentGlyph = (p: SVGProps<SVGSVGElement>) => (
   <Glyph {...p}>
@@ -60,22 +58,11 @@ const ShieldGlyph = (p: SVGProps<SVGSVGElement>) => (
     <path d="M9 12l2 2 4-4" />
   </Glyph>
 )
-const PhoneGlyph = (p: SVGProps<SVGSVGElement>) => (
-  <Glyph {...p}>
-    <path d="M5 4h3l1.5 4-2 1.5a12 12 0 006.5 6.5l1.5-2 4 1.5v3a2 2 0 01-2.2 2A17 17 0 013 6.2 2 2 0 015 4z" />
-  </Glyph>
-)
 const ArrowGlyph = (p: SVGProps<SVGSVGElement>) => (
   <Glyph {...p}><path d="M5 12h14M13 6l6 6-6 6" /></Glyph>
 )
 const CheckGlyph = (p: SVGProps<SVGSVGElement>) => (
   <Glyph {...p}><path d="M4 12l5 5L20 6" /></Glyph>
-)
-const WhatsappGlyph = (p: SVGProps<SVGSVGElement>) => (
-  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...p}>
-    <path d="M12 2a10 10 0 00-8.53 15.25L2 22l4.9-1.42A10 10 0 1012 2zm0 1.7a8.3 8.3 0 11-4.3 15.4l-.3-.18-2.9.84.86-2.83-.2-.3A8.3 8.3 0 0112 3.7z" />
-    <path d="M9.3 7.2c-.2-.45-.36-.35-.55-.36l-.47-.01c-.16 0-.43.06-.66.3-.23.25-.87.85-.87 2.08 0 1.23.9 2.42 1.02 2.58.13.17 1.74 2.77 4.3 3.78 2.13.84 2.57.68 3.03.63.46-.04 1.48-.6 1.69-1.19.2-.58.2-1.08.15-1.18-.06-.1-.22-.16-.46-.28-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.93-1.19-.71-.63-1.2-1.42-1.34-1.66-.14-.24-.01-.37.11-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78z" />
-  </svg>
 )
 
 /* ── Data ─────────────────────────────────────────────────────────── */
@@ -98,50 +85,6 @@ const pasos = [
 ]
 
 const trust = ['ISO 9001 certificada', 'Respuesta el mismo día', 'Talagante y alrededores', '+20 años de oficio']
-
-/* ── Building blocks ──────────────────────────────────────────────── */
-
-function Tape({ className = '' }: { className?: string }) {
-  return <div className={`p3-tape h-3 w-full ${className}`} aria-hidden="true" />
-}
-
-function WhatsappBtn({ className = '', children }: { className?: string; children: ReactNode }) {
-  return (
-    <a
-      href={WHATSAPP}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={`inline-flex items-center justify-center gap-2 bg-vetlain-green-dark px-6 py-3.5 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-vetlain-green-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vetlain-green ${className}`}
-    >
-      <WhatsappGlyph className="h-5 w-5" />
-      {children}
-    </a>
-  )
-}
-
-/* ── Header ───────────────────────────────────────────────────────── */
-
-function Header() {
-  return (
-    <header className="sticky top-0 z-40 border-b-2 border-vetlain-green bg-white">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3">
-        <a href="#top" className="flex items-center" aria-label="Vetlain, inicio">
-          <img src={A + 'brand/logo-recortado.png'} alt="Vetlain" className="h-9 w-auto" width={327} height={107} />
-        </a>
-        <div className="flex items-center gap-2">
-          <a
-            href={TEL_MOVIL}
-            className="hidden items-center gap-2 border-2 border-vetlain-ink px-4 py-2 text-sm font-bold uppercase tracking-wide text-vetlain-ink transition-colors hover:bg-vetlain-ink hover:text-white sm:inline-flex"
-          >
-            <PhoneGlyph className="h-4 w-4" />
-            Llamar
-          </a>
-          <WhatsappBtn className="px-4 py-2">WhatsApp</WhatsappBtn>
-        </div>
-      </div>
-    </header>
-  )
-}
 
 /* ── Hero ─────────────────────────────────────────────────────────── */
 
@@ -397,53 +340,6 @@ function Contact() {
         </div>
       </div>
     </section>
-  )
-}
-
-/* ── Footer ───────────────────────────────────────────────────────── */
-
-function Footer() {
-  return (
-    <footer className="bg-vetlain-ink">
-      <Tape />
-      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-5 py-10 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <img src={A + 'brand/logo-recortado.png'} alt="Vetlain" className="h-9 w-auto brightness-0 invert" width={327} height={107} />
-          <p className="mt-3 max-w-xs text-sm text-neutral-400">
-            Control y mantención ambiental · Talagante y alrededores.
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          {['Facebook', 'Instagram', 'YouTube', 'LinkedIn'].map((s) => (
-            <span key={s} className="border border-neutral-700 px-3 py-1 text-xs font-bold uppercase tracking-wide text-neutral-400">
-              {s}
-            </span>
-          ))}
-        </div>
-      </div>
-      <div className="border-t border-neutral-800">
-        <div className="mx-auto max-w-6xl px-5 py-4 text-xs uppercase tracking-wide text-neutral-400">
-          <span>© {new Date().getFullYear()} Vetlain</span>
-        </div>
-      </div>
-    </footer>
-  )
-}
-
-/* ── Sticky mobile CTA ────────────────────────────────────────────── */
-
-function StickyCta() {
-  return (
-    <div className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-2 border-t-2 border-vetlain-green md:hidden">
-      <a href={TEL_MOVIL} className="flex items-center justify-center gap-2 bg-vetlain-ink py-3.5 text-sm font-bold uppercase tracking-wide text-white">
-        <PhoneGlyph className="h-5 w-5" />
-        Llamar
-      </a>
-      <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 bg-vetlain-green-dark py-3.5 text-sm font-bold uppercase tracking-wide text-white">
-        <WhatsappGlyph className="h-5 w-5" />
-        WhatsApp
-      </a>
-    </div>
   )
 }
 
