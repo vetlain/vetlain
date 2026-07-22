@@ -1,14 +1,18 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { HashRouter } from 'react-router-dom'
+import { BrowserRouter } from 'react-router-dom'
+import { HelmetProvider } from 'react-helmet-async'
 import App from './App.tsx'
 import './index.css'
 
-// HashRouter: routing robusto en GitHub Pages (deep-links y refresh sin 404).
+// BrowserRouter: URLs limpias (/servicios en vez de /#/servicios), imprescindible
+// para SEO. HelmetProvider gestiona los <title>/<meta> por página.
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <HashRouter>
-      <App />
-    </HashRouter>
+    <HelmetProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </HelmetProvider>
   </StrictMode>,
 )

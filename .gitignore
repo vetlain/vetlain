@@ -5,6 +5,11 @@ dist-ssr
 .vercel
 *.tsbuildinfo
 
+# variables de entorno (secretos: DATABASE_URL, JWT_SECRET…)
+.env
+.env.*
+!.env.example
+
 # Claude Code local settings (permisos + hooks con rutas absolutas, no portable)
 .claude/settings.local.json
 
