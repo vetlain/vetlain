@@ -1,16 +1,17 @@
 /**
  * Aplicación Express de Vetlain.
  * Se usa en dos contextos:
- *  - Desarrollo: server/dev.ts la levanta en http://localhost:3001 y Vite le
+ *  - Desarrollo: server/dev.ts la levanta en http://localhost:8787 y Vite le
  *    hace proxy de /api.
  *  - Producción: api/index.ts la exporta como función serverless de Vercel,
  *    montada en /api/*.
- *
- * Los routers de contenido, blog y autenticación se irán montando aquí en las
- * fases siguientes.
  */
 import express from 'express'
 import cookieParser from 'cookie-parser'
+import type { Request, Response, NextFunction } from 'express'
+import { authRouter } from './routes/auth'
+import { publicRouter } from './routes/public'
+import { adminRouter } from './routes/admin'
 
 export function createApp() {
   const app = express()
@@ -24,7 +25,22 @@ export function createApp() {
     res.json({ ok: true, service: 'vetlain-api' })
   })
 
+  api.use('/auth', authRouter)
+  api.use('/admin', adminRouter)
+  api.use('/', publicRouter)
+
   app.use('/api', api)
+
+  // 404 para rutas de API no encontradas.
+  app.use('/api', (_req, res) => {
+    res.status(404).json({ error: 'Ruta no encontrada' })
+  })
+
+  // Manejador de errores: evita filtrar detalles internos al cliente.
+  app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
+    console.error('[api] error no controlado:', err)
+    res.status(500).json({ error: 'Error interno del servidor' })
+  })
 
   return app
 }
