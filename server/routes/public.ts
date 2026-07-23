@@ -4,7 +4,7 @@
  */
 import { Router } from 'express'
 import { eq, desc } from 'drizzle-orm'
-import { db, schema } from '../db'
+import { db, schema } from '../db/index.js'
 
 export const publicRouter = Router()
 

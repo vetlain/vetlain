@@ -7,7 +7,7 @@
  */
 import type { Request, Response } from 'express'
 import { eq, desc } from 'drizzle-orm'
-import { db, schema } from '../db'
+import { db, schema } from '../db/index.js'
 
 function baseUrl(req: Request): string {
   const host = (req.headers['x-forwarded-host'] as string) || req.headers.host || 'localhost'

@@ -14,7 +14,7 @@ let app: Handler | null = null
 
 async function getApp(): Promise<Handler> {
   if (app) return app
-  const { createApp } = await import('../server/app')
+  const { createApp } = await import('../server/app.js')
   app = createApp() as unknown as Handler
   return app
 }

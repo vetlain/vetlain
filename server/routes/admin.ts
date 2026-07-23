@@ -5,8 +5,8 @@
 import { Router } from 'express'
 import { z } from 'zod'
 import { eq } from 'drizzle-orm'
-import { db, schema } from '../db'
-import { requireAuth } from '../auth'
+import { db, schema } from '../db/index.js'
+import { requireAuth } from '../auth.js'
 
 export const adminRouter = Router()
 adminRouter.use(requireAuth)

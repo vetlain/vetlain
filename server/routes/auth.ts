@@ -2,8 +2,8 @@
 import { Router } from 'express'
 import { z } from 'zod'
 import { eq } from 'drizzle-orm'
-import { db, schema } from '../db'
-import { verifyPassword, issueSession, clearSession, readSession } from '../auth'
+import { db, schema } from '../db/index.js'
+import { verifyPassword, issueSession, clearSession, readSession } from '../auth.js'
 
 export const authRouter = Router()
 

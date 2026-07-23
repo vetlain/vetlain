@@ -4,7 +4,7 @@
  * En producción NO se usa este archivo: Vercel importa api/index.ts.
  */
 import 'dotenv/config'
-import { createApp } from './app'
+import { createApp } from './app.js'
 
 const app = createApp()
 const port = Number(process.env.PORT) || 8787

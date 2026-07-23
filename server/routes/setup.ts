@@ -11,8 +11,8 @@
  */
 import { Router } from 'express'
 import { neon } from '@neondatabase/serverless'
-import { DDL } from '../db/ddl'
-import { runSeed } from '../db/seed'
+import { DDL } from '../db/ddl.js'
+import { runSeed } from '../db/seed.js'
 
 export const setupRouter = Router()
 

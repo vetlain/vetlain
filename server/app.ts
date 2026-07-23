@@ -9,11 +9,11 @@
 import express from 'express'
 import cookieParser from 'cookie-parser'
 import type { Request, Response, NextFunction } from 'express'
-import { authRouter } from './routes/auth'
-import { publicRouter } from './routes/public'
-import { adminRouter } from './routes/admin'
-import { setupRouter } from './routes/setup'
-import { robotsHandler, sitemapHandler } from './routes/seo'
+import { authRouter } from './routes/auth.js'
+import { publicRouter } from './routes/public.js'
+import { adminRouter } from './routes/admin.js'
+import { setupRouter } from './routes/setup.js'
+import { robotsHandler, sitemapHandler } from './routes/seo.js'
 
 export function createApp() {
   const app = express()

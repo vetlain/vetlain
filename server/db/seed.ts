@@ -10,8 +10,8 @@
  * El administrador se crea con ADMIN_EMAIL / ADMIN_PASSWORD del entorno (o los
  * valores por defecto de abajo, que conviene cambiar tras el primer login).
  */
-import { db, schema } from './index'
-import { hashPassword } from '../auth'
+import { db, schema } from './index.js'
+import { hashPassword } from '../auth.js'
 
 export async function runSeed() {
   /* ── Administrador ─────────────────────────────────────────────────── */
