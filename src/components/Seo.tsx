@@ -8,11 +8,9 @@
 import { Helmet } from 'react-helmet-async'
 
 const SITE_NAME = 'Vetlain'
-
-function origin(): string {
-  if (typeof window !== 'undefined' && window.location) return window.location.origin
-  return ''
-}
+// Dominio canónico (override con VITE_SITE_URL en build). Así el canonical y el
+// Open Graph apuntan a vetlain.cl aunque se acceda por la URL de vercel.app.
+const SITE_URL = (import.meta.env.VITE_SITE_URL || 'https://vetlain.cl').replace(/\/$/, '')
 
 export function Seo({
   title,
@@ -33,7 +31,7 @@ export function Seo({
   jsonLd?: object | object[]
 }) {
   const url =
-    origin() + (path ?? (typeof window !== 'undefined' ? window.location.pathname : ''))
+    SITE_URL + (path ?? (typeof window !== 'undefined' ? window.location.pathname : ''))
   const fullTitle = title.includes(SITE_NAME) ? title : `${title} | ${SITE_NAME}`
   const blocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : []
 

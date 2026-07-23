@@ -9,27 +9,26 @@ import type { Request, Response } from 'express'
 import { eq, desc } from 'drizzle-orm'
 import { db, schema } from '../db/index.js'
 
-function baseUrl(req: Request): string {
-  const host = (req.headers['x-forwarded-host'] as string) || req.headers.host || 'localhost'
-  const proto = (req.headers['x-forwarded-proto'] as string) || 'https'
-  return `${proto}://${host}`
+// Dominio canónico del sitio. Fijo a vetlain.cl (override con SITE_URL en Vercel).
+function baseUrl(): string {
+  return (process.env.SITE_URL || 'https://vetlain.cl').replace(/\/$/, '')
 }
 
-export function robotsHandler(req: Request, res: Response): void {
+export function robotsHandler(_req: Request, res: Response): void {
   const body = [
     'User-agent: *',
     'Allow: /',
     'Disallow: /admin',
     'Disallow: /api',
     '',
-    `Sitemap: ${baseUrl(req)}/sitemap.xml`,
+    `Sitemap: ${baseUrl()}/sitemap.xml`,
     '',
   ].join('\n')
   res.type('text/plain').send(body)
 }
 
-export async function sitemapHandler(req: Request, res: Response): Promise<void> {
-  const base = baseUrl(req)
+export async function sitemapHandler(_req: Request, res: Response): Promise<void> {
+  const base = baseUrl()
   const staticPaths = ['/', '/servicios', '/nosotros', '/cobertura', '/preguntas-frecuentes', '/contacto', '/blog']
 
   type Entry = { loc: string; lastmod?: string }
