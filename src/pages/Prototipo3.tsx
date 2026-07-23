@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent, ReactNode, SVGProps } from 'react'
+import { Seo } from '../components/Seo'
 import {
   A,
   WHATSAPP,
@@ -348,6 +349,11 @@ function Contact() {
 export default function Prototipo3() {
   return (
     <div className="p3 min-h-screen bg-white text-vetlain-ink">
+      <Seo
+        title="Vetlain — Control de plagas en Talagante y alrededores"
+        description="Desratización, desinsectación, control de aves y sanitización con certificación ISO 9001. Cobertura en Talagante, Peñaflor, El Monte y comunas vecinas. Respuesta el mismo día."
+        path="/"
+      />
       <Header />
       <main className="pb-14 md:pb-0">
         <Hero />

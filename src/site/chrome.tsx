@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import type { ReactNode, SVGProps } from 'react'
-import { mainNav, footerGroups, socialLinks } from './nav'
+import { mainNav, footerGroups } from './nav'
 import type { SocialName } from './nav'
+import { useSiteContent } from '../lib/site-content'
 
 /* ── Constantes ───────────────────────────────────────────────────── */
 
@@ -72,6 +73,13 @@ const socialGlyphs: Record<SocialName, (p: SVGProps<SVGSVGElement>) => ReactNode
   ),
 }
 
+const socialLabels: Record<SocialName, string> = {
+  facebook: 'Facebook',
+  instagram: 'Instagram',
+  linkedin: 'LinkedIn',
+  youtube: 'YouTube',
+}
+
 /* ── Piezas reutilizables ─────────────────────────────────────────── */
 
 export function Tape({ className = '' }: { className?: string }) {
@@ -79,9 +87,10 @@ export function Tape({ className = '' }: { className?: string }) {
 }
 
 export function WhatsappBtn({ className = '', children }: { className?: string; children: ReactNode }) {
+  const { whatsappUrl } = useSiteContent()
   return (
     <a
-      href={WHATSAPP}
+      href={whatsappUrl}
       target="_blank"
       rel="noopener noreferrer"
       className={`inline-flex items-center justify-center gap-2 bg-vetlain-green-dark px-6 py-3.5 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-vetlain-green-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vetlain-green ${className}`}
@@ -99,6 +108,7 @@ const navLinkBase =
 
 export function Header() {
   const [open, setOpen] = useState(false)
+  const { telUrl } = useSiteContent()
 
   return (
     <header className="sticky top-0 z-40 border-b-2 border-vetlain-green bg-white">
@@ -128,7 +138,7 @@ export function Header() {
 
         <div className="flex items-center gap-2">
           <a
-            href={TEL_MOVIL}
+            href={telUrl}
             className="hidden items-center gap-2 border-2 border-vetlain-ink px-4 py-2 text-sm font-bold uppercase tracking-wide text-vetlain-ink transition-colors hover:bg-vetlain-ink hover:text-white lg:inline-flex"
           >
             <PhoneGlyph className="h-4 w-4" />
@@ -174,7 +184,7 @@ export function Header() {
               </NavLink>
             ))}
             <a
-              href={TEL_MOVIL}
+              href={telUrl}
               className="mt-3 inline-flex items-center justify-center gap-2 border-2 border-vetlain-ink px-4 py-3 text-sm font-bold uppercase tracking-wide text-vetlain-ink"
             >
               <PhoneGlyph className="h-4 w-4" />
@@ -190,6 +200,7 @@ export function Header() {
 /* ── Footer ───────────────────────────────────────────────────────── */
 
 export function Footer() {
+  const { phone, email, address, hours, telUrl, socials } = useSiteContent()
   return (
     <footer className="bg-vetlain-ink text-neutral-400">
       <Tape />
@@ -208,17 +219,17 @@ export function Footer() {
             sanitización en Talagante y alrededores.
           </p>
           <ul className="mt-5 space-y-1.5 text-sm">
-            <li>Juana Canales 987, Talagante</li>
+            <li>{address}</li>
             <li>
-              <a href={TEL_MOVIL} className="transition-colors hover:text-white">
-                +56 9 6830 2857
+              <a href={telUrl} className="transition-colors hover:text-white">
+                {phone}
               </a>
               {' · '}
-              <a href="mailto:vetlain@vetlain.cl" className="transition-colors hover:text-white">
-                vetlain@vetlain.cl
+              <a href={`mailto:${email}`} className="transition-colors hover:text-white">
+                {email}
               </a>
             </li>
-            <li>Lun a Vie · 09:00 – 18:00</li>
+            <li>{hours}</li>
           </ul>
         </div>
 
@@ -248,19 +259,23 @@ export function Footer() {
           <span className="text-xs uppercase tracking-wide">
             © {new Date().getFullYear()} Vetlain · Todos los derechos reservados
           </span>
-          <ul className="flex items-center gap-2">
-            {socialLinks.map((s) => (
-              <li key={s.name}>
-                <a
-                  href={s.href}
-                  aria-label={s.label}
-                  className="inline-flex h-10 w-10 items-center justify-center border border-neutral-700 text-neutral-400 transition-colors hover:border-vetlain-green hover:bg-vetlain-green-dark hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vetlain-green"
-                >
-                  {socialGlyphs[s.name]({ className: 'h-5 w-5' })}
-                </a>
-              </li>
-            ))}
-          </ul>
+          {socials.length > 0 && (
+            <ul className="flex items-center gap-2">
+              {socials.map((s) => (
+                <li key={s.name}>
+                  <a
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={socialLabels[s.name]}
+                    className="inline-flex h-10 w-10 items-center justify-center border border-neutral-700 text-neutral-400 transition-colors hover:border-vetlain-green hover:bg-vetlain-green-dark hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vetlain-green"
+                  >
+                    {socialGlyphs[s.name]({ className: 'h-5 w-5' })}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     </footer>
@@ -270,13 +285,14 @@ export function Footer() {
 /* ── CTA sticky (mobile) ──────────────────────────────────────────── */
 
 export function StickyCta() {
+  const { telUrl, whatsappUrl } = useSiteContent()
   return (
     <div className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-2 border-t-2 border-vetlain-green md:hidden">
-      <a href={TEL_MOVIL} className="flex items-center justify-center gap-2 bg-vetlain-ink py-3.5 text-sm font-bold uppercase tracking-wide text-white">
+      <a href={telUrl} className="flex items-center justify-center gap-2 bg-vetlain-ink py-3.5 text-sm font-bold uppercase tracking-wide text-white">
         <PhoneGlyph className="h-5 w-5" />
         Llamar
       </a>
-      <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 bg-vetlain-green-dark py-3.5 text-sm font-bold uppercase tracking-wide text-white">
+      <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 bg-vetlain-green-dark py-3.5 text-sm font-bold uppercase tracking-wide text-white">
         <WhatsappGlyph className="h-5 w-5" />
         WhatsApp
       </a>

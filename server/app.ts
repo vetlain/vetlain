@@ -13,6 +13,7 @@ import { authRouter } from './routes/auth'
 import { publicRouter } from './routes/public'
 import { adminRouter } from './routes/admin'
 import { setupRouter } from './routes/setup'
+import { robotsHandler, sitemapHandler } from './routes/seo'
 
 export function createApp() {
   const app = express()
@@ -20,11 +21,19 @@ export function createApp() {
   app.use(express.json({ limit: '1mb' }))
   app.use(cookieParser())
 
+  // robots.txt / sitemap.xml servidos en la raíz (Vercel reescribe hacia aquí).
+  app.get('/robots.txt', robotsHandler)
+  app.get('/sitemap.xml', sitemapHandler)
+
   const api = express.Router()
 
   api.get('/health', (_req, res) => {
     res.json({ ok: true, service: 'vetlain-api' })
   })
+
+  // Alias bajo /api por si el rewrite de Vercel entrega la ruta de destino.
+  api.get('/robots', robotsHandler)
+  api.get('/sitemap', sitemapHandler)
 
   api.use('/setup', setupRouter)
   api.use('/auth', authRouter)
