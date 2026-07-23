@@ -3,16 +3,17 @@
  * Rellena la base con el contenido que hoy vive hardcodeado en el sitio, para
  * que el cliente pueda editarlo desde el panel sin perder nada.
  *
- *   npm run db:seed
+ * Se usa desde dos lugares:
+ *  - CLI local:   npm run db:seed  (server/db/seed-cli.ts)
+ *  - Vercel:      GET /api/setup?token=...  (server/routes/setup.ts)
  *
- * El administrador se crea con ADMIN_EMAIL / ADMIN_PASSWORD del .env (o los
+ * El administrador se crea con ADMIN_EMAIL / ADMIN_PASSWORD del entorno (o los
  * valores por defecto de abajo, que conviene cambiar tras el primer login).
  */
-import 'dotenv/config'
 import { db, schema } from './index'
 import { hashPassword } from '../auth'
 
-async function seed() {
+export async function runSeed() {
   /* ── Administrador ─────────────────────────────────────────────────── */
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@vetlain.cl'
   const adminPassword = process.env.ADMIN_PASSWORD || 'vetlain2026'
@@ -188,13 +189,13 @@ async function seed() {
     })
     .onConflictDoNothing({ target: schema.blogPosts.slug })
   console.log('✓ blog: 1 entrada de ejemplo')
-
   console.log('\nSeed completado ✅')
-}
 
-seed()
-  .then(() => process.exit(0))
-  .catch((err) => {
-    console.error('Error en el seed:', err)
-    process.exit(1)
-  })
+  return {
+    admin: adminEmail,
+    content: content.length,
+    services: services.length,
+    pages: pages.length,
+    blog: 1,
+  }
+}

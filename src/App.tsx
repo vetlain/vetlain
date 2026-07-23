@@ -1,9 +1,13 @@
+import { lazy, Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Prototipo1 from './pages/Prototipo1'
 import Prototipo2 from './pages/Prototipo2'
 import Prototipo3 from './pages/Prototipo3'
 import SitePage from './pages/SitePage'
 import { sitePages } from './site/nav'
+
+// El panel se carga aparte (lazy): no lastra el bundle del sitio público.
+const AdminApp = lazy(() => import('./admin/AdminApp'))
 
 export default function App() {
   return (
@@ -17,6 +21,16 @@ export default function App() {
       {sitePages.map((page) => (
         <Route key={page.path} path={page.path} element={<SitePage {...page} />} />
       ))}
+
+      {/* Panel de administración (privado). Maneja su propio login y rutas. */}
+      <Route
+        path="/admin/*"
+        element={
+          <Suspense fallback={null}>
+            <AdminApp />
+          </Suspense>
+        }
+      />
 
       {/* P1 y P2 quedan fuera de la navegación; accesibles solo por URL directa. */}
       <Route path="/prototipo-1" element={<Prototipo1 />} />

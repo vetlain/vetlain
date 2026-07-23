@@ -14,7 +14,7 @@
     "db:push": "drizzle-kit push",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
-    "db:seed": "tsx server/db/seed.ts"
+    "db:seed": "tsx server/db/seed-cli.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
@@ -23,6 +23,7 @@
     "drizzle-orm": "^0.45.2",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
+    "marked": "^18.0.7",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-helmet-async": "^3.0.0",

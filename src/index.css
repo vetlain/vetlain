@@ -107,3 +107,46 @@ body {
     animation: none;
   }
 }
+
+/* ── Contenido Markdown renderizado (vista previa del panel y blog) ─── */
+.prose-vetlain {
+  color: #2e2e2e;
+  line-height: 1.7;
+}
+.prose-vetlain h2 {
+  font-family: 'Anton', 'Barlow', system-ui, sans-serif;
+  font-size: 1.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  color: #1a1a1a;
+  margin: 1.4em 0 0.5em;
+}
+.prose-vetlain h3 {
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #1a1a1a;
+  margin: 1.2em 0 0.4em;
+}
+.prose-vetlain p {
+  margin: 0.7em 0;
+}
+.prose-vetlain ul,
+.prose-vetlain ol {
+  margin: 0.7em 0;
+  padding-left: 1.3em;
+  list-style: revert;
+}
+.prose-vetlain li {
+  margin: 0.3em 0;
+}
+.prose-vetlain a {
+  color: #2c6a31;
+  text-decoration: underline;
+}
+.prose-vetlain strong {
+  color: #1a1a1a;
+}
+.prose-vetlain img {
+  max-width: 100%;
+  height: auto;
+}

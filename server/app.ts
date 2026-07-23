@@ -12,6 +12,7 @@ import type { Request, Response, NextFunction } from 'express'
 import { authRouter } from './routes/auth'
 import { publicRouter } from './routes/public'
 import { adminRouter } from './routes/admin'
+import { setupRouter } from './routes/setup'
 
 export function createApp() {
   const app = express()
@@ -25,6 +26,7 @@ export function createApp() {
     res.json({ ok: true, service: 'vetlain-api' })
   })
 
+  api.use('/setup', setupRouter)
   api.use('/auth', authRouter)
   api.use('/admin', adminRouter)
   api.use('/', publicRouter)
