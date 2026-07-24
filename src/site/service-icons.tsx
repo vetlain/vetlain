@@ -3,12 +3,19 @@ import type { SVGProps, ReactElement } from 'react'
 import { Glyph } from './chrome'
 
 const glyphs: Record<string, (p: SVGProps<SVGSVGElement>) => ReactElement> = {
+  /**
+   * Cara de roedor de frente: orejas redondas, ojos, hocico y bigotes.
+   * De frente y no de perfil a propósito: el perfil con cola se vuelve una
+   * mancha ilegible a los 36 px a los que se usa en las tarjetas de servicio.
+   */
   rodent: (p) => (
     <Glyph {...p}>
-      <path d="M4 16c0-3.3 2.7-6 6-6h1.5a4 4 0 003.4-1.9l.6-1a2 2 0 013.5.1" />
-      <path d="M4 16h9a3 3 0 003-3" />
-      <circle cx="7.5" cy="7" r="2.2" />
-      <path d="M4 16l-1.5 2M8 16l-1 2.5M12 16v2.5" />
+      <path d="M12 19.4c-3.1 0-5.6-2.3-5.6-5.2 0-2.4 1.7-4.4 4-4.9 .5-.1 1-.2 1.6-.2s1.1.1 1.6.2c2.3.5 4 2.5 4 4.9 0 2.9-2.5 5.2-5.6 5.2z" />
+      <circle cx="6.8" cy="8" r="2.9" />
+      <circle cx="17.2" cy="8" r="2.9" />
+      <path d="M10.2 13.6h.01M13.8 13.6h.01" />
+      <path d="M12 16.4h.01" />
+      <path d="M9.6 17.6l-4.4 1.6M14.4 17.6l4.4 1.6" />
     </Glyph>
   ),
   insect: (p) => (

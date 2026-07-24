@@ -1,7 +1,7 @@
 /** Piezas compartidas de las páginas internas del sitio (chrome + hero + cierre). */
 import { useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import type { ReactNode } from 'react'
+import type { ReactNode, SVGProps } from 'react'
 import {
   Header,
   Footer,
@@ -9,6 +9,7 @@ import {
   WhatsappBtn,
   ChevronGlyph,
   PhoneGlyph,
+  Glyph,
   A,
 } from '../../site/chrome'
 import { useSiteContent } from '../../lib/site-content'
@@ -158,6 +159,30 @@ export function ServiceAside() {
  * sitio antiguo que el cliente pidió mantener tal cual. Para cambiarlas hay que
  * tocar este archivo. */
 
+/** Iconos de los pilares (viven aquí porque no se usan en ningún otro lado). */
+const BadgeGlyph = (p: SVGProps<SVGSVGElement>) => (
+  <Glyph {...p}>
+    <circle cx="12" cy="9" r="5.5" />
+    <path d="M9.6 9.2l1.7 1.7 3.2-3.2" />
+    <path d="M8.4 13.6L7 21l5-2.4 5 2.4-1.4-7.4" />
+  </Glyph>
+)
+
+const LeafGlyph = (p: SVGProps<SVGSVGElement>) => (
+  <Glyph {...p}>
+    <path d="M20 4c0 9-5.2 13-10 13a5.6 5.6 0 01-5.7-5.7C4.3 7 9.5 4 20 4z" />
+    <path d="M4 20c1.5-4.5 4.6-8 9-10" />
+  </Glyph>
+)
+
+const RiseGlyph = (p: SVGProps<SVGSVGElement>) => (
+  <Glyph {...p}>
+    <path d="M3 20h18" />
+    <path d="M4 15.5l5-5 3.5 3.5L20 6" />
+    <path d="M15.5 6H20v4.5" />
+  </Glyph>
+)
+
 /** Los tres pilares del sitio original ("Técnicos CERTIFICADOS", etc.). */
 export function ServicePillars() {
   const pillars = [
@@ -165,29 +190,38 @@ export function ServicePillars() {
       soft: 'Técnicos',
       strong: 'Certificados',
       text: 'Nuestro equipo de trabajo ha sido cuidadosamente capacitado en el trabajo de excelencia y seguro.',
+      glyph: BadgeGlyph,
     },
     {
       soft: 'El mejor',
       strong: 'Servicio',
       text: 'Todos los productos con los que trabajamos priorizan la seguridad del entorno.',
+      glyph: LeafGlyph,
     },
     {
       soft: 'Mejora',
       strong: 'Continua',
       text: 'Trabajamos bajo las normas de la ISO 9001 - 2015 que nos obliga a funcionar ordenada y sistemáticamente.',
+      glyph: RiseGlyph,
     },
   ]
   return (
     <section className="bg-white">
-      <div className="mx-auto grid max-w-6xl gap-4 px-5 pb-14 sm:grid-cols-3">
-        {pillars.map((p) => (
-          <div key={p.strong} className="border-t-4 border-vetlain-green bg-vetlain-green-tint/40 p-5">
-            <h2 className="p3-display text-xl uppercase leading-tight text-vetlain-ink">
-              <span className="font-normal text-neutral-600">{p.soft} </span>
-              {p.strong}
-            </h2>
-            <p className="mt-2 text-sm leading-relaxed text-neutral-600">{p.text}</p>
-          </div>
+      <div className="mx-auto grid max-w-6xl gap-5 px-5 pb-16 sm:grid-cols-3">
+        {pillars.map(({ glyph: G, ...p }) => (
+          <article key={p.strong} className="flex flex-col border-2 border-vetlain-ink bg-white">
+            {/* Cabecera en el color primario: es lo que da el énfasis */}
+            <header className="flex items-start justify-between gap-3 bg-vetlain-green-dark px-5 py-4">
+              <div className="min-w-0">
+                <span className="block text-[11px] font-bold uppercase tracking-[0.2em] text-white/70">
+                  {p.soft}
+                </span>
+                <h2 className="p3-display mt-1 text-2xl uppercase leading-none text-white">{p.strong}</h2>
+              </div>
+              <G className="h-8 w-8 shrink-0 text-white/60" />
+            </header>
+            <p className="flex-1 px-5 py-5 text-sm leading-relaxed text-neutral-600">{p.text}</p>
+          </article>
         ))}
       </div>
     </section>
@@ -244,19 +278,31 @@ export function TrustedClients() {
     { name: 'Puratos', src: 'brand/cliente-puratos.png' },
   ]
   return (
-    <section className="border-t-2 border-neutral-100 bg-white">
-      <div className="mx-auto max-w-6xl px-5 py-14">
-        <h2 className="p3-display text-center text-[clamp(1.6rem,4vw,2.5rem)] uppercase leading-[0.95] text-vetlain-ink">
-          Han confiado en nosotros
-        </h2>
-        <ul className="mt-9 flex flex-wrap items-center justify-center gap-x-10 gap-y-8 sm:gap-x-14">
+    <section className="border-t-2 border-neutral-100 bg-vetlain-green-tint/30">
+      <div className="mx-auto max-w-6xl px-5 py-24 sm:py-28">
+        <div className="text-center">
+          <span className="p3-clip-slash inline-block bg-white px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-vetlain-green-deep">
+            Clientes
+          </span>
+          <h2 className="p3-display mt-6 text-[clamp(1.9rem,5vw,3rem)] uppercase leading-[0.95] text-vetlain-ink">
+            Han confiado en nosotros
+          </h2>
+          <p className="mx-auto mt-5 max-w-xl text-pretty text-base leading-relaxed text-neutral-600">
+            Empresas e instituciones que mantienen sus instalaciones libres de plagas con
+            nuestros programas de control periódico.
+          </p>
+        </div>
+        <ul className="mt-14 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
           {clients.map((c) => (
-            <li key={c.name}>
+            <li
+              key={c.name}
+              className="flex h-32 items-center justify-center border-2 border-neutral-200 bg-white p-6 transition-colors hover:border-vetlain-green sm:h-36"
+            >
               <img
                 src={A + c.src}
                 alt={c.name}
                 loading="lazy"
-                className="h-12 w-auto max-w-[9rem] object-contain opacity-70 grayscale transition duration-300 hover:opacity-100 hover:grayscale-0 sm:h-14"
+                className="max-h-full w-auto max-w-full object-contain opacity-70 grayscale transition duration-300 hover:opacity-100 hover:grayscale-0"
               />
             </li>
           ))}
