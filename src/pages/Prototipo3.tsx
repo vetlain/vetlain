@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { FormEvent, ReactNode, SVGProps } from 'react'
 import { Seo } from '../components/Seo'
 import { useSiteContent } from '../lib/site-content'
+import { ServiceIcon } from '../site/service-icons'
 import {
   A,
   WHATSAPP,
@@ -18,14 +19,9 @@ import {
 
 /* ── Icons (específicos de esta página) ───────────────────────────── */
 
-const RodentGlyph = (p: SVGProps<SVGSVGElement>) => (
-  <Glyph {...p}>
-    <path d="M4 16c0-3.3 2.7-6 6-6h1.5a4 4 0 003.4-1.9l.6-1a2 2 0 013.5.1" />
-    <path d="M4 16h9a3 3 0 003-3" />
-    <circle cx="7.5" cy="7" r="2.2" />
-    <path d="M4 16l-1.5 2M8 16l-1 2.5M12 16v2.5" />
-  </Glyph>
-)
+// Se reutiliza el icono compartido para que no vuelva a divergir del que sale
+// en las tarjetas de /servicios.
+const RodentGlyph = (p: SVGProps<SVGSVGElement>) => <ServiceIcon icon="rodent" {...p} />
 const InsectGlyph = (p: SVGProps<SVGSVGElement>) => (
   <Glyph {...p}>
     <ellipse cx="12" cy="13" rx="3.5" ry="5.5" />
