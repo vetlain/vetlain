@@ -9,8 +9,10 @@ import { useSiteContent } from '../lib/site-content'
 
 export const WHATSAPP = 'https://wa.me/56968302857'
 export const TEL_MOVIL = 'tel:+56968302857'
-// Prefijo de assets públicos (respeta el `base` de Vite: / en dev, /vetlain/ en prod)
-export const A = import.meta.env.BASE_URL
+// Prefijo de assets públicos (respeta el `base` de Vite). `?.` porque este
+// módulo también se importa desde el script de prerender (Node/tsx), donde
+// import.meta.env no existe.
+export const A = (import.meta as { env?: Record<string, string | undefined> }).env?.BASE_URL ?? '/'
 
 /* ── Iconos base y compartidos ────────────────────────────────────── */
 

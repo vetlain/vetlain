@@ -7,19 +7,27 @@ import { Tape, ChevronGlyph } from '../../site/chrome'
 import { SiteShell, PageHero, PageState } from './parts'
 import { formatDate } from '../../lib/format'
 
-export default function BlogList() {
-  const page = useApi<Page>('/pages/blog')
-  const { data: posts, loading, error } = useApi<BlogPost[]>('/blog')
-
-  const title = page.data?.title ?? 'Blog'
-  const kicker = page.data?.kicker ?? 'Guías y consejos'
+/** Presentación pura: la usan tanto el cliente (tras el fetch) como el prerender. */
+export function BlogListBody({
+  page,
+  posts,
+  loading,
+  error,
+}: {
+  page: Page | null
+  posts: BlogPost[] | null
+  loading: boolean
+  error: string | null
+}) {
+  const title = page?.title ?? 'Blog'
+  const kicker = page?.kicker ?? 'Guías y consejos'
   const description =
-    page.data?.description ??
+    page?.description ??
     'Cómo prevenir plagas en casa y negocio, señales de alerta y buenas prácticas de sanitización.'
 
   return (
     <SiteShell scrollKey="blog">
-      <Seo title={page.data?.seoTitle ?? title} description={page.data?.seoDescription ?? description} path="/blog" />
+      <Seo title={page?.seoTitle ?? title} description={page?.seoDescription ?? description} path="/blog" />
       <PageHero crumbs={[{ label: 'Blog' }]} kicker={kicker} title={title} description={description} />
 
       <section className="mx-auto max-w-4xl px-5 pb-16">
@@ -66,4 +74,10 @@ export default function BlogList() {
       <Tape />
     </SiteShell>
   )
+}
+
+export default function BlogList() {
+  const page = useApi<Page>('/pages/blog')
+  const { data: posts, loading, error } = useApi<BlogPost[]>('/blog')
+  return <BlogListBody page={page.data} posts={posts} loading={loading} error={error} />
 }

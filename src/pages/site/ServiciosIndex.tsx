@@ -7,21 +7,29 @@ import { Tape, ChevronGlyph } from '../../site/chrome'
 import { ServiceIcon } from '../../site/service-icons'
 import { SiteShell, PageHero, CtaRow, PageState } from './parts'
 
-export default function ServiciosIndex() {
-  const page = useApi<Page>('/pages/servicios')
-  const { data: services, loading, error } = useApi<Service[]>('/services')
-
-  const title = page.data?.title ?? 'Servicios'
-  const kicker = page.data?.kicker ?? 'Control de plagas'
+/** Presentación pura: la usan tanto el cliente (tras el fetch) como el prerender. */
+export function ServiciosIndexBody({
+  page,
+  services,
+  loading,
+  error,
+}: {
+  page: Page | null
+  services: Service[] | null
+  loading: boolean
+  error: string | null
+}) {
+  const title = page?.title ?? 'Servicios'
+  const kicker = page?.kicker ?? 'Control de plagas'
   const description =
-    page.data?.description ??
+    page?.description ??
     'Desratización, desinsectación, control de aves, desinfección y programas para empresas.'
 
   return (
     <SiteShell scrollKey="servicios">
       <Seo
-        title={page.data?.seoTitle ?? title}
-        description={page.data?.seoDescription ?? description}
+        title={page?.seoTitle ?? title}
+        description={page?.seoDescription ?? description}
         path="/servicios"
       />
       <PageHero crumbs={[{ label: 'Servicios' }]} kicker={kicker} title={title} description={description} />
@@ -57,4 +65,10 @@ export default function ServiciosIndex() {
       <Tape />
     </SiteShell>
   )
+}
+
+export default function ServiciosIndex() {
+  const page = useApi<Page>('/pages/servicios')
+  const { data: services, loading, error } = useApi<Service[]>('/services')
+  return <ServiciosIndexBody page={page.data} services={services} loading={loading} error={error} />
 }

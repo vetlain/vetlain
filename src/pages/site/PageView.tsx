@@ -7,9 +7,8 @@ import { Markdown } from '../../components/Markdown'
 import { Tape } from '../../site/chrome'
 import { SiteShell, PageHero, CtaRow, ConstructionNotice } from './parts'
 
-export default function PageView({ slug }: { slug: string }) {
-  const { data, loading } = useApi<Page>(`/pages/${slug}`)
-
+/** Presentación pura: la usan tanto el cliente (tras el fetch) como el prerender. */
+export function PageViewBody({ slug, data, loading }: { slug: string; data: Page | null; loading: boolean }) {
   // Fallback: los datos que ya viven en nav.ts, por si la API aún no responde.
   const fallback = sitePages.find((p) => p.path === `/${slug}`)
   const title = data?.title ?? fallback?.title ?? 'Vetlain'
@@ -35,4 +34,9 @@ export default function PageView({ slug }: { slug: string }) {
       <Tape />
     </SiteShell>
   )
+}
+
+export default function PageView({ slug }: { slug: string }) {
+  const { data, loading } = useApi<Page>(`/pages/${slug}`)
+  return <PageViewBody slug={slug} data={data} loading={loading} />
 }

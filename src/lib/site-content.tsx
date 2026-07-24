@@ -23,10 +23,18 @@ const DEFAULTS: ContentMap = {
 
 const ContentCtx = createContext<ContentMap>(DEFAULTS)
 
-export function SiteContentProvider({ children }: { children: ReactNode }) {
-  const [map, setMap] = useState<ContentMap>(DEFAULTS)
+export function SiteContentProvider({
+  children,
+  initial,
+}: {
+  children: ReactNode
+  /** Usado solo por el script de prerender: datos ya cargados, sin fetch. */
+  initial?: ContentMap
+}) {
+  const [map, setMap] = useState<ContentMap>(() => (initial ? { ...DEFAULTS, ...initial } : DEFAULTS))
 
   useEffect(() => {
+    if (initial) return // ya vino precargado (prerender): no repetir la carga.
     let alive = true
     fetch('/api/content')
       .then((r) => (r.ok ? r.json() : null))
@@ -43,6 +51,7 @@ export function SiteContentProvider({ children }: { children: ReactNode }) {
     return () => {
       alive = false
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- `initial` es fijo (solo lo pasa el prerender, una vez).
   }, [])
 
   return <ContentCtx.Provider value={map}>{children}</ContentCtx.Provider>

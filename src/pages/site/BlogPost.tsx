@@ -8,19 +8,9 @@ import { Tape } from '../../site/chrome'
 import { SiteShell, PageHero, CtaRow, PageState } from './parts'
 import { formatDate } from '../../lib/format'
 
-export default function BlogPost() {
-  const { slug = '' } = useParams()
-  const { data, loading, error } = useApi<Post>(`/blog/${slug}`)
-
-  if (loading) {
-    return (
-      <SiteShell scrollKey={slug}>
-        <PageState>Cargando…</PageState>
-      </SiteShell>
-    )
-  }
-
-  if (error || !data) {
+/** Presentación pura: la usan tanto el cliente (tras el fetch) como el prerender. */
+export function BlogPostBody({ slug, data }: { slug: string; data: Post | null }) {
+  if (!data) {
     return (
       <SiteShell scrollKey={slug}>
         <Seo title="Entrada no encontrada" noindex path={`/blog/${slug}`} />
@@ -74,4 +64,19 @@ export default function BlogPost() {
       <Tape />
     </SiteShell>
   )
+}
+
+export default function BlogPost() {
+  const { slug = '' } = useParams()
+  const { data, loading, error } = useApi<Post>(`/blog/${slug}`)
+
+  if (loading) {
+    return (
+      <SiteShell scrollKey={slug}>
+        <PageState>Cargando…</PageState>
+      </SiteShell>
+    )
+  }
+
+  return <BlogPostBody slug={slug} data={error ? null : data} />
 }

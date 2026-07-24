@@ -7,19 +7,9 @@ import { Markdown } from '../../components/Markdown'
 import { Tape } from '../../site/chrome'
 import { SiteShell, PageHero, CtaRow, ConstructionNotice, PageState } from './parts'
 
-export default function ServiceDetail() {
-  const { slug = '' } = useParams()
-  const { data, loading, error } = useApi<Service>(`/services/${slug}`)
-
-  if (loading) {
-    return (
-      <SiteShell scrollKey={slug}>
-        <PageState>Cargando…</PageState>
-      </SiteShell>
-    )
-  }
-
-  if (error || !data) {
+/** Presentación pura: la usan tanto el cliente (tras el fetch) como el prerender. */
+export function ServiceDetailBody({ slug, data }: { slug: string; data: Service | null }) {
+  if (!data) {
     return (
       <SiteShell scrollKey={slug}>
         <Seo title="Servicio no encontrado" noindex path={`/servicios/${slug}`} />
@@ -66,4 +56,19 @@ export default function ServiceDetail() {
       <Tape />
     </SiteShell>
   )
+}
+
+export default function ServiceDetail() {
+  const { slug = '' } = useParams()
+  const { data, loading, error } = useApi<Service>(`/services/${slug}`)
+
+  if (loading) {
+    return (
+      <SiteShell scrollKey={slug}>
+        <PageState>Cargando…</PageState>
+      </SiteShell>
+    )
+  }
+
+  return <ServiceDetailBody slug={slug} data={error ? null : data} />
 }

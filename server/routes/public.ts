@@ -1,27 +1,26 @@
 /**
- * API pública de lectura (la consume el sitio, incl. el render en servidor).
- * Solo devuelve contenido publicado. Rutas bajo /api/*.
+ * API pública de lectura (la consume el sitio). Solo devuelve contenido
+ * publicado. Rutas bajo /api/*. La lógica de consulta vive en server/content.ts
+ * (compartida con el script de prerender).
  */
 import { Router } from 'express'
-import { eq, desc } from 'drizzle-orm'
-import { db, schema } from '../db/index.js'
+import {
+  getSiteContentMap,
+  getPageBySlug,
+  getPublishedServices,
+  getServiceBySlug,
+  getPublishedBlogPosts,
+  getBlogPostBySlug,
+} from '../content.js'
 
 export const publicRouter = Router()
 
-/** Contenido suelto como objeto { key: value } para uso directo en el front. */
 publicRouter.get('/content', async (_req, res) => {
-  const rows = await db.select().from(schema.siteContent)
-  const map: Record<string, unknown> = {}
-  for (const row of rows) map[row.key] = row.value
-  res.json(map)
+  res.json(await getSiteContentMap())
 })
 
 publicRouter.get('/pages/:slug', async (req, res) => {
-  const [page] = await db
-    .select()
-    .from(schema.pages)
-    .where(eq(schema.pages.slug, req.params.slug))
-    .limit(1)
+  const page = await getPageBySlug(req.params.slug)
   if (!page) {
     res.status(404).json({ error: 'Página no encontrada' })
     return
@@ -30,21 +29,12 @@ publicRouter.get('/pages/:slug', async (req, res) => {
 })
 
 publicRouter.get('/services', async (_req, res) => {
-  const rows = await db
-    .select()
-    .from(schema.services)
-    .where(eq(schema.services.published, true))
-    .orderBy(schema.services.sortOrder)
-  res.json(rows)
+  res.json(await getPublishedServices())
 })
 
 publicRouter.get('/services/:slug', async (req, res) => {
-  const [service] = await db
-    .select()
-    .from(schema.services)
-    .where(eq(schema.services.slug, req.params.slug))
-    .limit(1)
-  if (!service || !service.published) {
+  const service = await getServiceBySlug(req.params.slug)
+  if (!service) {
     res.status(404).json({ error: 'Servicio no encontrado' })
     return
   }
@@ -52,21 +42,12 @@ publicRouter.get('/services/:slug', async (req, res) => {
 })
 
 publicRouter.get('/blog', async (_req, res) => {
-  const rows = await db
-    .select()
-    .from(schema.blogPosts)
-    .where(eq(schema.blogPosts.status, 'published'))
-    .orderBy(desc(schema.blogPosts.publishedAt))
-  res.json(rows)
+  res.json(await getPublishedBlogPosts())
 })
 
 publicRouter.get('/blog/:slug', async (req, res) => {
-  const [post] = await db
-    .select()
-    .from(schema.blogPosts)
-    .where(eq(schema.blogPosts.slug, req.params.slug))
-    .limit(1)
-  if (!post || post.status !== 'published') {
+  const post = await getBlogPostBySlug(req.params.slug)
+  if (!post) {
     res.status(404).json({ error: 'Entrada no encontrada' })
     return
   }

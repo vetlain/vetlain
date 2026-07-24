@@ -2,15 +2,17 @@
  * Metadatos SEO por página (react-helmet-async): title, description, canonical,
  * Open Graph y Twitter. Opcionalmente inyecta JSON-LD (structured data).
  *
- * El canonical/URL se calcula desde el dominio actual en el navegador. Cuando
- * se agregue SSR (fase 4b) esto se resolverá también en el servidor.
+ * Se usa tanto en el cliente (Vite) como en el script de prerender (Node/tsx,
+ * donde `import.meta.env` no existe) — de ahí el `?.` antes de leerla.
  */
 import { Helmet } from 'react-helmet-async'
 
 const SITE_NAME = 'Vetlain'
 // Dominio canónico (override con VITE_SITE_URL en build). Así el canonical y el
 // Open Graph apuntan a vetlain.cl aunque se acceda por la URL de vercel.app.
-const SITE_URL = (import.meta.env.VITE_SITE_URL || 'https://vetlain.cl').replace(/\/$/, '')
+const SITE_URL = (
+  (import.meta as { env?: Record<string, string | undefined> }).env?.VITE_SITE_URL || 'https://vetlain.cl'
+).replace(/\/$/, '')
 
 export function Seo({
   title,

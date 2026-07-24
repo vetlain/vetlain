@@ -11,6 +11,25 @@ import { requireAuth } from '../auth.js'
 export const adminRouter = Router()
 adminRouter.use(requireAuth)
 
+/* ── Publicar cambios (dispara un rebuild en Vercel) ──────────────────── */
+// El sitio prerenderiza páginas como HTML estático en cada build (server/prerender.tsx).
+// Este endpoint dispara ese rebuild vía un Deploy Hook de Vercel, sin exponer su
+// URL al navegador (queda solo en la variable de entorno del servidor).
+adminRouter.post('/publish', async (_req, res) => {
+  const hook = process.env.DEPLOY_HOOK_URL
+  if (!hook) {
+    res.status(400).json({ error: 'DEPLOY_HOOK_URL no está configurado en el servidor.' })
+    return
+  }
+  try {
+    const r = await fetch(hook, { method: 'POST' })
+    if (!r.ok) throw new Error(`El deploy hook respondió ${r.status}`)
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(502).json({ error: 'No se pudo iniciar la publicación.', detail: String(err) })
+  }
+})
+
 /* ── Contenido suelto (site_content) ─────────────────────────────────── */
 
 adminRouter.get('/content', async (_req, res) => {

@@ -1,14 +1,16 @@
-/** Inicio del panel: saludo + accesos rápidos con conteos. */
+/** Inicio del panel: saludo + accesos rápidos con conteos + publicar cambios. */
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { api } from '../lib/api'
+import { api, ApiError } from '../lib/api'
 import type { Page, Service, BlogPost, SiteContentRow } from '../lib/types'
-import { PageHeading, Card, Loading } from './ui'
+import { PageHeading, Card, Button, Notice, Loading } from './ui'
 
 type Counts = { contacto: number; paginas: number; servicios: number; blog: number; borradores: number }
 
 export default function Dashboard() {
   const [counts, setCounts] = useState<Counts | null>(null)
+  const [publishing, setPublishing] = useState(false)
+  const [publishMsg, setPublishMsg] = useState<{ kind: 'success' | 'error'; text: string } | null>(null)
 
   useEffect(() => {
     Promise.all([
@@ -29,6 +31,22 @@ export default function Dashboard() {
       .catch(() => setCounts({ contacto: 0, paginas: 0, servicios: 0, blog: 0, borradores: 0 }))
   }, [])
 
+  async function publish() {
+    setPublishing(true)
+    setPublishMsg(null)
+    try {
+      await api.post('/admin/publish')
+      setPublishMsg({
+        kind: 'success',
+        text: 'Publicación en curso. Los cambios quedarán visibles para Google en 1-2 minutos.',
+      })
+    } catch (err) {
+      setPublishMsg({ kind: 'error', text: err instanceof ApiError ? err.message : 'No se pudo publicar' })
+    } finally {
+      setPublishing(false)
+    }
+  }
+
   const tiles = [
     { to: '/admin/contacto', label: 'Contacto y redes', value: counts?.contacto, unit: 'datos' },
     { to: '/admin/paginas', label: 'Páginas', value: counts?.paginas, unit: 'páginas' },
@@ -45,8 +63,26 @@ export default function Dashboard() {
     <div>
       <PageHeading
         title="Bienvenido al panel"
-        description="Desde aquí editas los contenidos del sitio y el blog. Los cambios se ven publicados en el sitio."
+        description="Los cambios se guardan al instante y se ven en el sitio de inmediato. Para que también queden en el HTML que lee Google, publica los cambios."
       />
+
+      <Card className="mb-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-sm font-extrabold uppercase tracking-wide text-vetlain-ink">Publicar cambios</h2>
+          <p className="mt-1 text-sm text-neutral-600">
+            Actualiza las páginas, servicios y entradas del blog para que Google las vea con el contenido nuevo.
+          </p>
+        </div>
+        <Button onClick={publish} disabled={publishing} className="shrink-0">
+          {publishing ? 'Publicando…' : 'Publicar cambios'}
+        </Button>
+      </Card>
+      {publishMsg && (
+        <div className="mb-6">
+          <Notice kind={publishMsg.kind}>{publishMsg.text}</Notice>
+        </div>
+      )}
+
       {!counts ? (
         <Loading />
       ) : (
