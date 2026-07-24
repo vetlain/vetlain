@@ -9,15 +9,10 @@
 import { neon } from '@neondatabase/serverless'
 import { drizzle } from 'drizzle-orm/neon-http'
 import * as schema from './schema.js'
+import { getDatabaseUrl } from '../env.js'
 
 function createDb() {
-  const url = process.env.DATABASE_URL
-  if (!url) {
-    throw new Error(
-      'Falta DATABASE_URL. Copia .env.example a .env y pega tu connection string de Neon.',
-    )
-  }
-  return drizzle(neon(url), { schema })
+  return drizzle(neon(getDatabaseUrl()), { schema })
 }
 
 type DB = ReturnType<typeof createDb>

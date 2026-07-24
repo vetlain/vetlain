@@ -13,6 +13,7 @@ import { Router } from 'express'
 import { neon } from '@neondatabase/serverless'
 import { DDL } from '../db/ddl.js'
 import { runSeed } from '../db/seed.js'
+import { getDatabaseUrl } from '../env.js'
 
 export const setupRouter = Router()
 
@@ -27,9 +28,11 @@ async function handleSetup(token: unknown): Promise<
   if (token !== expected) {
     return { ok: false, status: 401, error: 'Token de setup inválido.' }
   }
-  const url = process.env.DATABASE_URL
-  if (!url) {
-    return { ok: false, status: 400, error: 'Falta DATABASE_URL en el entorno.' }
+  let url: string
+  try {
+    url = getDatabaseUrl(true) // conexión directa (mejor para DDL)
+  } catch (e) {
+    return { ok: false, status: 400, error: (e as Error).message }
   }
 
   const sql = neon(url)
