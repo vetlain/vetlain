@@ -11,6 +11,7 @@ type ContentMap = Record<string, unknown>
 
 const DEFAULTS: ContentMap = {
   'contact.phone': '+56 9 6830 2857',
+  'contact.phone_fijo': '+56 2 2815 3975',
   'contact.whatsapp': '56968302857',
   'contact.email': 'vetlain@vetlain.cl',
   'contact.address': 'Juana Canales 987, Talagante',
@@ -69,6 +70,7 @@ export function useSiteContent() {
       .filter((s) => s.href)
     return {
       phone,
+      phoneFijo: str('contact.phone_fijo'),
       whatsapp,
       email: str('contact.email'),
       address: str('contact.address'),

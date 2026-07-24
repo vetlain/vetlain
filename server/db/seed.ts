@@ -27,6 +27,7 @@ export async function runSeed() {
   /* ── Contenido suelto ──────────────────────────────────────────────── */
   const content: { key: string; value: unknown; label: string; group: string }[] = [
     { key: 'contact.phone', value: '+56 9 6830 2857', label: 'Teléfono visible', group: 'contacto' },
+    { key: 'contact.phone_fijo', value: '+56 2 2815 3975', label: 'Teléfono fijo', group: 'contacto' },
     { key: 'contact.whatsapp', value: '56968302857', label: 'WhatsApp (solo números)', group: 'contacto' },
     { key: 'contact.email', value: 'vetlain@vetlain.cl', label: 'Email', group: 'contacto' },
     { key: 'contact.address', value: 'Juana Canales 987, Talagante', label: 'Dirección', group: 'contacto' },

@@ -4,7 +4,7 @@
  */
 import { Router } from 'express'
 import { z } from 'zod'
-import { eq } from 'drizzle-orm'
+import { eq, desc } from 'drizzle-orm'
 import { db, schema } from '../db/index.js'
 import { requireAuth } from '../auth.js'
 
@@ -221,5 +221,36 @@ adminRouter.put('/blog/:id', async (req, res) => {
 
 adminRouter.delete('/blog/:id', async (req, res) => {
   await db.delete(schema.blogPosts).where(eq(schema.blogPosts.id, Number(req.params.id)))
+  res.json({ ok: true })
+})
+
+/* ── Contactos recibidos (leads) ─────────────────────────────────────── */
+
+// Más recientes primero.
+adminRouter.get('/leads', async (_req, res) => {
+  res.json(await db.select().from(schema.leads).orderBy(desc(schema.leads.createdAt)))
+})
+
+// Marcar como atendido / no atendido.
+adminRouter.put('/leads/:id', async (req, res) => {
+  const parsed = z.object({ handled: z.boolean() }).safeParse(req.body)
+  if (!parsed.success) {
+    res.status(400).json({ error: 'Datos inválidos' })
+    return
+  }
+  const [row] = await db
+    .update(schema.leads)
+    .set({ handled: parsed.data.handled })
+    .where(eq(schema.leads.id, Number(req.params.id)))
+    .returning()
+  if (!row) {
+    res.status(404).json({ error: 'Contacto no encontrado' })
+    return
+  }
+  res.json(row)
+})
+
+adminRouter.delete('/leads/:id', async (req, res) => {
+  await db.delete(schema.leads).where(eq(schema.leads.id, Number(req.params.id)))
   res.json({ ok: true })
 })

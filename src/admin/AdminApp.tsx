@@ -13,9 +13,11 @@ import ContentEditor from './ContentEditor'
 import PagesEditor from './PagesEditor'
 import ServicesEditor from './ServicesEditor'
 import BlogEditor from './BlogEditor'
+import LeadsPanel from './LeadsPanel'
 
 const sections = [
   { to: '/admin', label: 'Inicio', end: true },
+  { to: '/admin/mensajes', label: 'Contactos', end: false },
   { to: '/admin/contacto', label: 'Contacto y redes', end: false },
   { to: '/admin/paginas', label: 'Páginas', end: false },
   { to: '/admin/servicios', label: 'Servicios', end: false },
@@ -101,6 +103,7 @@ function Shell() {
           <main className="min-w-0 flex-1">
             <Routes>
               <Route index element={<Dashboard />} />
+              <Route path="mensajes" element={<LeadsPanel />} />
               <Route path="contacto" element={<ContentEditor />} />
               <Route path="paginas" element={<PagesEditor />} />
               <Route path="servicios" element={<ServicesEditor />} />

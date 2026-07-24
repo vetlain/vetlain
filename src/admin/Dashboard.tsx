@@ -2,10 +2,17 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api, ApiError } from '../lib/api'
-import type { Page, Service, BlogPost, SiteContentRow } from '../lib/types'
+import type { Page, Service, BlogPost, SiteContentRow, Lead } from '../lib/types'
 import { PageHeading, Card, Button, Notice, Loading } from './ui'
 
-type Counts = { contacto: number; paginas: number; servicios: number; blog: number; borradores: number }
+type Counts = {
+  contacto: number
+  paginas: number
+  servicios: number
+  blog: number
+  borradores: number
+  leadsPendientes: number
+}
 
 export default function Dashboard() {
   const [counts, setCounts] = useState<Counts | null>(null)
@@ -18,17 +25,21 @@ export default function Dashboard() {
       api.get<Page[]>('/admin/pages'),
       api.get<Service[]>('/admin/services'),
       api.get<BlogPost[]>('/admin/blog'),
+      api.get<Lead[]>('/admin/leads'),
     ])
-      .then(([content, pages, services, blog]) =>
+      .then(([content, pages, services, blog, leads]) =>
         setCounts({
           contacto: content.length,
           paginas: pages.length,
           servicios: services.length,
           blog: blog.length,
           borradores: blog.filter((p) => p.status === 'draft').length,
+          leadsPendientes: leads.filter((l) => !l.handled).length,
         }),
       )
-      .catch(() => setCounts({ contacto: 0, paginas: 0, servicios: 0, blog: 0, borradores: 0 }))
+      .catch(() =>
+        setCounts({ contacto: 0, paginas: 0, servicios: 0, blog: 0, borradores: 0, leadsPendientes: 0 }),
+      )
   }, [])
 
   async function publish() {
@@ -65,6 +76,17 @@ export default function Dashboard() {
         title="Bienvenido al panel"
         description="Los cambios se guardan al instante y se ven en el sitio de inmediato. Para que también queden en el HTML que lee Google, publica los cambios."
       />
+
+      {counts && counts.leadsPendientes > 0 && (
+        <Link to="/admin/mensajes" className="mb-6 block">
+          <div className="flex items-center justify-between border-2 border-vetlain-green bg-vetlain-green-tint px-5 py-4 transition-colors hover:bg-vetlain-green-tint/70">
+            <span className="text-sm font-bold uppercase tracking-wide text-vetlain-green-deep">
+              Tienes {counts.leadsPendientes} contacto{counts.leadsPendientes === 1 ? '' : 's'} sin atender
+            </span>
+            <span className="text-sm font-bold uppercase tracking-wide text-vetlain-green-dark">Ver →</span>
+          </div>
+        </Link>
+      )}
 
       <Card className="mb-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>

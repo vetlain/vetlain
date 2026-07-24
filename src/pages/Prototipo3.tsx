@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent, ReactNode, SVGProps } from 'react'
 import { Seo } from '../components/Seo'
+import { useSiteContent } from '../lib/site-content'
 import {
   A,
   WHATSAPP,
@@ -259,11 +260,39 @@ const inputClass =
   'w-full border-2 border-neutral-300 bg-white px-3.5 py-2.5 text-sm text-vetlain-ink placeholder:text-neutral-400 transition-colors focus:border-vetlain-green focus:outline-none'
 
 function Contact() {
+  const { telUrl, phone, phoneFijo, email, address, hours } = useSiteContent()
   const [sent, setSent] = useState(false)
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setSent(true)
+    setError(null)
+    setBusy(true)
+    const form = e.currentTarget
+    const data = new FormData(form)
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: data.get('nombre'),
+          phone: data.get('telefono'),
+          comuna: data.get('comuna'),
+          message: data.get('mensaje'),
+          website: data.get('website'), // honeypot
+        }),
+      })
+      if (!res.ok) throw new Error('fallo')
+      setSent(true)
+      form.reset()
+    } catch {
+      setError('No pudimos enviar tu mensaje. Escríbenos por WhatsApp y te respondemos al toque.')
+    } finally {
+      setBusy(false)
+    }
   }
+
   return (
     <section id="contacto" className="scroll-mt-20 bg-white">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 sm:py-20 md:grid-cols-2 lg:gap-14">
@@ -279,18 +308,21 @@ function Contact() {
           <div className="mt-8 flex flex-col gap-3">
             <WhatsappBtn className="px-6 py-4 text-base">Escríbenos por WhatsApp</WhatsappBtn>
             <a
-              href={TEL_MOVIL}
+              href={telUrl}
               className="inline-flex items-center justify-center gap-2 border-2 border-vetlain-ink px-6 py-4 text-base font-bold uppercase tracking-wide text-vetlain-ink transition-colors hover:bg-vetlain-ink hover:text-white"
             >
               <PhoneGlyph className="h-5 w-5" />
-              +56 9 6830 2857
+              {phone}
             </a>
           </div>
 
           <ul className="mt-8 space-y-2 text-sm text-neutral-600">
-            <li>Juana Canales 987, Talagante</li>
-            <li>Fijo: +56 2 2815 3975 · vetlain@vetlain.cl</li>
-            <li>Lun a Vie · 09:00 – 18:00</li>
+            <li>{address}</li>
+            <li>
+              {phoneFijo ? `Fijo: ${phoneFijo} · ` : ''}
+              {email}
+            </li>
+            <li>{hours}</li>
           </ul>
         </div>
 
@@ -329,11 +361,24 @@ function Contact() {
                 <span className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-neutral-600">¿Qué viste?</span>
                 <textarea id="p3-msg" name="mensaje" required rows={3} placeholder="Ratones en la cocina, cucarachas en la bodega…" className={`${inputClass} resize-none`} />
               </label>
+              {/* Honeypot anti-spam: oculto para humanos, tentador para bots. */}
+              <input
+                type="text"
+                name="website"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                className="absolute left-[-9999px] h-0 w-0 opacity-0"
+              />
+              {error && (
+                <p className="border-2 border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
+              )}
               <button
                 type="submit"
-                className="inline-flex w-full items-center justify-center gap-2 bg-vetlain-green-dark px-6 py-4 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-vetlain-green-deep"
+                disabled={busy}
+                className="inline-flex w-full items-center justify-center gap-2 bg-vetlain-green-dark px-6 py-4 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-vetlain-green-deep disabled:opacity-60"
               >
-                Quiero que me llamen
+                {busy ? 'Enviando…' : 'Quiero que me llamen'}
                 <ArrowGlyph className="h-4 w-4" />
               </button>
             </form>

@@ -94,9 +94,21 @@ export const blogPosts = pgTable('blog_posts', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 })
 
+/** Contactos recibidos por el formulario del sitio ("quiero que me llamen"). */
+export const leads = pgTable('leads', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 160 }).notNull(),
+  phone: varchar('phone', { length: 60 }).notNull(),
+  comuna: varchar('comuna', { length: 120 }),
+  message: text('message'),
+  handled: boolean('handled').default(false).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+})
+
 // Tipos inferidos para reutilizar en la API y el frontend.
 export type AdminUser = typeof adminUsers.$inferSelect
 export type SiteContentRow = typeof siteContent.$inferSelect
 export type Page = typeof pages.$inferSelect
 export type Service = typeof services.$inferSelect
 export type BlogPost = typeof blogPosts.$inferSelect
+export type Lead = typeof leads.$inferSelect

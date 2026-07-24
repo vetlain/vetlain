@@ -50,4 +50,14 @@ export type BlogPost = {
   updatedAt: string
 }
 
+export type Lead = {
+  id: number
+  name: string
+  phone: string
+  comuna: string | null
+  message: string | null
+  handled: boolean
+  createdAt: string
+}
+
 export type AdminUser = { email: string }
