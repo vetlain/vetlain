@@ -8,7 +8,7 @@
     "dev:web": "vite",
     "dev:api": "tsx watch server/dev.ts",
     "build": "tsc -b && vite build && npm run prerender",
-    "prerender": "cross-env TSX_TSCONFIG_PATH=tsconfig.server.json tsx server/prerender.tsx",
+    "prerender": "cross-env TSX_TSCONFIG_PATH=tsconfig.prerender.json tsx server/prerender.tsx",
     "preview": "vite preview",
     "lint": "eslint .",
     "db:generate": "drizzle-kit generate",

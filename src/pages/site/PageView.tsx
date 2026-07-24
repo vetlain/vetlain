@@ -4,8 +4,7 @@ import type { Page } from '../../lib/types'
 import { sitePages } from '../../site/nav'
 import { Seo } from '../../components/Seo'
 import { Markdown } from '../../components/Markdown'
-import { Tape } from '../../site/chrome'
-import { SiteShell, PageHero, CtaRow, ConstructionNotice } from './parts'
+import { SiteShell, PageHero, ClosingCta, ConstructionNotice } from './parts'
 
 /** Presentación pura: la usan tanto el cliente (tras el fetch) como el prerender. */
 export function PageViewBody({ slug, data, loading }: { slug: string; data: Page | null; loading: boolean }) {
@@ -23,15 +22,14 @@ export function PageViewBody({ slug, data, loading }: { slug: string; data: Page
         path={`/${slug}`}
       />
       <PageHero crumbs={[{ label: title }]} kicker={kicker} title={title} description={description} />
-      <section className="mx-auto max-w-3xl px-5 pb-16">
-        {data?.bodyMd ? (
-          <Markdown source={data.bodyMd} />
-        ) : (
-          !loading && <ConstructionNotice />
-        )}
-        <CtaRow />
+      <section className="bg-white">
+        <div className="mx-auto max-w-6xl px-5 pb-16">
+          <div className="max-w-2xl">
+            {data?.bodyMd ? <Markdown source={data.bodyMd} /> : !loading && <ConstructionNotice />}
+          </div>
+        </div>
       </section>
-      <Tape />
+      <ClosingCta />
     </SiteShell>
   )
 }

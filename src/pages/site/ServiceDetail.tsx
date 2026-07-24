@@ -4,8 +4,15 @@ import { useApi } from '../../lib/useApi'
 import type { Service } from '../../lib/types'
 import { Seo } from '../../components/Seo'
 import { Markdown } from '../../components/Markdown'
-import { Tape } from '../../site/chrome'
-import { SiteShell, PageHero, CtaRow, ConstructionNotice, PageState } from './parts'
+import {
+  SiteShell,
+  PageHero,
+  TrustChips,
+  ServiceAside,
+  ClosingCta,
+  ConstructionNotice,
+  PageState,
+} from './parts'
 
 /** Presentación pura: la usan tanto el cliente (tras el fetch) como el prerender. */
 export function ServiceDetailBody({ slug, data }: { slug: string; data: Service | null }) {
@@ -48,12 +55,20 @@ export function ServiceDetailBody({ slug, data }: { slug: string; data: Service 
         kicker={data.kicker}
         title={data.title}
         description={data.summary}
-      />
-      <section className="mx-auto max-w-3xl px-5 pb-16">
-        {data.bodyMd ? <Markdown source={data.bodyMd} /> : <ConstructionNotice />}
-        <CtaRow />
+      >
+        <TrustChips />
+      </PageHero>
+
+      <section className="bg-white">
+        <div className="mx-auto grid max-w-6xl gap-10 px-5 pb-16 lg:grid-cols-[minmax(0,1fr)_19rem] lg:gap-14">
+          <div className="max-w-2xl">
+            {data.bodyMd ? <Markdown source={data.bodyMd} /> : <ConstructionNotice />}
+          </div>
+          <ServiceAside />
+        </div>
       </section>
-      <Tape />
+
+      <ClosingCta />
     </SiteShell>
   )
 }

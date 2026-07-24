@@ -4,8 +4,7 @@ import { useApi } from '../../lib/useApi'
 import type { BlogPost as Post } from '../../lib/types'
 import { Seo } from '../../components/Seo'
 import { Markdown } from '../../components/Markdown'
-import { Tape } from '../../site/chrome'
-import { SiteShell, PageHero, CtaRow, PageState } from './parts'
+import { SiteShell, PageHero, ClosingCta, PageState } from './parts'
 import { formatDate } from '../../lib/format'
 
 /** Presentación pura: la usan tanto el cliente (tras el fetch) como el prerender. */
@@ -54,14 +53,35 @@ export function BlogPostBody({ slug, data }: { slug: string; data: Post | null }
         title={data.title}
         description={data.excerpt}
       />
-      <article className="mx-auto max-w-3xl px-5 pb-16">
-        {data.coverImage && (
-          <img src={data.coverImage} alt="" className="mb-8 w-full object-cover" loading="lazy" />
-        )}
-        <Markdown source={data.bodyMd} />
-        <CtaRow />
-      </article>
-      <Tape />
+
+      <section className="bg-white">
+        <div className="mx-auto max-w-6xl px-5 pb-16">
+          {data.coverImage && (
+            <div className="mb-10 max-w-3xl pr-2.5">
+              <img
+                src={data.coverImage}
+                alt=""
+                loading="lazy"
+                className="w-full border-2 border-vetlain-ink shadow-[10px_10px_0_0_#3d8b40]"
+              />
+            </div>
+          )}
+          <article className="max-w-2xl">
+            <Markdown source={data.bodyMd} />
+          </article>
+
+          <div className="mt-12 max-w-2xl border-t-2 border-neutral-100 pt-6">
+            <Link
+              to="/blog"
+              className="inline-flex items-center gap-1 text-sm font-bold uppercase tracking-wide text-vetlain-green-dark transition-colors hover:text-vetlain-green-deep"
+            >
+              ← Volver al blog
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <ClosingCta title="¿Necesitas ayuda con una plaga?" />
     </SiteShell>
   )
 }
