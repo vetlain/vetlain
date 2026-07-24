@@ -2,13 +2,14 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api, ApiError } from '../lib/api'
-import type { Page, Service, BlogPost, SiteContentRow, Lead } from '../lib/types'
+import type { Page, Service, Product, BlogPost, SiteContentRow, Lead } from '../lib/types'
 import { PageHeading, Card, Button, Notice, Loading } from './ui'
 
 type Counts = {
   contacto: number
   paginas: number
   servicios: number
+  productos: number
   blog: number
   borradores: number
   leadsPendientes: number
@@ -24,21 +25,23 @@ export default function Dashboard() {
       api.get<SiteContentRow[]>('/admin/content'),
       api.get<Page[]>('/admin/pages'),
       api.get<Service[]>('/admin/services'),
+      api.get<Product[]>('/admin/products'),
       api.get<BlogPost[]>('/admin/blog'),
       api.get<Lead[]>('/admin/leads'),
     ])
-      .then(([content, pages, services, blog, leads]) =>
+      .then(([content, pages, services, products, blog, leads]) =>
         setCounts({
           contacto: content.length,
           paginas: pages.length,
           servicios: services.length,
+          productos: products.length,
           blog: blog.length,
           borradores: blog.filter((p) => p.status === 'draft').length,
           leadsPendientes: leads.filter((l) => !l.handled).length,
         }),
       )
       .catch(() =>
-        setCounts({ contacto: 0, paginas: 0, servicios: 0, blog: 0, borradores: 0, leadsPendientes: 0 }),
+        setCounts({ contacto: 0, paginas: 0, servicios: 0, productos: 0, blog: 0, borradores: 0, leadsPendientes: 0 }),
       )
   }, [])
 
@@ -62,6 +65,7 @@ export default function Dashboard() {
     { to: '/admin/contacto', label: 'Contacto y redes', value: counts?.contacto, unit: 'datos' },
     { to: '/admin/paginas', label: 'Páginas', value: counts?.paginas, unit: 'páginas' },
     { to: '/admin/servicios', label: 'Servicios', value: counts?.servicios, unit: 'servicios' },
+    { to: '/admin/productos', label: 'Productos', value: counts?.productos, unit: 'productos' },
     {
       to: '/admin/blog',
       label: 'Blog',

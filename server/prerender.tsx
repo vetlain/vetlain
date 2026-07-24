@@ -29,15 +29,18 @@ import {
   getSiteContentMap,
   getAllPages,
   getPublishedServices,
+  getPublishedProducts,
   getPublishedBlogPosts,
 } from './content.js'
 import { SiteContentProvider } from '../src/lib/site-content'
 import { PageViewBody } from '../src/pages/site/PageView'
 import { ServiciosIndexBody } from '../src/pages/site/ServiciosIndex'
 import { ServiceDetailBody } from '../src/pages/site/ServiceDetail'
+import { ProductosIndexBody } from '../src/pages/site/ProductosIndex'
+import { ProductDetailBody } from '../src/pages/site/ProductDetail'
 import { BlogListBody } from '../src/pages/site/BlogList'
 import { BlogPostBody } from '../src/pages/site/BlogPost'
-import type { Page, Service, BlogPost } from '../src/lib/types'
+import type { Page, Service, Product, BlogPost } from '../src/lib/types'
 
 const DIST = join(process.cwd(), 'dist')
 
@@ -72,18 +75,21 @@ async function main() {
   let siteContentMap: Record<string, unknown> = {}
   const pagesBySlug = new Map<string, Page>()
   let services: Service[] = []
+  let products: Product[] = []
   let posts: BlogPost[] = []
 
   try {
-    const [contentMap, pageRows, serviceRows, postRows] = await Promise.all([
+    const [contentMap, pageRows, serviceRows, productRows, postRows] = await Promise.all([
       getSiteContentMap(),
       getAllPages(),
       getPublishedServices(),
+      getPublishedProducts(),
       getPublishedBlogPosts(),
     ])
     siteContentMap = contentMap
     for (const row of pageRows) pagesBySlug.set(row.slug, toJsonSafe<Page>(row))
     services = serviceRows.map((s) => toJsonSafe<Service>(s))
+    products = productRows.map((p) => toJsonSafe<Product>(p))
     posts = postRows.map((p) => toJsonSafe<BlogPost>(p))
   } catch (err) {
     console.error('[prerender] No se pudo leer la base de datos; se omite el prerender:', err)
@@ -102,6 +108,16 @@ async function main() {
     ...services.map((s) => ({
       path: `/servicios/${s.slug}`,
       element: wrap(<ServiceDetailBody slug={s.slug} data={s} />),
+    })),
+    {
+      path: '/productos',
+      element: wrap(
+        <ProductosIndexBody page={pagesBySlug.get('productos') ?? null} products={products} loading={false} error={null} />,
+      ),
+    },
+    ...products.map((p) => ({
+      path: `/productos/${p.slug}`,
+      element: wrap(<ProductDetailBody slug={p.slug} data={p} />),
     })),
     ...['nosotros', 'cobertura', 'preguntas-frecuentes', 'contacto'].map((slug) => ({
       path: `/${slug}`,

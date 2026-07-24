@@ -12,6 +12,7 @@ import Dashboard from './Dashboard'
 import ContentEditor from './ContentEditor'
 import PagesEditor from './PagesEditor'
 import ServicesEditor from './ServicesEditor'
+import ProductsEditor from './ProductsEditor'
 import BlogEditor from './BlogEditor'
 import LeadsPanel from './LeadsPanel'
 
@@ -21,6 +22,7 @@ const sections = [
   { to: '/admin/contacto', label: 'Contacto y redes', end: false },
   { to: '/admin/paginas', label: 'Páginas', end: false },
   { to: '/admin/servicios', label: 'Servicios', end: false },
+  { to: '/admin/productos', label: 'Productos', end: false },
   { to: '/admin/blog', label: 'Blog', end: false },
 ]
 
@@ -107,6 +109,7 @@ function Shell() {
               <Route path="contacto" element={<ContentEditor />} />
               <Route path="paginas" element={<PagesEditor />} />
               <Route path="servicios" element={<ServicesEditor />} />
+              <Route path="productos" element={<ProductsEditor />} />
               <Route path="blog/*" element={<BlogEditor />} />
               <Route path="*" element={<Navigate to="/admin" replace />} />
             </Routes>

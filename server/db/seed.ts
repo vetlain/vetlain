@@ -7,13 +7,21 @@
  *  - CLI local:   npm run db:seed  (server/db/seed-cli.ts)
  *  - Vercel:      GET /api/setup?token=...  (server/routes/setup.ts)
  *
+ * Modo `overwrite`: por defecto el seed sólo INSERTA lo que falta y nunca pisa
+ * lo que el cliente haya editado desde el panel. Con `overwrite: true`
+ * (`npm run db:seed:force`, o `?overwrite=1` en /api/setup) además re-sincroniza
+ * servicios, páginas y productos con el texto de este archivo — útil cuando se
+ * incorpora contenido nuevo desde el sitio antiguo, pero descarta ediciones del
+ * panel en esas tablas.
+ *
  * El administrador se crea con ADMIN_EMAIL / ADMIN_PASSWORD del entorno (o los
  * valores por defecto de abajo, que conviene cambiar tras el primer login).
  */
 import { db, schema } from './index.js'
 import { hashPassword } from '../auth.js'
+import { productsSeed } from './seed-products.js'
 
-export async function runSeed() {
+export async function runSeed({ overwrite = false }: { overwrite?: boolean } = {}) {
   /* ── Administrador ─────────────────────────────────────────────────── */
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@vetlain.cl'
   const adminPassword = process.env.ADMIN_PASSWORD || 'vetlain2026'
@@ -43,7 +51,17 @@ export async function runSeed() {
   console.log(`✓ contenido suelto: ${content.length} claves`)
 
   /* ── Servicios ─────────────────────────────────────────────────────── */
-  const services = [
+  type ServiceSeed = {
+    slug: string
+    title: string
+    kicker: string
+    icon: string
+    summary: string
+    bodyMd: string
+    seoTitle?: string
+    seoDescription?: string
+  }
+  const services: ServiceSeed[] = [
     {
       slug: 'desratizacion',
       title: 'Desratización',
@@ -52,7 +70,7 @@ export async function runSeed() {
       summary:
         'Eliminación y control de ratas y ratones con estaciones certificadas, sellado de accesos y monitoreo posterior.',
       bodyMd:
-        '## Control integral de roedores\n\nRealizamos una inspección en terreno para detectar accesos, madrigueras y rutas de desplazamiento. Instalamos **estaciones de cebo certificadas** en puntos estratégicos, sellamos ingresos y programamos visitas de monitoreo para asegurar el control en el tiempo.\n\n- Diagnóstico y plano de instalación\n- Estaciones a prueba de manipulación\n- Sellado de accesos\n- Informe y certificado del servicio',
+        '## Control de Roedores\n\nAlgunas especies de roedores están altamente adaptadas al medio urbano y poseen altas capacidades de colonizar nuestros ambientes, siendo un riesgo para la Salud Pública al ser un transmisor de muchas enfermedades. En caso de detectar o necesitar un plan de gestión de plagas contra roedores en AMBIENTE CERO, nos basaremos en el empleo de sistemas preventivos como modificación del medio y sistemas de control directo, es decir, utilizaremos tanto controles físico-mecánicos como otros químicos.\n\n### Cómo trabajamos\n\nRealizamos una inspección en terreno para detectar accesos, madrigueras y rutas de desplazamiento. Instalamos **estaciones de cebo certificadas** en puntos estratégicos, sellamos ingresos y programamos visitas de monitoreo para asegurar el control en el tiempo.\n\n- Diagnóstico y plano de instalación\n- Estaciones a prueba de manipulación\n- Sellado de accesos\n- Informe y certificado del servicio\n\n[Ver los productos que usamos para el control de roedores →](/productos#roedores)',
     },
     {
       slug: 'desinsectacion',
@@ -62,7 +80,7 @@ export async function runSeed() {
       summary:
         'Control de cucarachas, hormigas, moscas y otros insectos con productos de bajo impacto para casa y negocio.',
       bodyMd:
-        '## Adiós a las plagas de insectos\n\nAplicamos tratamientos focalizados según el tipo de insecto y el lugar, priorizando **productos de bajo impacto** para personas y mascotas. Combinamos aspersión, gel y barreras según corresponda.\n\n- Cucarachas, hormigas, moscas, pulgas y más\n- Productos autorizados por la autoridad sanitaria\n- Recomendaciones de prevención posteriores',
+        '## Control de Insectos\n\nLas plagas urbanas son aquellas especies implicadas en la transferencia de enfermedades infecciosas para el hombre y en el daño o deterioro de nuestro hábitat. Por esto, se ha sentido la necesidad de eliminar, o al menos controlar, las plagas de insectos a fin de disminuir el daño que causan desde épocas remotas.\n\nCon el fin de minimizar estos problemas en ambientes interiores, se vienen desarrollando acciones de control de plagas como son la Desinsectación y Desinfección. Priorizamos la implementación de medidas preventivas, limitando el uso de productos químicos sólo en los casos en los que las medidas naturales sean insuficientes. Así disminuye el riesgo para la salud pública y el impacto medioambiental que lleva asociados el uso de productos químicos.\n\n### Cómo trabajamos\n\nAplicamos tratamientos focalizados según el tipo de insecto y el lugar, priorizando **productos de bajo impacto** para personas y mascotas. Combinamos aspersión, gel y barreras según corresponda.\n\n- Cucarachas, hormigas, moscas, pulgas y más\n- Productos autorizados por la autoridad sanitaria\n- Recomendaciones de prevención posteriores\n\n[Ver los productos que usamos para el control de insectos →](/productos#insectos)',
     },
     {
       slug: 'control-de-aves',
@@ -72,7 +90,7 @@ export async function runSeed() {
       summary:
         'Disuasión, exclusión y captura de aves en fachadas, techos y patios, sin dañar la infraestructura.',
       bodyMd:
-        '## Manejo responsable de aves\n\nInstalamos sistemas de **disuasión y exclusión** (púas, redes, tensados) que impiden que las aves aniden sin dañarlas ni afectar la fachada. Evaluamos cada estructura para elegir la solución adecuada.\n\n- Púas y redes anti-aves\n- Limpieza y desinfección de zonas afectadas\n- Soluciones discretas y duraderas',
+        '## Control de Aves\n\nLas aves urbanas pueden causar importantes problemas de salud. Enfermedades producidas por la contaminación con sus heces a los alimentos y propagan plagas de ácaros e insectos. Por ello es que en situaciones urbanas pueden causar numerosos problemas en la infraestructura, especialmente en edificios, llegando a constituirse en plagas. Por todo esto, muchas veces es necesario proteger estos edificios e inclusive llevar a cabo medidas de reducción de la población de las aves.\n\nEl control de aves es un tema complejo y especializado ya que son animales móviles, adaptables y persistentes, por lo tanto, difíciles de controlar. Si no se emplean los métodos adecuados para cada situación tal como lo hacemos nosotros, puede salir más costoso.\n\n### Cómo trabajamos\n\nInstalamos sistemas de **disuasión y exclusión** (púas, redes, tensados) que impiden que las aves aniden sin dañarlas ni afectar la fachada. Evaluamos cada estructura para elegir la solución adecuada.\n\n- Púas y redes anti-aves\n- Limpieza y desinfección de zonas afectadas\n- Soluciones discretas y duraderas\n\n[Ver los productos que usamos para el control de aves →](/productos#aves)',
     },
     {
       slug: 'desinfeccion',
@@ -92,16 +110,46 @@ export async function runSeed() {
       summary:
         'Programas de control de plagas a medida bajo norma sanitaria para plantas, bodegas y locales comerciales.',
       bodyMd:
-        '## Programas para empresas\n\nDiseñamos un **programa de control de plagas a medida**, con visitas periódicas, registros y documentación lista para auditorías e inspecciones sanitarias (ISO 9001, HACCP, etc.).\n\n- Plan anual con visitas programadas\n- Registros y planos de estaciones\n- Documentación para auditorías\n- Respuesta ante emergencias',
+        '## Programas para empresas\n\nDiseñamos un **programa de control de plagas a medida**, con visitas periódicas, registros y documentación lista para auditorías e inspecciones sanitarias (ISO 9001, HACCP, etc.).\n\n- Plan anual con visitas programadas\n- Registros y planos de estaciones\n- Documentación para auditorías\n- Respuesta ante emergencias\n\n### Dónde aplicamos el servicio\n\n- Espacios Comunes\n- Bodegas\n- Oficinas\n- Control Externo de Plagas\n- Plantas Alimentarias\n- Casinos',
+    },
+    {
+      slug: 'capacitaciones',
+      title: 'Capacitaciones',
+      kicker: 'Servicio',
+      icon: 'training',
+      summary:
+        'Formamos a tu equipo en identificación temprana de plagas, prevención y medidas de control preventivas y correctivas.',
+      bodyMd:
+        '## Capacitaciones\n\nLos beneficios de capacitar a los clientes en el manejo y control de plagas incluyen:\n\n- **Maneras de conocer y manejar las plagas de forma temprana.** Para ello los capacitamos en identificar las diferentes plagas que pueden encontrar en su propiedad o tipo de negocio.\n- **Medidas para prevenir la propagación de enfermedades y lesiones de los colaboradores.** Cuáles son las condiciones que atraen a las plagas tales como la suciedad, la humedad y los alimentos.\n- **Definición de medidas que protejan sus espacios de las plagas.** Para ello, les presentamos métodos de control de plagas, tanto preventivos como correctivos.',
+      seoTitle: 'Capacitaciones en manejo y control de plagas | Vetlain',
+      seoDescription:
+        'Capacitamos a tu equipo en identificación temprana de plagas, prevención de enfermedades y medidas de control preventivas y correctivas.',
     },
   ]
   for (const [i, s] of services.entries()) {
-    await db
-      .insert(schema.services)
-      .values({ ...s, sortOrder: i, published: true })
-      .onConflictDoNothing({ target: schema.services.slug })
+    const values = { ...s, sortOrder: i, published: true }
+    const insert = db.insert(schema.services).values(values)
+    await (overwrite
+      ? insert.onConflictDoUpdate({
+          target: schema.services.slug,
+          set: { ...values, updatedAt: new Date() },
+        })
+      : insert.onConflictDoNothing({ target: schema.services.slug }))
   }
   console.log(`✓ servicios: ${services.length}`)
+
+  /* ── Productos ─────────────────────────────────────────────────────── */
+  for (const [i, p] of productsSeed.entries()) {
+    const values = { ...p, sortOrder: i, published: true }
+    const insert = db.insert(schema.products).values(values)
+    await (overwrite
+      ? insert.onConflictDoUpdate({
+          target: schema.products.slug,
+          set: { ...values, updatedAt: new Date() },
+        })
+      : insert.onConflictDoNothing({ target: schema.products.slug }))
+  }
+  console.log(`✓ productos: ${productsSeed.length}`)
 
   /* ── Páginas ───────────────────────────────────────────────────────── */
   const pages = [
@@ -146,12 +194,24 @@ export async function runSeed() {
       title: 'Servicios',
       kicker: 'Control de plagas',
       description:
-        'Desratización, desinsectación, control de aves, desinfección y programas para empresas. Cobertura en Talagante y alrededores con certificación ISO 9001.',
+        'Somos una empresa de control y manejo integral de plagas, comprometida con las necesidades, requerimientos ambientales e higiene de nuestros clientes.',
       bodyMd:
-        '## Nuestros servicios\n\nControlamos las principales plagas urbanas para hogares y empresas, con productos autorizados y respaldo por escrito. Revisa cada servicio para conocer el detalle, o escríbenos y te asesoramos según tu caso.',
+        '## Servicio de mantención de ambientes libres de plagas\n\nVelamos por un servicio de excelencia, con atención personalizada y especializada, que responde a cada necesidad que tenga entre nuestros servicios.\n\n**Nuestro negocio es mantener el suyo ¡sin plagas!**',
       seoTitle: 'Servicios de control de plagas | Vetlain — Talagante',
       seoDescription:
-        'Desratización, desinsectación, control de aves, desinfección y programas para empresas con certificación ISO 9001 en Talagante y alrededores.',
+        'Desratización, desinsectación, control de aves, capacitaciones y programas para empresas con certificación ISO 9001 en Talagante y alrededores.',
+    },
+    {
+      slug: 'productos',
+      title: 'Productos',
+      kicker: 'Catálogo',
+      description:
+        'Equipos y dispositivos que usamos en terreno para el control de roedores, insectos y aves: trampas ecológicas, estaciones de control, lámparas UV, atrayentes y sistemas anti-aves.',
+      bodyMd:
+        '## Nuestro catálogo\n\nTrabajamos con equipos y dispositivos de marcas especializadas, priorizando siempre la seguridad del entorno: soluciones sin veneno, sin dispersión de cadáveres y aptas para plantas alimentarias, bodegas, oficinas y espacios de atención de público.\n\n¿Necesitas alguno de estos productos o quieres saber cuál se adapta a tu caso? Escríbenos y te asesoramos sin costo.',
+      seoTitle: 'Productos para el control de plagas | Vetlain',
+      seoDescription:
+        'Catálogo Vetlain: Ekomille, Ekologic, EVO, Snap Trap, Nara Lure, Vastrap, Mouse Shield, Tunap, lámparas UV, Blatrap, XLure MST, trampa rotatoria e INOX 80/25.',
     },
     {
       slug: 'contacto',
@@ -167,7 +227,10 @@ export async function runSeed() {
     },
   ]
   for (const p of pages) {
-    await db.insert(schema.pages).values(p).onConflictDoNothing({ target: schema.pages.slug })
+    const insert = db.insert(schema.pages).values(p)
+    await (overwrite
+      ? insert.onConflictDoUpdate({ target: schema.pages.slug, set: { ...p, updatedAt: new Date() } })
+      : insert.onConflictDoNothing({ target: schema.pages.slug }))
   }
   console.log(`✓ páginas: ${pages.length}`)
 
@@ -194,8 +257,10 @@ export async function runSeed() {
 
   return {
     admin: adminEmail,
+    modo: overwrite ? 'overwrite (re-sincroniza servicios, páginas y productos)' : 'solo inserta lo que falta',
     content: content.length,
     services: services.length,
+    products: productsSeed.length,
     pages: pages.length,
     blog: 1,
   }

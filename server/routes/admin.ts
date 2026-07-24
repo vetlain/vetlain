@@ -143,6 +143,58 @@ adminRouter.delete('/services/:id', async (req, res) => {
   res.json({ ok: true })
 })
 
+/* ── Productos ───────────────────────────────────────────────────────── */
+
+const productFields = z.object({
+  slug: z.string().min(1),
+  name: z.string().min(1),
+  category: z.enum(['roedores', 'insectos', 'aves']),
+  summary: z.string().nullish(),
+  bodyMd: z.string().nullish(),
+  image: z.string().nullish(),
+  sortOrder: z.number().int().optional(),
+  published: z.boolean().optional(),
+  seoTitle: z.string().nullish(),
+  seoDescription: z.string().nullish(),
+})
+
+adminRouter.get('/products', async (_req, res) => {
+  res.json(await db.select().from(schema.products).orderBy(schema.products.sortOrder))
+})
+
+adminRouter.post('/products', async (req, res) => {
+  const parsed = productFields.safeParse(req.body)
+  if (!parsed.success) {
+    res.status(400).json({ error: 'Datos inválidos' })
+    return
+  }
+  const [row] = await db.insert(schema.products).values(parsed.data).returning()
+  res.status(201).json(row)
+})
+
+adminRouter.put('/products/:id', async (req, res) => {
+  const parsed = productFields.partial().safeParse(req.body)
+  if (!parsed.success) {
+    res.status(400).json({ error: 'Datos inválidos' })
+    return
+  }
+  const [row] = await db
+    .update(schema.products)
+    .set({ ...parsed.data, updatedAt: new Date() })
+    .where(eq(schema.products.id, Number(req.params.id)))
+    .returning()
+  if (!row) {
+    res.status(404).json({ error: 'Producto no encontrado' })
+    return
+  }
+  res.json(row)
+})
+
+adminRouter.delete('/products/:id', async (req, res) => {
+  await db.delete(schema.products).where(eq(schema.products.id, Number(req.params.id)))
+  res.json({ ok: true })
+})
+
 /* ── Blog ────────────────────────────────────────────────────────────── */
 
 const postFields = z.object({

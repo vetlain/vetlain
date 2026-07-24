@@ -2,9 +2,13 @@
  * Arranque de la base desde Vercel (sin terminal local).
  *
  *   GET /api/setup?token=EL_TOKEN
+ *   GET /api/setup?token=EL_TOKEN&overwrite=1
  *
  * Crea las tablas (DDL) y carga el contenido inicial (seed). Es idempotente:
  * si las tablas ya existen o los datos ya están, no rompe.
+ *
+ * Con `overwrite=1` el seed además re-sincroniza servicios, páginas y productos
+ * con el texto del código (descarta ediciones hechas en el panel en esas tablas).
  *
  * Protegido por SETUP_TOKEN (variable de entorno). Tras dejar la base lista,
  * conviene borrar SETUP_TOKEN de Vercel para deshabilitar el endpoint.
@@ -17,7 +21,7 @@ import { getDatabaseUrl } from '../env.js'
 
 export const setupRouter = Router()
 
-async function handleSetup(token: unknown): Promise<
+async function handleSetup(token: unknown, overwrite: boolean): Promise<
   | { ok: true; tablas: string[]; seed: Awaited<ReturnType<typeof runSeed>> }
   | { ok: false; status: number; error: string }
 > {
@@ -57,13 +61,13 @@ async function handleSetup(token: unknown): Promise<
     }
   }
 
-  const seed = await runSeed()
+  const seed = await runSeed({ overwrite })
   return { ok: true, tablas, seed }
 }
 
 setupRouter.get('/', async (req, res) => {
   try {
-    const result = await handleSetup(req.query.token)
+    const result = await handleSetup(req.query.token, req.query.overwrite === '1')
     if (!result.ok) {
       res.status(result.status).json({ error: result.error })
       return

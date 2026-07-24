@@ -3,9 +3,18 @@ import { Link } from 'react-router-dom'
 import { useApi } from '../../lib/useApi'
 import type { Page, Service } from '../../lib/types'
 import { Seo } from '../../components/Seo'
+import { Markdown } from '../../components/Markdown'
 import { ChevronGlyph } from '../../site/chrome'
 import { ServiceIcon } from '../../site/service-icons'
-import { SiteShell, PageHero, ClosingCta, PageState } from './parts'
+import {
+  SiteShell,
+  PageHero,
+  ClosingCta,
+  PageState,
+  ServicePillars,
+  ServiceSectors,
+  TrustedClients,
+} from './parts'
 
 /** Presentación pura: la usan tanto el cliente (tras el fetch) como el prerender. */
 export function ServiciosIndexBody({
@@ -34,8 +43,23 @@ export function ServiciosIndexBody({
       />
       <PageHero crumbs={[{ label: 'Servicios' }]} kicker={kicker} title={title} description={description} />
 
+      {page?.bodyMd && (
+        <section className="bg-white">
+          <div className="mx-auto max-w-6xl px-5 pb-10">
+            <div className="max-w-2xl">
+              <Markdown source={page.bodyMd} />
+            </div>
+          </div>
+        </section>
+      )}
+
+      <ServicePillars />
+
       <section className="bg-white">
         <div className="mx-auto max-w-6xl px-5 pb-16">
+          <h2 className="p3-display mb-8 text-[clamp(1.6rem,4vw,2.5rem)] uppercase leading-[0.95] text-vetlain-ink">
+            Nuestros servicios
+          </h2>
           {loading && <PageState>Cargando servicios…</PageState>}
           {error && !services && (
             <PageState>No pudimos cargar los servicios. Escríbenos y te ayudamos igual.</PageState>
@@ -49,9 +73,9 @@ export function ServiciosIndexBody({
                   className="group flex flex-col border-2 border-neutral-200 p-5 transition-colors hover:border-vetlain-green"
                 >
                   <ServiceIcon icon={s.icon} className="h-9 w-9 text-vetlain-green-dark" />
-                  <h2 className="mt-4 text-lg font-extrabold uppercase tracking-tight text-vetlain-ink">
+                  <h3 className="mt-4 text-lg font-extrabold uppercase tracking-tight text-vetlain-ink">
                     {s.title}
-                  </h2>
+                  </h3>
                   {s.summary && (
                     <p className="mt-1.5 flex-1 text-sm leading-relaxed text-neutral-600">{s.summary}</p>
                   )}
@@ -65,6 +89,9 @@ export function ServiciosIndexBody({
           )}
         </div>
       </section>
+
+      <ServiceSectors />
+      <TrustedClients />
 
       <ClosingCta />
     </SiteShell>

@@ -10,6 +10,7 @@ export type NavItem = { label: string; to: string }
 /** Navegación principal (barra superior). */
 export const mainNav: NavItem[] = [
   { label: 'Servicios', to: '/servicios' },
+  { label: 'Productos', to: '/productos' },
   { label: 'Nosotros', to: '/nosotros' },
   { label: 'Cobertura', to: '/cobertura' },
   { label: 'Blog', to: '/blog' },
@@ -25,6 +26,16 @@ export const footerGroups: { title: string; links: NavItem[] }[] = [
       { label: 'Control de aves', to: '/servicios/control-de-aves' },
       { label: 'Desinfección y sanitización', to: '/servicios/desinfeccion' },
       { label: 'Empresas y bodegas', to: '/servicios/empresas' },
+      { label: 'Capacitaciones', to: '/servicios/capacitaciones' },
+    ],
+  },
+  {
+    title: 'Productos',
+    links: [
+      { label: 'Control de roedores', to: '/productos#roedores' },
+      { label: 'Control de insectos', to: '/productos#insectos' },
+      { label: 'Control de aves', to: '/productos#aves' },
+      { label: 'Ver catálogo completo', to: '/productos' },
     ],
   },
   {
@@ -64,6 +75,13 @@ export const sitePages: SitePageDef[] = [
     title: 'Servicios',
     description:
       'Desratización, desinsectación, control de aves, desinfección y programas para empresas. Cobertura en Talagante y alrededores con certificación ISO 9001.',
+  },
+  {
+    path: '/productos',
+    kicker: 'Catálogo',
+    title: 'Productos',
+    description:
+      'Equipos y dispositivos para el control de roedores, insectos y aves: trampas ecológicas, estaciones de control, lámparas UV, atrayentes y sistemas anti-aves.',
   },
   {
     path: '/nosotros',
@@ -134,5 +152,12 @@ export const sitePages: SitePageDef[] = [
     title: 'Empresas y bodegas',
     description:
       'Programas de control de plagas a medida bajo norma sanitaria para plantas, bodegas y locales comerciales.',
+  },
+  {
+    path: '/servicios/capacitaciones',
+    kicker: 'Servicio',
+    title: 'Capacitaciones',
+    description:
+      'Formamos a tu equipo en identificación temprana de plagas, prevención y medidas de control preventivas y correctivas.',
   },
 ]

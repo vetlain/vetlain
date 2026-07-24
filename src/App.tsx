@@ -5,6 +5,8 @@ import Prototipo2 from './pages/Prototipo2'
 import Prototipo3 from './pages/Prototipo3'
 import ServiciosIndex from './pages/site/ServiciosIndex'
 import ServiceDetail from './pages/site/ServiceDetail'
+import ProductosIndex from './pages/site/ProductosIndex'
+import ProductDetail from './pages/site/ProductDetail'
 import PageView from './pages/site/PageView'
 import BlogList from './pages/site/BlogList'
 import BlogPost from './pages/site/BlogPost'
@@ -23,6 +25,8 @@ export default function App() {
       {/* Páginas internas: contenido servido desde la API (editable en el panel). */}
       <Route path="/servicios" element={<ServiciosIndex />} />
       <Route path="/servicios/:slug" element={<ServiceDetail />} />
+      <Route path="/productos" element={<ProductosIndex />} />
+      <Route path="/productos/:slug" element={<ProductDetail />} />
       <Route path="/nosotros" element={<PageView slug="nosotros" />} />
       <Route path="/cobertura" element={<PageView slug="cobertura" />} />
       <Route path="/preguntas-frecuentes" element={<PageView slug="preguntas-frecuentes" />} />

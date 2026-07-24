@@ -7,6 +7,7 @@
  *                    dirección, horario, WhatsApp, redes sociales…
  *  - pages         → páginas largas editables (nosotros, cobertura, FAQ…).
  *  - services      → fichas de servicio (desratización, desinsectación…).
+ *  - products      → catálogo de productos (Ekomille, Blatrap, INOX 80/25…).
  *  - blog_posts    → entradas del blog (sin comentarios por ahora).
  *
  * Cada tabla con contenido público lleva campos SEO (seo_title / seo_description)
@@ -78,6 +79,27 @@ export const services = pgTable('services', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 })
 
+/**
+ * Catálogo de productos (cuelgan de /productos y /productos/:slug).
+ * `category` es texto libre acotado a 'roedores' | 'insectos' | 'aves' (validado
+ * en la API): un varchar en vez de un enum de Postgres para que añadir una
+ * categoría nueva más adelante no exija una migración.
+ */
+export const products = pgTable('products', {
+  id: serial('id').primaryKey(),
+  slug: varchar('slug', { length: 160 }).notNull().unique(),
+  name: text('name').notNull(),
+  category: varchar('category', { length: 40 }).notNull(),
+  summary: text('summary'),
+  bodyMd: text('body_md'),
+  image: text('image'),
+  sortOrder: integer('sort_order').default(0).notNull(),
+  published: boolean('published').default(true).notNull(),
+  seoTitle: text('seo_title'),
+  seoDescription: text('seo_description'),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+})
+
 /** Entradas del blog. Cuerpo en Markdown; se renderiza a HTML en el servidor. */
 export const blogPosts = pgTable('blog_posts', {
   id: serial('id').primaryKey(),
@@ -110,5 +132,6 @@ export type AdminUser = typeof adminUsers.$inferSelect
 export type SiteContentRow = typeof siteContent.$inferSelect
 export type Page = typeof pages.$inferSelect
 export type Service = typeof services.$inferSelect
+export type Product = typeof products.$inferSelect
 export type BlogPost = typeof blogPosts.$inferSelect
 export type Lead = typeof leads.$inferSelect

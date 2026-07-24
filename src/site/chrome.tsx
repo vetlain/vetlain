@@ -206,7 +206,7 @@ export function Footer() {
   return (
     <footer className="bg-vetlain-ink text-neutral-400">
       <Tape />
-      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-12 sm:grid-cols-2 md:grid-cols-[1.6fr_1fr_1fr]">
+      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-12 sm:grid-cols-2 md:grid-cols-[1.6fr_1fr_1fr_1fr]">
         {/* Marca + contacto */}
         <div>
           <img

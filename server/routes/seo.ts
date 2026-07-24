@@ -29,14 +29,24 @@ export function robotsHandler(_req: Request, res: Response): void {
 
 export async function sitemapHandler(_req: Request, res: Response): Promise<void> {
   const base = baseUrl()
-  const staticPaths = ['/', '/servicios', '/nosotros', '/cobertura', '/preguntas-frecuentes', '/contacto', '/blog']
+  const staticPaths = [
+    '/',
+    '/servicios',
+    '/productos',
+    '/nosotros',
+    '/cobertura',
+    '/preguntas-frecuentes',
+    '/contacto',
+    '/blog',
+  ]
 
   type Entry = { loc: string; lastmod?: string }
   const entries: Entry[] = staticPaths.map((p) => ({ loc: base + p }))
 
   try {
-    const [services, posts] = await Promise.all([
+    const [services, products, posts] = await Promise.all([
       db.select().from(schema.services).where(eq(schema.services.published, true)),
+      db.select().from(schema.products).where(eq(schema.products.published, true)),
       db
         .select()
         .from(schema.blogPosts)
@@ -45,6 +55,9 @@ export async function sitemapHandler(_req: Request, res: Response): Promise<void
     ])
     for (const s of services) {
       entries.push({ loc: `${base}/servicios/${s.slug}`, lastmod: s.updatedAt?.toISOString?.() })
+    }
+    for (const p of products) {
+      entries.push({ loc: `${base}/productos/${p.slug}`, lastmod: p.updatedAt?.toISOString?.() })
     }
     for (const p of posts) {
       entries.push({ loc: `${base}/blog/${p.slug}`, lastmod: (p.updatedAt ?? p.publishedAt)?.toISOString?.() })

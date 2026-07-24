@@ -15,6 +15,13 @@
       "when": 1784859960031,
       "tag": "0001_modern_lenny_balinger",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1784906225982,
+      "tag": "0002_productos",
+      "breakpoints": true
     }
   ]
 }

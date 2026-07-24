@@ -1,6 +1,6 @@
 /** Piezas compartidas de las páginas internas del sitio (chrome + hero + cierre). */
 import { useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import {
   Header,
@@ -9,14 +9,22 @@ import {
   WhatsappBtn,
   ChevronGlyph,
   PhoneGlyph,
+  A,
 } from '../../site/chrome'
 import { useSiteContent } from '../../lib/site-content'
 
-/** Envoltorio con encabezado, pie y CTA fijo; hace scroll arriba al cambiar. */
+/**
+ * Envoltorio con encabezado, pie y CTA fijo. Al cambiar de página hace scroll
+ * arriba, salvo que la URL traiga un ancla (p. ej. /productos#roedores), en
+ * cuyo caso salta a esa sección.
+ */
 export function SiteShell({ scrollKey, children }: { scrollKey?: string; children: ReactNode }) {
+  const { hash } = useLocation()
   useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [scrollKey])
+    const target = hash ? document.getElementById(decodeURIComponent(hash.slice(1))) : null
+    if (target) target.scrollIntoView({ block: 'start' })
+    else window.scrollTo(0, 0)
+  }, [scrollKey, hash])
   return (
     <div className="p3 flex min-h-screen flex-col bg-white text-vetlain-ink">
       <Header />
@@ -142,6 +150,119 @@ export function ServiceAside() {
         </p>
       </div>
     </aside>
+  )
+}
+
+/* ── Secciones estáticas de /servicios (traídas del sitio original) ───────
+ * Estas tres secciones NO se editan desde el panel: son contenido fijo del
+ * sitio antiguo que el cliente pidió mantener tal cual. Para cambiarlas hay que
+ * tocar este archivo. */
+
+/** Los tres pilares del sitio original ("Técnicos CERTIFICADOS", etc.). */
+export function ServicePillars() {
+  const pillars = [
+    {
+      soft: 'Técnicos',
+      strong: 'Certificados',
+      text: 'Nuestro equipo de trabajo ha sido cuidadosamente capacitado en el trabajo de excelencia y seguro.',
+    },
+    {
+      soft: 'El mejor',
+      strong: 'Servicio',
+      text: 'Todos los productos con los que trabajamos priorizan la seguridad del entorno.',
+    },
+    {
+      soft: 'Mejora',
+      strong: 'Continua',
+      text: 'Trabajamos bajo las normas de la ISO 9001 - 2015 que nos obliga a funcionar ordenada y sistemáticamente.',
+    },
+  ]
+  return (
+    <section className="bg-white">
+      <div className="mx-auto grid max-w-6xl gap-4 px-5 pb-14 sm:grid-cols-3">
+        {pillars.map((p) => (
+          <div key={p.strong} className="border-t-4 border-vetlain-green bg-vetlain-green-tint/40 p-5">
+            <h2 className="p3-display text-xl uppercase leading-tight text-vetlain-ink">
+              <span className="font-normal text-neutral-600">{p.soft} </span>
+              {p.strong}
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-neutral-600">{p.text}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+/** Rubros y espacios donde trabajamos (las 6 tarjetas del sitio original). */
+export function ServiceSectors() {
+  const sectors = [
+    { label: 'Espacios Comunes', img: 'brand/sectores/espacios-comunes.jpg' },
+    { label: 'Bodegas', img: 'brand/sectores/bodegas.jpg' },
+    { label: 'Oficinas', img: 'brand/sectores/oficinas.jpg' },
+    { label: 'Control Externo de Plagas', img: 'brand/sectores/control-externo.jpg' },
+    { label: 'Plantas Alimentarias', img: 'brand/sectores/plantas-alimentarias.jpg' },
+    { label: 'Casinos', img: 'brand/sectores/casinos.gif' },
+  ]
+  return (
+    <section className="border-t-2 border-neutral-100 bg-white">
+      <div className="mx-auto max-w-6xl px-5 py-14">
+        <h2 className="p3-display text-[clamp(1.6rem,4vw,2.5rem)] uppercase leading-[0.95] text-vetlain-ink">
+          Dónde trabajamos
+        </h2>
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-neutral-600">
+          Atendemos hogares, comunidades y empresas: desde espacios comunes hasta plantas
+          alimentarias con exigencias sanitarias.
+        </p>
+        <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {sectors.map((s) => (
+            <li key={s.label} className="group relative overflow-hidden border-2 border-neutral-200">
+              <img
+                src={A + s.img}
+                alt={s.label}
+                loading="lazy"
+                className="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-vetlain-ink/90 to-transparent px-4 pb-3 pt-10">
+                <span className="text-sm font-extrabold uppercase tracking-wide text-white">{s.label}</span>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+/** "Han confiado en nosotros": logos de clientes. Estático, no editable. */
+export function TrustedClients() {
+  const clients = [
+    { name: 'Aristía', src: 'brand/cliente-aristia.png' },
+    { name: 'Brüggen', src: 'brand/cliente-bruggen.png' },
+    { name: 'Huentelauquén', src: 'brand/cliente-huentelauquen.png' },
+    { name: 'Pacífico Sur', src: 'brand/cliente-pacifico-sur.png' },
+    { name: 'Puratos', src: 'brand/cliente-puratos.png' },
+  ]
+  return (
+    <section className="border-t-2 border-neutral-100 bg-white">
+      <div className="mx-auto max-w-6xl px-5 py-14">
+        <h2 className="p3-display text-center text-[clamp(1.6rem,4vw,2.5rem)] uppercase leading-[0.95] text-vetlain-ink">
+          Han confiado en nosotros
+        </h2>
+        <ul className="mt-9 flex flex-wrap items-center justify-center gap-x-10 gap-y-8 sm:gap-x-14">
+          {clients.map((c) => (
+            <li key={c.name}>
+              <img
+                src={A + c.src}
+                alt={c.name}
+                loading="lazy"
+                className="h-12 w-auto max-w-[9rem] object-contain opacity-70 grayscale transition duration-300 hover:opacity-100 hover:grayscale-0 sm:h-14"
+              />
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
   )
 }
 

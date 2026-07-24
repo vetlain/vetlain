@@ -35,6 +35,30 @@ export type Service = {
   updatedAt: string
 }
 
+/** Categorías del catálogo de productos (espejo del validador de la API). */
+export type ProductCategory = 'roedores' | 'insectos' | 'aves'
+
+export const PRODUCT_CATEGORIES: { id: ProductCategory; label: string; heading: string }[] = [
+  { id: 'roedores', label: 'Control Roedores', heading: 'Control de Roedores' },
+  { id: 'insectos', label: 'Control Insectos', heading: 'Control de Insectos' },
+  { id: 'aves', label: 'Control Aves', heading: 'Control de Aves' },
+]
+
+export type Product = {
+  id: number
+  slug: string
+  name: string
+  category: ProductCategory
+  summary: string | null
+  bodyMd: string | null
+  image: string | null
+  sortOrder: number
+  published: boolean
+  seoTitle: string | null
+  seoDescription: string | null
+  updatedAt: string
+}
+
 export type BlogPost = {
   id: number
   slug: string

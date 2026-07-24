@@ -55,3 +55,50 @@ Estos son datos verificados del negocio (sirven de insumo, no de estética):
 
 > Nota: la portada de vetlain.cl está comprometida (redirect a spam); toda la
 > identidad se extrajo de las páginas internas sanas, no del home hackeado.
+
+## Contenido migrado desde el sitio antiguo
+
+Se transcribió el contenido de `vetlain.cl/servicios/` y `vetlain.cl/productos/`
+para que la web nueva ofrezca lo mismo que la original:
+
+- **Servicios** (`/servicios`): los textos originales de *Control de Roedores*,
+  *Control de Insectos* y *Control de Aves* pasaron al `bodyMd` de las fichas
+  existentes, y se creó la ficha nueva **Capacitaciones**. Los 6 rubros
+  (*Espacios Comunes, Bodegas, Oficinas, Control Externo de Plagas, Plantas
+  Alimentarias, Casinos*) se listan en la ficha *Empresas y bodegas* y como
+  sección con imágenes en el índice.
+- **Productos** (`/productos`, `/productos/:slug`): tabla `products` nueva, con
+  los **17 productos** del catálogo original agrupados en 3 categorías
+  (roedores / insectos / aves). Editable desde el panel en *Productos*.
+- **Imágenes**: descargadas del sitio antiguo a `public/brand/productos/` (17)
+  y `public/brand/sectores/` (6).
+
+### Secciones estáticas (no editables desde el panel)
+
+Viven en `src/pages/site/parts.tsx` y sólo se cambian tocando ese archivo:
+
+| Componente | Dónde | Qué es |
+|---|---|---|
+| `ServicePillars` | `/servicios` | Los 3 pilares del sitio original (Técnicos Certificados / El mejor Servicio / Mejora Continua). |
+| `ServiceSectors` | `/servicios` | Los 6 rubros con foto. |
+| `TrustedClients` | `/servicios` | **"Han confiado en nosotros"** — logos de Aristía, Brüggen, Huentelauquén, Pacífico Sur y Puratos. Estático por pedido del cliente. |
+
+### Cargar el contenido en la base
+
+El seed inserta sólo lo que falta y **nunca pisa** lo que el cliente editó en el
+panel. Para re-sincronizar servicios, páginas y productos con el texto del
+código (por ejemplo, la primera vez tras esta migración) hay que forzarlo:
+
+```bash
+npm run db:migrate      # crea la tabla products (migración 0002)
+npm run db:seed:force   # inserta los 17 productos y actualiza servicios/páginas
+```
+
+En Vercel, donde no hay terminal, el equivalente es visitar una vez:
+
+```
+/api/setup?token=EL_SETUP_TOKEN&overwrite=1
+```
+
+Después conviene pulsar **Publicar cambios** en el panel para que el prerender
+regenere el HTML estático de `/productos` y las fichas nuevas.

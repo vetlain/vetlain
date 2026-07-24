@@ -35,6 +35,19 @@ export async function getServiceBySlug(slug: string) {
   return service && service.published ? service : null
 }
 
+export function getPublishedProducts() {
+  return db
+    .select()
+    .from(schema.products)
+    .where(eq(schema.products.published, true))
+    .orderBy(schema.products.sortOrder)
+}
+
+export async function getProductBySlug(slug: string) {
+  const [product] = await db.select().from(schema.products).where(eq(schema.products.slug, slug)).limit(1)
+  return product && product.published ? product : null
+}
+
 export function getPublishedBlogPosts() {
   return db
     .select()

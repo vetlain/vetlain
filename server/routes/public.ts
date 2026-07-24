@@ -9,6 +9,8 @@ import {
   getPageBySlug,
   getPublishedServices,
   getServiceBySlug,
+  getPublishedProducts,
+  getProductBySlug,
   getPublishedBlogPosts,
   getBlogPostBySlug,
 } from '../content.js'
@@ -39,6 +41,19 @@ publicRouter.get('/services/:slug', async (req, res) => {
     return
   }
   res.json(service)
+})
+
+publicRouter.get('/products', async (_req, res) => {
+  res.json(await getPublishedProducts())
+})
+
+publicRouter.get('/products/:slug', async (req, res) => {
+  const product = await getProductBySlug(req.params.slug)
+  if (!product) {
+    res.status(404).json({ error: 'Producto no encontrado' })
+    return
+  }
+  res.json(product)
 })
 
 publicRouter.get('/blog', async (_req, res) => {

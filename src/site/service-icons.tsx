@@ -39,6 +39,13 @@ const glyphs: Record<string, (p: SVGProps<SVGSVGElement>) => ReactElement> = {
       <path d="M7 7h2M7 11h2M7 15h2M17 13h0M17 17h0" />
     </Glyph>
   ),
+  training: (p) => (
+    <Glyph {...p}>
+      <path d="M12 4L2.5 8.5 12 13l9.5-4.5L12 4z" />
+      <path d="M6 10.5V16c0 1.7 2.7 3 6 3s6-1.3 6-3v-5.5" />
+      <path d="M20.5 9v5" />
+    </Glyph>
+  ),
   shield: (p) => (
     <Glyph {...p}>
       <path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3z" />
