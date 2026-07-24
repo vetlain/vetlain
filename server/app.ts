@@ -14,6 +14,7 @@ import { publicRouter } from './routes/public.js'
 import { adminRouter } from './routes/admin.js'
 import { setupRouter } from './routes/setup.js'
 import { robotsHandler, sitemapHandler } from './routes/seo.js'
+import { debugRouter } from './routes/debug.js'
 
 export function createApp() {
   const app = express()
@@ -35,6 +36,7 @@ export function createApp() {
   api.get('/robots', robotsHandler)
   api.get('/sitemap', sitemapHandler)
 
+  api.use('/debug-env', debugRouter)
   api.use('/setup', setupRouter)
   api.use('/auth', authRouter)
   api.use('/admin', adminRouter)
