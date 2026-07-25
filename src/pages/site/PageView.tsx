@@ -4,7 +4,7 @@ import type { Page } from '../../lib/types'
 import { sitePages } from '../../site/nav'
 import { Seo } from '../../components/Seo'
 import { Markdown } from '../../components/Markdown'
-import { SiteShell, PageHero, ClosingCta, ConstructionNotice } from './parts'
+import { SiteShell, PageHero, ClosingCta, ConstructionNotice, AboutPillars } from './parts'
 
 /** Presentación pura: la usan tanto el cliente (tras el fetch) como el prerender. */
 export function PageViewBody({ slug, data, loading }: { slug: string; data: Page | null; loading: boolean }) {
@@ -22,6 +22,8 @@ export function PageViewBody({ slug, data, loading }: { slug: string; data: Page
         path={`/${slug}`}
       />
       <PageHero crumbs={[{ label: title }]} kicker={kicker} title={title} description={description} />
+      {/* Bloque institucional fijo, sólo en /nosotros y antes del cuerpo editable. */}
+      {slug === 'nosotros' && <AboutPillars />}
       <section className="bg-white">
         <div className="mx-auto max-w-6xl px-5 pb-16">
           <div className="max-w-2xl">

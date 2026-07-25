@@ -1,7 +1,7 @@
 /** Piezas compartidas de las páginas internas del sitio (chrome + hero + cierre). */
 import { useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import type { ReactNode, SVGProps } from 'react'
+import type { ReactElement, ReactNode, SVGProps } from 'react'
 import {
   Header,
   Footer,
@@ -183,47 +183,120 @@ const RiseGlyph = (p: SVGProps<SVGSVGElement>) => (
   </Glyph>
 )
 
+const TargetGlyph = (p: SVGProps<SVGSVGElement>) => (
+  <Glyph {...p}>
+    <circle cx="12" cy="12" r="8.5" />
+    <circle cx="12" cy="12" r="4" />
+    <path d="M12 12h.01" />
+  </Glyph>
+)
+
+const EyeGlyph = (p: SVGProps<SVGSVGElement>) => (
+  <Glyph {...p}>
+    <path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6-10-6-10-6z" />
+    <circle cx="12" cy="12" r="3" />
+  </Glyph>
+)
+
+const FlagGlyph = (p: SVGProps<SVGSVGElement>) => (
+  <Glyph {...p}>
+    <path d="M5.5 21V3.5" />
+    <path d="M5.5 4.2h11.8l-2.2 3.9 2.2 3.9H5.5" />
+  </Glyph>
+)
+
+type Pillar = {
+  soft: string
+  strong: string
+  text: string
+  glyph: (p: SVGProps<SVGSVGElement>) => ReactElement
+}
+
+/** Tarjeta con cabecera en el color primario. La comparten los dos bloques. */
+function PillarCards({ items, className = '' }: { items: Pillar[]; className?: string }) {
+  return (
+    <div className={`mx-auto grid max-w-6xl gap-5 px-5 sm:grid-cols-3 ${className}`}>
+      {items.map(({ glyph: G, ...p }) => (
+        <article key={p.strong} className="flex flex-col border-2 border-vetlain-ink bg-white">
+          {/* Cabecera en el color primario: es lo que da el énfasis */}
+          <header className="flex items-start justify-between gap-3 bg-vetlain-green-dark px-5 py-4">
+            <div className="min-w-0">
+              <span className="block text-[11px] font-bold uppercase tracking-[0.2em] text-white/70">
+                {p.soft}
+              </span>
+              <h2 className="p3-display mt-1 text-2xl uppercase leading-none text-white">{p.strong}</h2>
+            </div>
+            <G className="h-8 w-8 shrink-0 text-white/60" />
+          </header>
+          <p className="flex-1 px-5 py-5 text-sm leading-relaxed text-neutral-600">{p.text}</p>
+        </article>
+      ))}
+    </div>
+  )
+}
+
 /** Los tres pilares del sitio original ("Técnicos CERTIFICADOS", etc.). */
 export function ServicePillars() {
-  const pillars = [
-    {
-      soft: 'Técnicos',
-      strong: 'Certificados',
-      text: 'Nuestro equipo de trabajo ha sido cuidadosamente capacitado en el trabajo de excelencia y seguro.',
-      glyph: BadgeGlyph,
-    },
-    {
-      soft: 'El mejor',
-      strong: 'Servicio',
-      text: 'Todos los productos con los que trabajamos priorizan la seguridad del entorno.',
-      glyph: LeafGlyph,
-    },
-    {
-      soft: 'Mejora',
-      strong: 'Continua',
-      text: 'Trabajamos bajo las normas de la ISO 9001 - 2015 que nos obliga a funcionar ordenada y sistemáticamente.',
-      glyph: RiseGlyph,
-    },
-  ]
   return (
     <section className="bg-white">
-      <div className="mx-auto grid max-w-6xl gap-5 px-5 pb-16 sm:grid-cols-3">
-        {pillars.map(({ glyph: G, ...p }) => (
-          <article key={p.strong} className="flex flex-col border-2 border-vetlain-ink bg-white">
-            {/* Cabecera en el color primario: es lo que da el énfasis */}
-            <header className="flex items-start justify-between gap-3 bg-vetlain-green-dark px-5 py-4">
-              <div className="min-w-0">
-                <span className="block text-[11px] font-bold uppercase tracking-[0.2em] text-white/70">
-                  {p.soft}
-                </span>
-                <h2 className="p3-display mt-1 text-2xl uppercase leading-none text-white">{p.strong}</h2>
-              </div>
-              <G className="h-8 w-8 shrink-0 text-white/60" />
-            </header>
-            <p className="flex-1 px-5 py-5 text-sm leading-relaxed text-neutral-600">{p.text}</p>
-          </article>
-        ))}
-      </div>
+      <PillarCards
+        className="pb-16"
+        items={[
+          {
+            soft: 'Técnicos',
+            strong: 'Certificados',
+            text: 'Nuestro equipo de trabajo ha sido cuidadosamente capacitado en el trabajo de excelencia y seguro.',
+            glyph: BadgeGlyph,
+          },
+          {
+            soft: 'El mejor',
+            strong: 'Servicio',
+            text: 'Todos los productos con los que trabajamos priorizan la seguridad del entorno.',
+            glyph: LeafGlyph,
+          },
+          {
+            soft: 'Mejora',
+            strong: 'Continua',
+            text: 'Trabajamos bajo las normas de la ISO 9001 - 2015 que nos obliga a funcionar ordenada y sistemáticamente.',
+            glyph: RiseGlyph,
+          },
+        ]}
+      />
+    </section>
+  )
+}
+
+/**
+ * Misión, visión y objetivo de /nosotros. Estático a propósito: son la
+ * declaración institucional de la empresa, no contenido de campaña, así que no
+ * cuelga del panel. Va antes del cuerpo editable de la página.
+ */
+export function AboutPillars() {
+  return (
+    <section className="bg-white">
+      <PillarCards
+        className="pb-14"
+        items={[
+          {
+            soft: 'Nuestra',
+            strong: 'Misión',
+            text: 'Proteger la salud, el patrimonio y la tranquilidad de nuestros clientes mediante un manejo integrado de plagas eficaz, seguro para las personas y respetuoso con el medio ambiente, entregando siempre un servicio cercano, puntual y documentado.',
+            glyph: TargetGlyph,
+          },
+          {
+            soft: 'Nuestra',
+            strong: 'Visión',
+            text: 'Ser la empresa de control y mantención ambiental de mayor confianza de la zona poniente de Santiago: la que los hogares recomiendan a sus vecinos y la que las empresas eligen cuando el estándar sanitario no admite improvisación.',
+            glyph: EyeGlyph,
+          },
+          {
+            soft: 'Nuestro',
+            strong: 'Objetivo',
+            text: 'Que cada cliente deje de preocuparse por las plagas. No perseguimos una visita puntual, sino un ambiente controlado en el tiempo: diagnosticar el origen, eliminar el problema y dejar instalado un plan de prevención que evite que vuelva.',
+            glyph: FlagGlyph,
+          },
+        ]}
+      />
     </section>
   )
 }
