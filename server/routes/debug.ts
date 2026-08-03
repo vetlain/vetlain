@@ -22,6 +22,20 @@ const KEYS = [
   'ADMIN_EMAIL',
   'ADMIN_PASSWORD',
   'SITE_URL',
+  'DEPLOY_HOOK_URL',
+  'BLOB_READ_WRITE_TOKEN',
+]
+
+/** Tablas que el sitio espera encontrar (ver server/db/schema.ts). */
+const TABLAS_ESPERADAS = [
+  'admin_users',
+  'site_content',
+  'pages',
+  'services',
+  'products',
+  'news',
+  'blog_posts',
+  'leads',
 ]
 
 debugRouter.get('/', async (_req, res) => {
@@ -29,14 +43,25 @@ debugRouter.get('/', async (_req, res) => {
   for (const k of KEYS) present[k] = Boolean(process.env[k])
 
   let dbTest: { ok: boolean; detail?: string } = { ok: false }
+  // Qué tablas faltan por crear: es lo primero que hay que mirar cuando el panel
+  // muestra ceros o una sección no carga tras un despliegue con esquema nuevo.
+  let tablas: { existentes: string[]; faltan: string[] } | null = null
   try {
     const url = getDatabaseUrl()
     const sql = neon(url)
     await sql.query('select 1')
     dbTest = { ok: true }
+    const rows = (await sql.query(
+      "select table_name from information_schema.tables where table_schema = 'public'",
+    )) as { table_name: string }[]
+    const existentes = rows.map((r) => r.table_name).sort()
+    tablas = {
+      existentes,
+      faltan: TABLAS_ESPERADAS.filter((t) => !existentes.includes(t)),
+    }
   } catch (err) {
     dbTest = { ok: false, detail: err instanceof Error ? (err.stack ?? err.message) : String(err) }
   }
 
-  res.json({ env_present: present, db_connection: dbTest })
+  res.json({ env_present: present, db_connection: dbTest, tablas })
 })

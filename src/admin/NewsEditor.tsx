@@ -26,12 +26,29 @@ const blank: Draft = {
 
 export default function NewsEditor() {
   const [items, setItems] = useState<News[] | null>(null)
+  const [cargaFallida, setCargaFallida] = useState<string | null>(null)
   const [draft, setDraft] = useState<Draft | null>(null)
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState<{ kind: 'success' | 'error'; text: string } | null>(null)
 
+  // Ojo: si la carga falla hay que decirlo. Sin este catch, `items` se quedaba
+  // en null y la pestaña mostraba el spinner para siempre.
   function reload() {
-    return api.get<News[]>('/admin/news').then(setItems)
+    return api
+      .get<News[]>('/admin/news')
+      .then((rows) => {
+        setItems(rows)
+        setCargaFallida(null)
+      })
+      .catch((err) => {
+        setCargaFallida(
+          err instanceof ApiError && err.status >= 500
+            ? 'No se pudieron cargar las novedades. Si el sitio se acaba de actualizar, falta crear la tabla en la base: abre una vez /api/setup?token=TU_SETUP_TOKEN y vuelve a esta pestaña.'
+            : err instanceof ApiError
+              ? err.message
+              : 'No se pudieron cargar las novedades.',
+        )
+      })
   }
   useEffect(() => {
     reload()
@@ -110,7 +127,7 @@ export default function NewsEditor() {
     }
   }
 
-  if (!items) return <Loading />
+  if (!items) return cargaFallida ? <Notice kind="error">{cargaFallida}</Notice> : <Loading />
 
   return (
     <div>

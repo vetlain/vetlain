@@ -16,46 +16,50 @@ type Counts = {
   leadsPendientes: number
 }
 
-const SIN_DATOS: Counts = {
-  contacto: 0,
-  novedades: 0,
-  paginas: 0,
-  servicios: 0,
-  productos: 0,
-  blog: 0,
-  borradores: 0,
-  leadsPendientes: 0,
+/**
+ * Cada contador se pide por separado y tolera su propio fallo: antes iban todos
+ * en un Promise.all y una sola consulta caída (p. ej. una tabla que aún no
+ * existe) dejaba el panel entero mostrando ceros, sin decir por qué.
+ */
+function suave<T>(p: Promise<T[]>): Promise<T[] | null> {
+  return p.catch(() => null)
 }
 
 export default function Dashboard() {
   const [counts, setCounts] = useState<Counts | null>(null)
+  const [aviso, setAviso] = useState<string | null>(null)
   const [publishing, setPublishing] = useState(false)
   const [publishMsg, setPublishMsg] = useState<{ kind: 'success' | 'error'; text: string } | null>(null)
 
   useEffect(() => {
     Promise.all([
-      api.get<SiteContentRow[]>('/admin/content'),
-      api.get<Page[]>('/admin/pages'),
-      api.get<Service[]>('/admin/services'),
-      api.get<Product[]>('/admin/products'),
-      api.get<News[]>('/admin/news'),
-      api.get<BlogPost[]>('/admin/blog'),
-      api.get<Lead[]>('/admin/leads'),
-    ])
-      .then(([content, pages, services, products, news, blog, leads]) =>
-        setCounts({
-          // Los bloques de la portada viven en site_content pero se editan aparte.
-          contacto: content.filter((r) => r.group !== 'home').length,
-          novedades: news.length,
-          paginas: pages.length,
-          servicios: services.length,
-          productos: products.length,
-          blog: blog.length,
-          borradores: blog.filter((p) => p.status === 'draft').length,
-          leadsPendientes: leads.filter((l) => !l.handled).length,
-        }),
-      )
-      .catch(() => setCounts(SIN_DATOS))
+      suave(api.get<SiteContentRow[]>('/admin/content')),
+      suave(api.get<Page[]>('/admin/pages')),
+      suave(api.get<Service[]>('/admin/services')),
+      suave(api.get<Product[]>('/admin/products')),
+      suave(api.get<News[]>('/admin/news')),
+      suave(api.get<BlogPost[]>('/admin/blog')),
+      suave(api.get<Lead[]>('/admin/leads')),
+    ]).then((resultados) => {
+      const [content, pages, services, products, news, blog, leads] = resultados
+      setCounts({
+        // Los bloques de la portada viven en site_content pero se editan aparte.
+        contacto: content?.filter((r) => r.group !== 'home').length ?? 0,
+        novedades: news?.length ?? 0,
+        paginas: pages?.length ?? 0,
+        servicios: services?.length ?? 0,
+        productos: products?.length ?? 0,
+        blog: blog?.length ?? 0,
+        borradores: blog?.filter((p) => p.status === 'draft').length ?? 0,
+        leadsPendientes: leads?.filter((l) => !l.handled).length ?? 0,
+      })
+      if (resultados.some((r) => r === null)) {
+        setAviso(
+          'Algunos datos no se pudieron cargar y aparecen en 0. Si el sitio se acaba de actualizar, ' +
+            'falta poner la base al día: abre una vez /api/setup?token=TU_SETUP_TOKEN.',
+        )
+      }
+    })
   }, [])
 
   async function publish() {
@@ -99,6 +103,12 @@ export default function Dashboard() {
         title="Bienvenido al panel"
         description="Los cambios se guardan al instante y se ven en el sitio de inmediato. Para que también queden en el HTML que lee Google, publica los cambios."
       />
+
+      {aviso && (
+        <div className="mb-6">
+          <Notice kind="error">{aviso}</Notice>
+        </div>
+      )}
 
       {counts && counts.leadsPendientes > 0 && (
         <Link to="/admin/mensajes" className="mb-6 block">
