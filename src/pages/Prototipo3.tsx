@@ -1,10 +1,23 @@
+/**
+ * Portada del sitio (/). Todo su contenido es editable desde el panel:
+ *  - Textos, imagen del hero, tarjetas y franjas → site_content, grupo "home"
+ *    (ver src/lib/home-content.ts y /admin/portada).
+ *  - Novedades → tabla `news` (/api/news).
+ *
+ * `Prototipo3Body` es la presentación pura, con las novedades ya cargadas: la
+ * usan tanto el cliente (tras el fetch) como el script de prerender.
+ */
 import { useState } from 'react'
-import type { FormEvent, ReactNode, SVGProps } from 'react'
+import type { FormEvent, SVGProps } from 'react'
+import { Link } from 'react-router-dom'
 import { Seo } from '../components/Seo'
-import { useSiteContent } from '../lib/site-content'
+import { useSiteContent, useHomeContent } from '../lib/site-content'
+import { useApi } from '../lib/useApi'
+import { formatDay } from '../lib/format'
+import type { News } from '../lib/types'
+import type { HomeContent } from '../lib/home-content'
 import { ServiceIcon } from '../site/service-icons'
 import {
-  A,
   WHATSAPP,
   TEL_MOVIL,
   Glyph,
@@ -15,47 +28,11 @@ import {
   Header,
   Footer,
   StickyCta,
+  assetUrl,
 } from '../site/chrome'
 
 /* ── Icons (específicos de esta página) ───────────────────────────── */
 
-// Se reutiliza el icono compartido para que no vuelva a divergir del que sale
-// en las tarjetas de /servicios.
-const RodentGlyph = (p: SVGProps<SVGSVGElement>) => <ServiceIcon icon="rodent" {...p} />
-const InsectGlyph = (p: SVGProps<SVGSVGElement>) => (
-  <Glyph {...p}>
-    <ellipse cx="12" cy="13" rx="3.5" ry="5.5" />
-    <path d="M12 7.5V4M10 5l2 2M14 5l-2 2" />
-    <path d="M8.5 10L5 8M8.5 13H4.5M8.5 16l-3.2 1.8" />
-    <path d="M15.5 10L19 8M15.5 13H19.5M15.5 16l3.2 1.8" />
-  </Glyph>
-)
-const BirdGlyph = (p: SVGProps<SVGSVGElement>) => (
-  <Glyph {...p}>
-    <path d="M4 15.5c3-1 4.5-4.5 7.5-4.5.9 0 1.6.2 2.2.6" />
-    <path d="M13.7 11.6c1-2.3 3.2-3.9 5.8-3.9-1 1.6-1.1 2.8-.6 4 -1.2 4-4.8 6.8-9.3 6.8-1.9 0-3.4-.4-4.6-1.1 2 0 3.6-.6 4.6-1.7" />
-  </Glyph>
-)
-const SprayGlyph = (p: SVGProps<SVGSVGElement>) => (
-  <Glyph {...p}>
-    <rect x="8" y="9" width="7" height="12" />
-    <path d="M8 9V6h4v3M12 6V4h3" />
-    <path d="M18 6h1M18 9h2M19 12h1M18 4h1" />
-  </Glyph>
-)
-const BuildingGlyph = (p: SVGProps<SVGSVGElement>) => (
-  <Glyph {...p}>
-    <rect x="4" y="3" width="10" height="18" />
-    <rect x="14" y="9" width="6" height="12" />
-    <path d="M7 7h2M7 11h2M7 15h2M17 13h0M17 17h0" />
-  </Glyph>
-)
-const ShieldGlyph = (p: SVGProps<SVGSVGElement>) => (
-  <Glyph {...p}>
-    <path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3z" />
-    <path d="M9 12l2 2 4-4" />
-  </Glyph>
-)
 const ArrowGlyph = (p: SVGProps<SVGSVGElement>) => (
   <Glyph {...p}><path d="M5 12h14M13 6l6 6-6 6" /></Glyph>
 )
@@ -63,80 +40,87 @@ const CheckGlyph = (p: SVGProps<SVGSVGElement>) => (
   <Glyph {...p}><path d="M4 12l5 5L20 6" /></Glyph>
 )
 
-/* ── Data ─────────────────────────────────────────────────────────── */
+/* ── Utilidades de presentación ───────────────────────────────────── */
 
-type GlyphComp = (p: SVGProps<SVGSVGElement>) => ReactNode
-
-const servicios: { glyph: GlyphComp; title: string; desc: string }[] = [
-  { glyph: RodentGlyph, title: 'Ratas y ratones', desc: 'Desratización con estaciones certificadas y sellado de accesos.' },
-  { glyph: InsectGlyph, title: 'Insectos y cucarachas', desc: 'Desinsectación de bajo impacto para casa y negocio.' },
-  { glyph: BirdGlyph, title: 'Aves', desc: 'Disuasión y captura para fachadas, techos y patios.' },
-  { glyph: SprayGlyph, title: 'Desinfección', desc: 'Sanitización de superficies y ambientes de trabajo.' },
-  { glyph: BuildingGlyph, title: 'Plantas y bodegas', desc: 'Programas a medida bajo norma sanitaria.' },
-  { glyph: ShieldGlyph, title: 'Garantía', desc: 'Trabajo certificado ISO 9001 y con respaldo por escrito.' },
-]
-
-const pasos = [
-  { n: '01', title: 'Llamas o escribes', desc: 'Nos cuentas qué viste y dónde. Respondemos el mismo día.' },
-  { n: '02', title: 'Evaluamos en terreno', desc: 'Vamos, identificamos la plaga y te cotizamos sin costo.' },
-  { n: '03', title: 'Eliminamos la plaga', desc: 'Aplicamos el tratamiento y dejamos un plan de control.' },
-]
-
-const trust = ['ISO 9001 certificada', 'Respuesta el mismo día', 'Talagante y alrededores', '+20 años de oficio']
+/**
+ * Renderiza un texto respetando los saltos de línea que el cliente escriba en
+ * el panel (los títulos de portada son textareas de una o dos líneas).
+ */
+function Lines({ text }: { text: string }) {
+  const parts = text.split('\n')
+  return (
+    <>
+      {parts.map((line, i) => (
+        <span key={i}>
+          {line}
+          {i < parts.length - 1 && <br />}
+        </span>
+      ))}
+    </>
+  )
+}
 
 /* ── Hero ─────────────────────────────────────────────────────────── */
 
-function Hero() {
+function Hero({ hero }: { hero: HomeContent['hero'] }) {
+  const img = assetUrl(hero.image)
   return (
     <section id="top" className="relative overflow-hidden bg-white">
       <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-14 sm:py-20 md:grid-cols-[1.1fr_0.9fr] lg:gap-14">
         <div className="p3-rise">
-          <span className="p3-clip-slash inline-block bg-vetlain-green-tint px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-vetlain-green-deep">
-            Control de plagas · Talagante
-          </span>
+          {hero.badge && (
+            <span className="p3-clip-slash inline-block bg-vetlain-green-tint px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-vetlain-green-deep">
+              {hero.badge}
+            </span>
+          )}
           <h1 className="p3-display mt-5 text-[clamp(2.8rem,9vw,5.5rem)] uppercase leading-[0.92] text-vetlain-ink">
-            Plagas fuera.{' '}
-            <span className="text-vetlain-green">rápido y en serio.</span>
+            <Lines text={hero.title} />{' '}
+            <span className="text-vetlain-green"><Lines text={hero.titleAccent} /></span>
           </h1>
           <p className="mt-5 max-w-lg text-base leading-relaxed text-neutral-600 sm:text-lg">
-            Ratas, insectos y aves fuera de tu casa o negocio. Evaluación en
-            terreno el mismo día, con garantía y certificación ISO 9001.
+            {hero.text}
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <WhatsappBtn className="px-6 py-4 text-base">Escríbenos por WhatsApp</WhatsappBtn>
+            <WhatsappBtn className="px-6 py-4 text-base">{hero.ctaWhatsapp}</WhatsappBtn>
             <a
               href={TEL_MOVIL}
               className="inline-flex items-center justify-center gap-2 border-2 border-vetlain-ink px-6 py-4 text-base font-bold uppercase tracking-wide text-vetlain-ink transition-colors hover:bg-vetlain-ink hover:text-white"
             >
               <PhoneGlyph className="h-5 w-5" />
-              Llamar ahora
+              {hero.ctaCall}
             </a>
           </div>
-          <p className="mt-5 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-vetlain-green-deep">
-            <ShieldGlyph className="h-4 w-4 text-vetlain-green" />
-            Sin costo de visita · cotización al toque
-          </p>
+          {hero.note && (
+            <p className="mt-5 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-vetlain-green-deep">
+              <ServiceIcon icon="shield" className="h-4 w-4 text-vetlain-green" />
+              {hero.note}
+            </p>
+          )}
         </div>
 
         {/* Angular photo */}
-        <div className="relative p3-rise" style={{ animationDelay: '120ms' }}>
-          <div className="absolute inset-0 translate-x-3 translate-y-3 bg-vetlain-green" aria-hidden="true" />
-          <div
-            className="relative border-2 border-vetlain-ink"
-            style={{ clipPath: 'polygon(0 0, 100% 0, 100% 92%, 0 100%)' }}
-          >
-            <img
-              src={A + 'brand/foto-desinsectacion.jpg'}
-              alt="Técnico de Vetlain aplicando control de plagas en terreno"
-              className="aspect-[4/3] w-full object-cover"
-              width={976}
-              height={720}
-            />
+        {img && (
+          <div className="relative p3-rise" style={{ animationDelay: '120ms' }}>
+            <div className="absolute inset-0 translate-x-3 translate-y-3 bg-vetlain-green" aria-hidden="true" />
+            <div
+              className="relative border-2 border-vetlain-ink"
+              style={{ clipPath: 'polygon(0 0, 100% 0, 100% 92%, 0 100%)' }}
+            >
+              <img
+                src={img}
+                alt={hero.imageAlt}
+                className="aspect-[4/3] w-full object-cover"
+                width={976}
+                height={720}
+              />
+            </div>
+            {hero.imageBadge && (
+              <span className="absolute bottom-4 left-0 -translate-x-2 bg-vetlain-green-dark px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-white">
+                {hero.imageBadge}
+              </span>
+            )}
           </div>
-          <span className="absolute bottom-4 left-0 -translate-x-2 bg-vetlain-green-dark px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-white">
-            Respuesta el mismo día
-          </span>
-        </div>
+        )}
       </div>
       <Tape />
     </section>
@@ -145,11 +129,12 @@ function Hero() {
 
 /* ── Trust ────────────────────────────────────────────────────────── */
 
-function Trust() {
+function Trust({ trust }: { trust: HomeContent['trust'] }) {
+  if (!trust.items.length) return null
   return (
     <section className="bg-vetlain-green-tint">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-8 gap-y-3 px-5 py-5 sm:justify-between">
-        {trust.map((t) => (
+        {trust.items.map((t) => (
           <span key={t} className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-vetlain-ink sm:text-sm">
             <CheckGlyph className="h-4 w-4 text-vetlain-green-dark" />
             {t}
@@ -160,32 +145,125 @@ function Trust() {
   )
 }
 
+/* ── Novedades ────────────────────────────────────────────────────── */
+
+/** Enlace de una novedad: interno con el router, externo en pestaña nueva. */
+function NewsLink({ href, label }: { href: string; label: string }) {
+  const className =
+    'mt-auto inline-flex w-fit items-center gap-1.5 pt-4 text-sm font-bold uppercase tracking-wide text-vetlain-green-dark group-hover:underline'
+  const inner = (
+    <>
+      {label}
+      <ArrowGlyph className="h-4 w-4" />
+    </>
+  )
+  return /^https?:\/\//i.test(href) ? (
+    <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
+      {inner}
+    </a>
+  ) : (
+    <Link to={href} className={className}>
+      {inner}
+    </Link>
+  )
+}
+
+function NewsCard({ item }: { item: News }) {
+  const img = assetUrl(item.image)
+  return (
+    <article className="group flex flex-col border-2 border-neutral-200 bg-white transition-colors hover:border-vetlain-green">
+      {img && (
+        <div className="relative">
+          <img
+            src={img}
+            alt=""
+            loading="lazy"
+            className="aspect-[16/10] w-full bg-neutral-100 object-cover"
+          />
+          {item.date && (
+            <span className="absolute bottom-0 left-0 bg-vetlain-green-dark px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-white">
+              {formatDay(item.date)}
+            </span>
+          )}
+        </div>
+      )}
+      <div className="flex flex-1 flex-col p-5">
+        {!img && item.date && (
+          <span className="mb-3 w-fit bg-vetlain-green-tint px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-vetlain-green-deep">
+            {formatDay(item.date)}
+          </span>
+        )}
+        <h3 className="p3-display text-xl uppercase leading-tight text-vetlain-ink">{item.title}</h3>
+        {item.excerpt && (
+          <p className="mt-2 text-sm leading-relaxed text-neutral-600">{item.excerpt}</p>
+        )}
+        {item.link && <NewsLink href={item.link} label={item.linkLabel || 'Ver más'} />}
+      </div>
+    </article>
+  )
+}
+
+function Novedades({
+  novedades,
+  items,
+}: {
+  novedades: HomeContent['novedades']
+  items: News[] | null
+}) {
+  // Sin novedades (o con la sección apagada en el panel) no se muestra nada:
+  // mejor un hueco que un bloque vacío entre el hero y los servicios.
+  if (!novedades.visible || !items?.length) return null
+  return (
+    <section id="novedades" className="scroll-mt-20 bg-neutral-100">
+      <div className="mx-auto max-w-6xl px-5 py-16 sm:py-20">
+        <h2 className="p3-display text-[clamp(2rem,5vw,3.25rem)] uppercase leading-none text-vetlain-ink">
+          <Lines text={novedades.title} />{' '}
+          <span className="text-vetlain-green"><Lines text={novedades.titleAccent} /></span>
+        </h2>
+        {novedades.intro && (
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-neutral-600">
+            {novedades.intro}
+          </p>
+        )}
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {items.map((n) => (
+            <NewsCard key={n.id} item={n} />
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
 /* ── Services ─────────────────────────────────────────────────────── */
 
-function Services() {
+function Services({ services }: { services: HomeContent['services'] }) {
   return (
     <section id="servicios" className="scroll-mt-20 bg-white">
       <div className="mx-auto max-w-6xl px-5 py-16 sm:py-20">
         <div className="flex items-end justify-between gap-6">
           <h2 className="p3-display text-[clamp(2rem,5vw,3.25rem)] uppercase leading-none text-vetlain-ink">
-            Qué <span className="text-vetlain-green">eliminamos</span>
+            <Lines text={services.title} />{' '}
+            <span className="text-vetlain-green"><Lines text={services.titleAccent} /></span>
           </h2>
-          <span className="hidden text-sm font-bold uppercase tracking-wide text-neutral-500 sm:block">
-            06 servicios
-          </span>
+          {services.note && (
+            <span className="hidden text-sm font-bold uppercase tracking-wide text-neutral-500 sm:block">
+              {services.note}
+            </span>
+          )}
         </div>
 
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {servicios.map(({ glyph: G, title, desc }) => (
+          {services.items.map((item, i) => (
             <div
-              key={title}
+              key={`${item.title}-${i}`}
               className="group border-2 border-neutral-200 bg-white p-6 transition-colors hover:border-vetlain-green"
             >
               <div className="flex h-12 w-12 items-center justify-center bg-vetlain-green text-white">
-                <G className="h-6 w-6" />
+                <ServiceIcon icon={item.icon} className="h-6 w-6" />
               </div>
-              <h3 className="p3-display mt-5 text-xl uppercase text-vetlain-ink">{title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-neutral-600">{desc}</p>
+              <h3 className="p3-display mt-5 text-xl uppercase text-vetlain-ink">{item.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-neutral-600">{item.desc}</p>
             </div>
           ))}
         </div>
@@ -196,16 +274,17 @@ function Services() {
 
 /* ── Steps ────────────────────────────────────────────────────────── */
 
-function Steps() {
+function Steps({ steps }: { steps: HomeContent['steps'] }) {
   return (
     <section className="bg-vetlain-green-tint">
       <div className="mx-auto max-w-6xl px-5 py-16 sm:py-20">
         <h2 className="p3-display text-[clamp(2rem,5vw,3.25rem)] uppercase leading-none text-vetlain-ink">
-          Cómo <span className="text-vetlain-green">trabajamos</span>
+          <Lines text={steps.title} />{' '}
+          <span className="text-vetlain-green"><Lines text={steps.titleAccent} /></span>
         </h2>
         <div className="mt-10 grid gap-6 md:grid-cols-3">
-          {pasos.map((p) => (
-            <div key={p.n} className="border-t-2 border-vetlain-green/40 pt-5">
+          {steps.items.map((p, i) => (
+            <div key={`${p.n}-${i}`} className="border-t-2 border-vetlain-green/40 pt-5">
               <span className="p3-clip-tag inline-block bg-vetlain-green-dark px-4 py-2 font-bold text-white">
                 <span className="p3-display text-2xl">{p.n}</span>
               </span>
@@ -221,19 +300,16 @@ function Steps() {
 
 /* ── Urgency band ─────────────────────────────────────────────────── */
 
-function Urgency() {
+function Urgency({ urgency }: { urgency: HomeContent['urgency'] }) {
   return (
     <section className="bg-vetlain-green-dark">
       <Tape />
       <div className="mx-auto flex max-w-6xl flex-col items-start gap-6 px-5 py-14 md:flex-row md:items-center md:justify-between">
         <div>
           <h2 className="p3-display text-[clamp(2rem,5vw,3.5rem)] uppercase leading-[0.95] text-white">
-            No esperes a que<br className="hidden sm:block" /> se multipliquen.
+            <Lines text={urgency.title} />
           </h2>
-          <p className="mt-3 max-w-lg text-white/90">
-            Una plaga chica hoy es una plaga grande en dos semanas. Actúa ahora
-            y te respondemos el mismo día.
-          </p>
+          <p className="mt-3 max-w-lg text-white/90">{urgency.text}</p>
         </div>
         <a
           href={WHATSAPP}
@@ -242,7 +318,7 @@ function Urgency() {
           className="inline-flex shrink-0 items-center justify-center gap-2 bg-vetlain-ink px-7 py-4 text-base font-bold uppercase tracking-wide text-white transition-colors hover:bg-white hover:text-vetlain-ink"
         >
           <WhatsappGlyph className="h-5 w-5" />
-          Escríbenos ahora
+          {urgency.cta}
         </a>
       </div>
       <Tape />
@@ -255,7 +331,7 @@ function Urgency() {
 const inputClass =
   'w-full border-2 border-neutral-300 bg-white px-3.5 py-2.5 text-sm text-vetlain-ink placeholder:text-neutral-400 transition-colors focus:border-vetlain-green focus:outline-none'
 
-function Contact() {
+function Contact({ contact }: { contact: HomeContent['contact'] }) {
   const { telUrl, phone, phoneFijo, email, address, hours } = useSiteContent()
   const [sent, setSent] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -294,12 +370,11 @@ function Contact() {
       <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 sm:py-20 md:grid-cols-2 lg:gap-14">
         <div>
           <h2 className="p3-display text-[clamp(2rem,5vw,3.25rem)] uppercase leading-none text-vetlain-ink">
-            Contáctanos<br /><span className="text-vetlain-green">ahora</span>
+            <Lines text={contact.title} />
+            <br />
+            <span className="text-vetlain-green"><Lines text={contact.titleAccent} /></span>
           </h2>
-          <p className="mt-5 max-w-md text-neutral-600">
-            La forma más rápida es WhatsApp o teléfono. También puedes dejarnos
-            tus datos y te llamamos.
-          </p>
+          <p className="mt-5 max-w-md text-neutral-600">{contact.text}</p>
 
           <div className="mt-8 flex flex-col gap-3">
             <WhatsappBtn className="px-6 py-4 text-base">Escríbenos por WhatsApp</WhatsappBtn>
@@ -387,25 +462,29 @@ function Contact() {
 
 /* ── Page ─────────────────────────────────────────────────────────── */
 
-export default function Prototipo3() {
+/** Presentación pura: la usan tanto el cliente (tras el fetch) como el prerender. */
+export function Prototipo3Body({ news }: { news: News[] | null }) {
+  const home = useHomeContent()
   return (
     <div className="p3 min-h-screen bg-white text-vetlain-ink">
-      <Seo
-        title="Vetlain — Control de plagas en Talagante y alrededores"
-        description="Desratización, desinsectación, control de aves y sanitización con certificación ISO 9001. Cobertura en Talagante, Peñaflor, El Monte y comunas vecinas. Respuesta el mismo día."
-        path="/"
-      />
+      <Seo title={home.seo.title} description={home.seo.description} path="/" />
       <Header />
       <main className="pb-14 md:pb-0">
-        <Hero />
-        <Trust />
-        <Services />
-        <Steps />
-        <Urgency />
-        <Contact />
+        <Hero hero={home.hero} />
+        <Trust trust={home.trust} />
+        <Novedades novedades={home.novedades} items={news} />
+        <Services services={home.services} />
+        <Steps steps={home.steps} />
+        <Urgency urgency={home.urgency} />
+        <Contact contact={home.contact} />
       </main>
       <Footer />
       <StickyCta />
     </div>
   )
+}
+
+export default function Prototipo3() {
+  const { data } = useApi<News[]>('/news')
+  return <Prototipo3Body news={data} />
 }

@@ -9,6 +9,7 @@ import { AuthProvider, useAuth } from './auth'
 import { Loading } from './ui'
 import Login from './Login'
 import Dashboard from './Dashboard'
+import HomeEditor from './HomeEditor'
 import ContentEditor from './ContentEditor'
 import PagesEditor from './PagesEditor'
 import ServicesEditor from './ServicesEditor'
@@ -19,6 +20,7 @@ import LeadsPanel from './LeadsPanel'
 const sections = [
   { to: '/admin', label: 'Inicio', end: true },
   { to: '/admin/mensajes', label: 'Contactos', end: false },
+  { to: '/admin/portada', label: 'Portada', end: false },
   { to: '/admin/contacto', label: 'Contacto y redes', end: false },
   { to: '/admin/paginas', label: 'Páginas', end: false },
   { to: '/admin/servicios', label: 'Servicios', end: false },
@@ -106,6 +108,7 @@ function Shell() {
             <Routes>
               <Route index element={<Dashboard />} />
               <Route path="mensajes" element={<LeadsPanel />} />
+              <Route path="portada" element={<HomeEditor />} />
               <Route path="contacto" element={<ContentEditor />} />
               <Route path="paginas" element={<PagesEditor />} />
               <Route path="servicios" element={<ServicesEditor />} />

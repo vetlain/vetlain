@@ -9,6 +9,7 @@
  *  - services      → fichas de servicio (desratización, desinsectación…).
  *  - products      → catálogo de productos (Ekomille, Blatrap, INOX 80/25…).
  *  - blog_posts    → entradas del blog (sin comentarios por ahora).
+ *  - news          → novedades de la portada (tarjetas entre el hero y servicios).
  *
  * Cada tabla con contenido público lleva campos SEO (seo_title / seo_description)
  * para que el cliente controle cómo se ve cada página en Google.
@@ -22,6 +23,7 @@ import {
   integer,
   boolean,
   jsonb,
+  date,
   timestamp,
 } from 'drizzle-orm/pg-core'
 
@@ -116,6 +118,26 @@ export const blogPosts = pgTable('blog_posts', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 })
 
+/**
+ * Novedades de la portada: tarjetas cortas entre el hero y "Qué eliminamos".
+ * No tienen página propia; `link` (opcional) apunta a una ruta del sitio o a
+ * una URL externa. `date` es una fecha simple (sin hora ni zona horaria):
+ * lo que se muestra es "3 ago 2026", no un instante exacto.
+ */
+export const news = pgTable('news', {
+  id: serial('id').primaryKey(),
+  title: text('title').notNull(),
+  excerpt: text('excerpt'),
+  image: text('image'),
+  link: text('link'),
+  linkLabel: text('link_label'),
+  date: date('date'),
+  sortOrder: integer('sort_order').default(0).notNull(),
+  published: boolean('published').default(true).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+})
+
 /** Contactos recibidos por el formulario del sitio ("quiero que me llamen"). */
 export const leads = pgTable('leads', {
   id: serial('id').primaryKey(),
@@ -134,4 +156,5 @@ export type Page = typeof pages.$inferSelect
 export type Service = typeof services.$inferSelect
 export type Product = typeof products.$inferSelect
 export type BlogPost = typeof blogPosts.$inferSelect
+export type News = typeof news.$inferSelect
 export type Lead = typeof leads.$inferSelect

@@ -14,6 +14,16 @@ export const TEL_MOVIL = 'tel:+56968302857'
 // import.meta.env no existe.
 export const A = (import.meta as { env?: Record<string, string | undefined> }).env?.BASE_URL ?? '/'
 
+/**
+ * Resuelve la ruta de una imagen guardada desde el panel: si es una URL
+ * completa (p. ej. la que devuelve Vercel Blob) se usa tal cual; si es una ruta
+ * dentro de /public se le antepone el base del sitio.
+ */
+export function assetUrl(image: string | null | undefined): string | null {
+  if (!image) return null
+  return /^https?:\/\//i.test(image) ? image : A + image.replace(/^\//, '')
+}
+
 /* ── Iconos base y compartidos ────────────────────────────────────── */
 
 export function Glyph(props: SVGProps<SVGSVGElement> & { children: ReactNode }) {

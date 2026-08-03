@@ -1,5 +1,11 @@
 /** Primitivas de UI del panel. Simples y consistentes (verde/carbón de marca). */
-import type { ReactNode, ButtonHTMLAttributes, InputHTMLAttributes, TextareaHTMLAttributes } from 'react'
+import type {
+  ReactNode,
+  ButtonHTMLAttributes,
+  InputHTMLAttributes,
+  TextareaHTMLAttributes,
+  SelectHTMLAttributes,
+} from 'react'
 
 /* ── Botón ───────────────────────────────────────────────────────────── */
 type BtnProps = ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -51,6 +57,11 @@ export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
 export function Textarea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
   const { className = '', ...rest } = props
   return <textarea className={`${inputBase} font-mono leading-relaxed ${className}`} {...rest} />
+}
+
+export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
+  const { className = '', ...rest } = props
+  return <select className={`${inputBase} ${className}`} {...rest} />
 }
 
 /* ── Tarjeta ─────────────────────────────────────────────────────────── */

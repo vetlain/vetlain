@@ -2,17 +2,29 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api, ApiError } from '../lib/api'
-import type { Page, Service, Product, BlogPost, SiteContentRow, Lead } from '../lib/types'
+import type { Page, Service, Product, News, BlogPost, SiteContentRow, Lead } from '../lib/types'
 import { PageHeading, Card, Button, Notice, Loading } from './ui'
 
 type Counts = {
   contacto: number
+  novedades: number
   paginas: number
   servicios: number
   productos: number
   blog: number
   borradores: number
   leadsPendientes: number
+}
+
+const SIN_DATOS: Counts = {
+  contacto: 0,
+  novedades: 0,
+  paginas: 0,
+  servicios: 0,
+  productos: 0,
+  blog: 0,
+  borradores: 0,
+  leadsPendientes: 0,
 }
 
 export default function Dashboard() {
@@ -26,12 +38,15 @@ export default function Dashboard() {
       api.get<Page[]>('/admin/pages'),
       api.get<Service[]>('/admin/services'),
       api.get<Product[]>('/admin/products'),
+      api.get<News[]>('/admin/news'),
       api.get<BlogPost[]>('/admin/blog'),
       api.get<Lead[]>('/admin/leads'),
     ])
-      .then(([content, pages, services, products, blog, leads]) =>
+      .then(([content, pages, services, products, news, blog, leads]) =>
         setCounts({
-          contacto: content.length,
+          // Los bloques de la portada viven en site_content pero se editan aparte.
+          contacto: content.filter((r) => r.group !== 'home').length,
+          novedades: news.length,
           paginas: pages.length,
           servicios: services.length,
           productos: products.length,
@@ -40,9 +55,7 @@ export default function Dashboard() {
           leadsPendientes: leads.filter((l) => !l.handled).length,
         }),
       )
-      .catch(() =>
-        setCounts({ contacto: 0, paginas: 0, servicios: 0, productos: 0, blog: 0, borradores: 0, leadsPendientes: 0 }),
-      )
+      .catch(() => setCounts(SIN_DATOS))
   }, [])
 
   async function publish() {
@@ -62,6 +75,12 @@ export default function Dashboard() {
   }
 
   const tiles = [
+    {
+      to: '/admin/portada',
+      label: 'Portada',
+      value: counts?.novedades,
+      unit: counts?.novedades === 1 ? 'novedad' : 'novedades',
+    },
     { to: '/admin/contacto', label: 'Contacto y redes', value: counts?.contacto, unit: 'datos' },
     { to: '/admin/paginas', label: 'Páginas', value: counts?.paginas, unit: 'páginas' },
     { to: '/admin/servicios', label: 'Servicios', value: counts?.servicios, unit: 'servicios' },

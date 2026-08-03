@@ -1,15 +1,20 @@
 /**
  * API privada del panel (/api/admin/*). Todo protegido por requireAuth.
- * CRUD de: contenido suelto, páginas, servicios y blog.
+ * CRUD de: contenido suelto (incluida la portada), páginas, servicios,
+ * productos, novedades y blog, más la subida de imágenes.
  */
 import { Router } from 'express'
 import { z } from 'zod'
 import { eq, desc } from 'drizzle-orm'
 import { db, schema } from '../db/index.js'
 import { requireAuth } from '../auth.js'
+import { uploadsRouter } from './uploads.js'
 
 export const adminRouter = Router()
 adminRouter.use(requireAuth)
+
+/* ── Subida de imágenes ──────────────────────────────────────────────── */
+adminRouter.use('/uploads', uploadsRouter)
 
 /* ── Publicar cambios (dispara un rebuild en Vercel) ──────────────────── */
 // El sitio prerenderiza páginas como HTML estático en cada build (server/prerender.tsx).
@@ -40,21 +45,26 @@ adminRouter.get('/content', async (_req, res) => {
   res.json(rows)
 })
 
+// Upsert: si la clave no existe todavía se crea. Necesario para los bloques de
+// la portada (home.*), que pueden no estar en bases sembradas antes de existir.
+// En un UPDATE no se tocan `label`/`group`: los pone el seed y son del panel.
 adminRouter.put('/content/:key', async (req, res) => {
-  const parsed = z.object({ value: z.any() }).safeParse(req.body)
-  if (!parsed.success) {
+  const parsed = z
+    .object({ value: z.any(), label: z.string().nullish(), group: z.string().nullish() })
+    .safeParse(req.body)
+  if (!parsed.success || parsed.data.value === undefined) {
     res.status(400).json({ error: 'Datos inválidos' })
     return
   }
+  const { value, label, group } = parsed.data
   const [row] = await db
-    .update(schema.siteContent)
-    .set({ value: parsed.data.value, updatedAt: new Date() })
-    .where(eq(schema.siteContent.key, req.params.key))
+    .insert(schema.siteContent)
+    .values({ key: req.params.key, value, label: label ?? null, group: group ?? null })
+    .onConflictDoUpdate({
+      target: schema.siteContent.key,
+      set: { value, updatedAt: new Date() },
+    })
     .returning()
-  if (!row) {
-    res.status(404).json({ error: 'Clave no encontrada' })
-    return
-  }
   res.json(row)
 })
 
@@ -273,6 +283,62 @@ adminRouter.put('/blog/:id', async (req, res) => {
 
 adminRouter.delete('/blog/:id', async (req, res) => {
   await db.delete(schema.blogPosts).where(eq(schema.blogPosts.id, Number(req.params.id)))
+  res.json({ ok: true })
+})
+
+/* ── Novedades de la portada ─────────────────────────────────────────── */
+
+// `date` llega del <input type="date"> como 'YYYY-MM-DD'; vacío se guarda null.
+const newsFields = z.object({
+  title: z.string().min(1),
+  excerpt: z.string().nullish(),
+  image: z.string().nullish(),
+  link: z.string().nullish(),
+  linkLabel: z.string().nullish(),
+  date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Fecha inválida')
+    .or(z.literal(''))
+    .nullish()
+    .transform((v) => (v ? v : null)),
+  sortOrder: z.number().int().optional(),
+  published: z.boolean().optional(),
+})
+
+adminRouter.get('/news', async (_req, res) => {
+  res.json(await db.select().from(schema.news).orderBy(schema.news.sortOrder, desc(schema.news.date)))
+})
+
+adminRouter.post('/news', async (req, res) => {
+  const parsed = newsFields.safeParse(req.body)
+  if (!parsed.success) {
+    res.status(400).json({ error: 'Datos inválidos' })
+    return
+  }
+  const [row] = await db.insert(schema.news).values(parsed.data).returning()
+  res.status(201).json(row)
+})
+
+adminRouter.put('/news/:id', async (req, res) => {
+  const parsed = newsFields.partial().safeParse(req.body)
+  if (!parsed.success) {
+    res.status(400).json({ error: 'Datos inválidos' })
+    return
+  }
+  const [row] = await db
+    .update(schema.news)
+    .set({ ...parsed.data, updatedAt: new Date() })
+    .where(eq(schema.news.id, Number(req.params.id)))
+    .returning()
+  if (!row) {
+    res.status(404).json({ error: 'Novedad no encontrada' })
+    return
+  }
+  res.json(row)
+})
+
+adminRouter.delete('/news/:id', async (req, res) => {
+  await db.delete(schema.news).where(eq(schema.news.id, Number(req.params.id)))
   res.json({ ok: true })
 })
 

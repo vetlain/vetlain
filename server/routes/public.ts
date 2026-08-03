@@ -11,6 +11,7 @@ import {
   getServiceBySlug,
   getPublishedProducts,
   getProductBySlug,
+  getPublishedNews,
   getPublishedBlogPosts,
   getBlogPostBySlug,
 } from '../content.js'
@@ -54,6 +55,10 @@ publicRouter.get('/products/:slug', async (req, res) => {
     return
   }
   res.json(product)
+})
+
+publicRouter.get('/news', async (_req, res) => {
+  res.json(await getPublishedNews())
 })
 
 publicRouter.get('/blog', async (_req, res) => {

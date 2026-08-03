@@ -74,6 +74,22 @@ export type BlogPost = {
   updatedAt: string
 }
 
+/** Novedad de la portada (tarjeta entre el hero y "Qué eliminamos"). */
+export type News = {
+  id: number
+  title: string
+  excerpt: string | null
+  image: string | null
+  link: string | null
+  linkLabel: string | null
+  /** Fecha simple 'YYYY-MM-DD' (sin hora). */
+  date: string | null
+  sortOrder: number
+  published: boolean
+  createdAt: string
+  updatedAt: string
+}
+
 export type Lead = {
   id: number
   name: string

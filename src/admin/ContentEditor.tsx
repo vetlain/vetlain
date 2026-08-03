@@ -11,7 +11,10 @@ export default function ContentEditor() {
   const [msg, setMsg] = useState<{ kind: 'success' | 'error'; text: string } | null>(null)
 
   useEffect(() => {
-    api.get<SiteContentRow[]>('/admin/content').then((data) => {
+    // Los bloques de la portada (grupo "home") también viven en site_content,
+    // pero son objetos con estructura: se editan en la sección Portada.
+    api.get<SiteContentRow[]>('/admin/content').then((all) => {
+      const data = all.filter((r) => r.group !== 'home')
       setRows(data)
       const initial: Record<string, string> = {}
       for (const r of data) initial[r.key] = typeof r.value === 'string' ? r.value : JSON.stringify(r.value)

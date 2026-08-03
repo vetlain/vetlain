@@ -6,6 +6,8 @@
  */
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
+import { buildHomeContent } from './home-content'
+import type { HomeContent } from './home-content'
 
 type ContentMap = Record<string, unknown>
 
@@ -56,6 +58,20 @@ export function SiteContentProvider({
   }, [])
 
   return <ContentCtx.Provider value={map}>{children}</ContentCtx.Provider>
+}
+
+/**
+ * Mapa crudo clave→valor de site_content. Lo usan los bloques que guardan
+ * objetos (la portada, en src/lib/home-content.ts) y no simples strings.
+ */
+export function useContentMap(): ContentMap {
+  return useContext(ContentCtx)
+}
+
+/** Contenido editable de la portada, con los valores por defecto ya aplicados. */
+export function useHomeContent(): HomeContent {
+  const map = useContext(ContentCtx)
+  return useMemo(() => buildHomeContent(map), [map])
 }
 
 /** Acceso al contenido del sitio con helpers de contacto ya derivados. */

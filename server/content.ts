@@ -48,6 +48,15 @@ export async function getProductBySlug(slug: string) {
   return product && product.published ? product : null
 }
 
+/** Novedades visibles en la portada, en el orden definido en el panel. */
+export function getPublishedNews() {
+  return db
+    .select()
+    .from(schema.news)
+    .where(eq(schema.news.published, true))
+    .orderBy(schema.news.sortOrder, desc(schema.news.date))
+}
+
 export function getPublishedBlogPosts() {
   return db
     .select()

@@ -5,17 +5,8 @@ import type { Page, Product } from '../../lib/types'
 import { PRODUCT_CATEGORIES } from '../../lib/types'
 import { Seo } from '../../components/Seo'
 import { Markdown } from '../../components/Markdown'
-import { ChevronGlyph, A } from '../../site/chrome'
+import { ChevronGlyph, assetUrl } from '../../site/chrome'
 import { SiteShell, PageHero, ClosingCta, PageState } from './parts'
-
-/**
- * Resuelve la ruta de la imagen de un producto: si el panel guardó una URL
- * completa se usa tal cual; si es una ruta de /public, se le antepone el base.
- */
-export function productImageUrl(image: string | null): string | null {
-  if (!image) return null
-  return /^https?:\/\//i.test(image) ? image : A + image.replace(/^\//, '')
-}
 
 /** Presentación pura: la usan tanto el cliente (tras el fetch) como el prerender. */
 export function ProductosIndexBody({
@@ -87,7 +78,7 @@ export function ProductosIndexBody({
               </h2>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {g.items.map((p) => {
-                  const img = productImageUrl(p.image)
+                  const img = assetUrl(p.image)
                   return (
                     <Link
                       key={p.id}

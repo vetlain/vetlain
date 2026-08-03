@@ -2,11 +2,10 @@
 import { useEffect, useState } from 'react'
 import { api, ApiError } from '../lib/api'
 import type { Service } from '../lib/types'
-import { PageHeading, Card, Field, Input, Textarea, Button, Notice, Loading } from './ui'
+import { SERVICE_ICONS } from '../site/service-icons'
+import { PageHeading, Card, Field, Input, Textarea, Select, Button, Notice, Loading } from './ui'
 
 type Draft = Partial<Service> & { title: string; slug: string }
-
-const ICONS = ['rodent', 'insect', 'bird', 'spray', 'building', 'training', 'shield']
 
 const blank: Draft = {
   slug: '',
@@ -143,17 +142,13 @@ export default function ServicesEditor() {
                 <Input value={draft.kicker ?? ''} onChange={(e) => set('kicker', e.target.value)} />
               </Field>
               <Field label="Icono">
-                <select
-                  value={draft.icon ?? 'shield'}
-                  onChange={(e) => set('icon', e.target.value)}
-                  className="w-full border-2 border-neutral-200 bg-white px-3 py-2 text-sm outline-none focus:border-vetlain-green"
-                >
-                  {ICONS.map((i) => (
-                    <option key={i} value={i}>
-                      {i}
+                <Select value={draft.icon ?? 'shield'} onChange={(e) => set('icon', e.target.value)}>
+                  {SERVICE_ICONS.map((i) => (
+                    <option key={i.id} value={i.id}>
+                      {i.label}
                     </option>
                   ))}
-                </select>
+                </Select>
               </Field>
             </div>
             <Field label="Resumen" hint="Frase corta que se muestra en la tarjeta del servicio.">

@@ -20,6 +20,9 @@
 import { db, schema } from './index.js'
 import { hashPassword } from '../auth.js'
 import { productsSeed } from './seed-products.js'
+// Los textos de la portada viven junto al sitio (una sola fuente de verdad):
+// el mismo objeto que usa el front como respaldo es el que se siembra aquí.
+import { DEFAULT_HOME, HOME_BLOCKS, homeKey } from '../../src/lib/home-content.js'
 
 export async function runSeed({ overwrite = false }: { overwrite?: boolean } = {}) {
   /* ── Administrador ─────────────────────────────────────────────────── */
@@ -49,6 +52,36 @@ export async function runSeed({ overwrite = false }: { overwrite?: boolean } = {
     await db.insert(schema.siteContent).values(row).onConflictDoNothing({ target: schema.siteContent.key })
   }
   console.log(`✓ contenido suelto: ${content.length} claves`)
+
+  /* ── Portada (bloques editables) ───────────────────────────────────── */
+  // Un registro por bloque (home.hero, home.services…), con el objeto completo
+  // como valor. Con `overwrite` se restauran los textos originales del código.
+  const homeLabels: Record<string, string> = {
+    seo: 'Portada · Título y descripción en Google',
+    hero: 'Portada · Encabezado principal',
+    trust: 'Portada · Cinta de garantías',
+    novedades: 'Portada · Novedades (encabezado)',
+    services: 'Portada · Qué eliminamos',
+    steps: 'Portada · Cómo trabajamos',
+    urgency: 'Portada · Franja de urgencia',
+    contact: 'Portada · Contacto',
+  }
+  for (const block of HOME_BLOCKS) {
+    const values = {
+      key: homeKey(block),
+      value: DEFAULT_HOME[block],
+      label: homeLabels[block],
+      group: 'home',
+    }
+    const insert = db.insert(schema.siteContent).values(values)
+    await (overwrite
+      ? insert.onConflictDoUpdate({
+          target: schema.siteContent.key,
+          set: { value: values.value, label: values.label, group: values.group, updatedAt: new Date() },
+        })
+      : insert.onConflictDoNothing({ target: schema.siteContent.key }))
+  }
+  console.log(`✓ portada: ${HOME_BLOCKS.length} bloques`)
 
   /* ── Servicios ─────────────────────────────────────────────────────── */
   type ServiceSeed = {
@@ -292,15 +325,64 @@ export async function runSeed({ overwrite = false }: { overwrite?: boolean } = {
     })
     .onConflictDoNothing({ target: schema.blogPosts.slug })
   console.log('✓ blog: 1 entrada de ejemplo')
+
+  /* ── Novedades de la portada ───────────────────────────────────────── */
+  // No tienen slug ni ninguna otra clave única, así que la idempotencia se
+  // resuelve por presencia: si ya hay novedades, no se toca nada (ni siquiera
+  // con `overwrite`; son contenido del cliente, no textos del código).
+  const [algunaNovedad] = await db.select({ id: schema.news.id }).from(schema.news).limit(1)
+  let novedades = 0
+  if (!algunaNovedad) {
+    const hoy = new Date()
+    const diasAtras = (d: number) =>
+      new Date(hoy.getTime() - d * 86_400_000).toISOString().slice(0, 10)
+    const ejemplos = [
+      {
+        title: 'Campaña de temporada: control preventivo de moscas',
+        excerpt:
+          'Con el calor aumentan las moscas en cocinas y patios de comida. Estamos agendando visitas preventivas con tarifa de temporada.',
+        image: 'brand/foto-desinsectacion.jpg',
+        link: '/servicios/desinsectacion',
+        linkLabel: 'Ver el servicio',
+        date: diasAtras(3),
+        sortOrder: 0,
+      },
+      {
+        title: 'Renovamos nuestra certificación ISO 9001',
+        excerpt:
+          'Aprobamos la auditoría anual: seguimos trabajando con procedimientos escritos, registros de cada visita y trazabilidad de los productos.',
+        image: 'brand/iso-9001.png',
+        link: '/nosotros',
+        linkLabel: 'Conocer más',
+        date: diasAtras(20),
+        sortOrder: 1,
+      },
+      {
+        title: 'Nuevas trampas ecológicas sin veneno',
+        excerpt:
+          'Sumamos equipos de captura para roedores aptos para plantas alimentarias: sin cebos tóxicos y sin dispersión de cadáveres.',
+        image: 'brand/productos/ekomille.png',
+        link: '/productos',
+        linkLabel: 'Ver el catálogo',
+        date: diasAtras(45),
+        sortOrder: 2,
+      },
+    ]
+    await db.insert(schema.news).values(ejemplos.map((n) => ({ ...n, published: true })))
+    novedades = ejemplos.length
+  }
+  console.log(`✓ novedades: ${novedades || 'ya había, no se tocaron'}`)
   console.log('\nSeed completado ✅')
 
   return {
     admin: adminEmail,
-    modo: overwrite ? 'overwrite (re-sincroniza servicios, páginas y productos)' : 'solo inserta lo que falta',
+    modo: overwrite ? 'overwrite (re-sincroniza servicios, páginas, productos y portada)' : 'solo inserta lo que falta',
     content: content.length,
+    home: HOME_BLOCKS.length,
     services: services.length,
     products: productsSeed.length,
     pages: pages.length,
     blog: 1,
+    novedades,
   }
 }

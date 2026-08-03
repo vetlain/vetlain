@@ -5,6 +5,10 @@ dist-ssr
 .vercel
 *.tsbuildinfo
 
+# imágenes subidas desde el panel en desarrollo local (en producción van a
+# Vercel Blob, no al repo)
+public/uploads
+
 # variables de entorno (secretos: DATABASE_URL, JWT_SECRET…)
 .env
 .env.*

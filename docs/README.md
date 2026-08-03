@@ -102,3 +102,54 @@ En Vercel, donde no hay terminal, el equivalente es visitar una vez:
 
 Después conviene pulsar **Publicar cambios** en el panel para que el prerender
 regenere el HTML estático de `/productos` y las fichas nuevas.
+
+## Portada editable (sección «Portada» del panel)
+
+Desde `/admin/portada` el cliente edita **toda** la home, sin tocar código.
+
+**Dónde vive cada cosa**
+
+| Pieza | Almacenamiento | Editor |
+|---|---|---|
+| Textos, botones, imagen del hero, tarjetas, franjas y SEO | `site_content`, grupo `home`, una clave por bloque (`home.hero`, `home.services`…) con el objeto completo en `jsonb` | Panel → Portada → *Contenido* |
+| Novedades (tarjetas entre el hero y «Qué eliminamos») | tabla `news` | Panel → Portada → *Novedades* |
+
+La estructura de los bloques y sus valores por defecto están en
+`src/lib/home-content.ts`. Ese archivo es la **única fuente de verdad**: lo usan
+el sitio (como respaldo si la API falla o mientras carga), el panel (para armar
+el formulario) y el seed (para poblar la base). Si se añade un campo nuevo a un
+bloque, las filas ya guardadas siguen funcionando: el merge rellena lo que falte
+con el valor por defecto.
+
+Las novedades sólo aparecen si hay al menos una publicada y la sección está
+activada en *Contenido → Novedades (encabezado)*.
+
+### Subida de imágenes
+
+El panel sube fotos con **Vercel Blob** (`POST /api/admin/uploads`, protegido por
+sesión). Para que funcione en producción hay que crear una vez el store:
+
+> Vercel → proyecto → *Storage* → **Create Database** → *Blob* → conectarlo al
+> proyecto. Eso inyecta `BLOB_READ_WRITE_TOKEN` automáticamente; luego hay que
+> redeployar para que la función lo tome.
+
+Sin ese token: en local las imágenes se guardan en `public/uploads/` (ignorado
+por git) y en producción el panel avisa de que falta configurarlo — el campo de
+texto para pegar una ruta o URL sigue disponible como alternativa.
+
+Formatos aceptados: JPG, PNG, WEBP, GIF y AVIF, hasta 8 MB. SVG queda fuera a
+propósito (puede contener scripts y se serviría desde el propio dominio).
+
+### La portada se prerenderiza
+
+Desde que su contenido sale de la base, `/` se genera como HTML estático en cada
+build, igual que el resto de páginas. Como el resultado pisa `dist/index.html`,
+el build guarda antes una copia intacta de la plantilla en **`dist/app.html`**, y
+`vercel.json` manda ahí las rutas sin fichero propio (`/admin`, 404…). Si se
+toca `vercel.json` o `server/prerender.tsx`, hay que mantener esa pareja:
+
+- `dist/index.html` → portada prerenderizada (lo que ve Google).
+- `dist/app.html` → shell vacío del SPA (fallback de las demás rutas).
+
+Los cambios de contenido se ven **al instante** en el sitio (se leen por API);
+el HTML estático se actualiza al pulsar **Publicar cambios**.

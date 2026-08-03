@@ -22,6 +22,13 @@
       "when": 1784906225982,
       "tag": "0002_productos",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1785776777067,
+      "tag": "0003_news",
+      "breakpoints": true
     }
   ]
 }

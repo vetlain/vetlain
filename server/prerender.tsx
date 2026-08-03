@@ -12,8 +12,12 @@
  * sale mal, se registra una advertencia y el build sigue — esas rutas quedan
  * serviditas por el SPA normal (client-rendered), como antes de esta fase.
  *
- * La home ("/") NO se prerenderiza: ya tiene meta/JSON-LD estáticos en
- * index.html y su contenido es mayormente marketing fijo, no datos de la BD.
+ * La portada ("/") también se prerenderiza: desde que sus textos, imágenes y
+ * novedades salen de la base (site_content grupo "home" + tabla news), el HTML
+ * estático es la única forma de que un buscador los vea. Como el resultado pisa
+ * dist/index.html, antes se guarda una copia intacta de la plantilla en
+ * dist/app.html: ese es el shell al que Vercel manda las rutas sin HTML propio
+ * (ver los rewrites de vercel.json).
  */
 import 'dotenv/config'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
@@ -30,9 +34,11 @@ import {
   getAllPages,
   getPublishedServices,
   getPublishedProducts,
+  getPublishedNews,
   getPublishedBlogPosts,
 } from './content.js'
 import { SiteContentProvider } from '../src/lib/site-content'
+import { Prototipo3Body } from '../src/pages/Prototipo3'
 import { PageViewBody } from '../src/pages/site/PageView'
 import { ServiciosIndexBody } from '../src/pages/site/ServiciosIndex'
 import { ServiceDetailBody } from '../src/pages/site/ServiceDetail'
@@ -40,7 +46,7 @@ import { ProductosIndexBody } from '../src/pages/site/ProductosIndex'
 import { ProductDetailBody } from '../src/pages/site/ProductDetail'
 import { BlogListBody } from '../src/pages/site/BlogList'
 import { BlogPostBody } from '../src/pages/site/BlogPost'
-import type { Page, Service, Product, BlogPost } from '../src/lib/types'
+import type { Page, Service, Product, News, BlogPost } from '../src/lib/types'
 
 const DIST = join(process.cwd(), 'dist')
 
@@ -57,6 +63,18 @@ function toJsonSafe<T>(row: unknown): T {
 }
 
 async function main() {
+  const templatePath = join(DIST, 'index.html')
+  if (!existsSync(templatePath)) {
+    console.warn('[prerender] No existe dist/index.html todavía. Se omite.')
+    return
+  }
+  const template = readFileSync(templatePath, 'utf-8')
+
+  // Shell del SPA para las rutas sin HTML propio (/admin, 404…). Se escribe
+  // SIEMPRE y antes que nada: vercel.json redirige ahí todo lo que no tenga
+  // fichero propio, así que debe existir aunque el prerender no llegue a correr.
+  writeFileSync(join(DIST, 'app.html'), template, 'utf-8')
+
   // Sin conexión a la base: se omite el prerender, el sitio sigue 100% client-rendered.
   try {
     getDatabaseUrl()
@@ -65,31 +83,33 @@ async function main() {
     return
   }
 
-  const templatePath = join(DIST, 'index.html')
-  if (!existsSync(templatePath)) {
-    console.warn('[prerender] No existe dist/index.html todavía. Se omite.')
-    return
-  }
-  const template = readFileSync(templatePath, 'utf-8')
-
   let siteContentMap: Record<string, unknown> = {}
   const pagesBySlug = new Map<string, Page>()
   let services: Service[] = []
   let products: Product[] = []
+  let news: News[] = []
   let posts: BlogPost[] = []
 
   try {
-    const [contentMap, pageRows, serviceRows, productRows, postRows] = await Promise.all([
+    const [contentMap, pageRows, serviceRows, productRows, newsRows, postRows] = await Promise.all([
       getSiteContentMap(),
       getAllPages(),
       getPublishedServices(),
       getPublishedProducts(),
+      // Aparte del resto: si la tabla `news` todavía no existe (deploy anterior
+      // a la migración 0003) la portada sale sin novedades, pero el prerender
+      // del sitio entero no se cae por eso.
+      Promise.resolve(getPublishedNews()).catch((err: unknown) => {
+        console.warn('[prerender] Sin novedades (¿falta la migración 0003_news?):', err)
+        return []
+      }),
       getPublishedBlogPosts(),
     ])
     siteContentMap = contentMap
     for (const row of pageRows) pagesBySlug.set(row.slug, toJsonSafe<Page>(row))
     services = serviceRows.map((s) => toJsonSafe<Service>(s))
     products = productRows.map((p) => toJsonSafe<Product>(p))
+    news = newsRows.map((n) => toJsonSafe<News>(n))
     posts = postRows.map((p) => toJsonSafe<BlogPost>(p))
   } catch (err) {
     console.error('[prerender] No se pudo leer la base de datos; se omite el prerender:', err)
@@ -99,6 +119,7 @@ async function main() {
   const wrap = (children: ReactElement) => <SiteContentProvider initial={siteContentMap}>{children}</SiteContentProvider>
 
   const routes: Route[] = [
+    { path: '/', element: wrap(<Prototipo3Body news={news} />) },
     {
       path: '/servicios',
       element: wrap(

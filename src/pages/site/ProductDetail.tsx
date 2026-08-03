@@ -5,8 +5,8 @@ import type { Product } from '../../lib/types'
 import { PRODUCT_CATEGORIES } from '../../lib/types'
 import { Seo } from '../../components/Seo'
 import { Markdown } from '../../components/Markdown'
+import { assetUrl } from '../../site/chrome'
 import { SiteShell, PageHero, ServiceAside, ClosingCta, PageState } from './parts'
-import { productImageUrl } from './ProductosIndex'
 
 /** Presentación pura: la usan tanto el cliente (tras el fetch) como el prerender. */
 export function ProductDetailBody({ slug, data }: { slug: string; data: Product | null }) {
@@ -30,7 +30,7 @@ export function ProductDetailBody({ slug, data }: { slug: string; data: Product 
   }
 
   const category = PRODUCT_CATEGORIES.find((c) => c.id === data.category)
-  const img = productImageUrl(data.image)
+  const img = assetUrl(data.image)
 
   const jsonLd = {
     '@context': 'https://schema.org',

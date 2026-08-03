@@ -61,6 +61,17 @@ const glyphs: Record<string, (p: SVGProps<SVGSVGElement>) => ReactElement> = {
   ),
 }
 
+/** Catálogo de iconos disponibles, para los selectores del panel. */
+export const SERVICE_ICONS: { id: string; label: string }[] = [
+  { id: 'rodent', label: 'Roedor (ratas y ratones)' },
+  { id: 'insect', label: 'Insecto' },
+  { id: 'bird', label: 'Ave' },
+  { id: 'spray', label: 'Desinfección (spray)' },
+  { id: 'building', label: 'Edificio (plantas y bodegas)' },
+  { id: 'training', label: 'Capacitación' },
+  { id: 'shield', label: 'Escudo (garantía)' },
+]
+
 export function ServiceIcon({ icon, ...props }: { icon: string | null } & SVGProps<SVGSVGElement>) {
   const Comp = glyphs[icon ?? 'shield'] ?? glyphs.shield
   return Comp(props)
