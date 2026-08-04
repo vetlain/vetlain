@@ -29,6 +29,13 @@
       "when": 1785776777067,
       "tag": "0003_news",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1785847228893,
+      "tag": "0004_novedades_entrada",
+      "breakpoints": true
     }
   ]
 }

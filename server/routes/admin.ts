@@ -289,12 +289,23 @@ adminRouter.delete('/blog/:id', async (req, res) => {
 /* ── Novedades de la portada ─────────────────────────────────────────── */
 
 // `date` llega del <input type="date"> como 'YYYY-MM-DD'; vacío se guarda null.
+// La coherencia entre `mode` y sus campos (slug obligatorio en 'entry') se
+// comprueba aparte, en `revisarModo`: un .refine() aquí impediría usar
+// .partial() para el PUT.
 const newsFields = z.object({
+  mode: z.enum(['link', 'entry']).optional(),
   title: z.string().min(1),
   excerpt: z.string().nullish(),
   image: z.string().nullish(),
   link: z.string().nullish(),
   linkLabel: z.string().nullish(),
+  slug: z
+    .string()
+    .nullish()
+    .transform((v) => (v ? v.trim() : null)),
+  bodyMd: z.string().nullish(),
+  seoTitle: z.string().nullish(),
+  seoDescription: z.string().nullish(),
   date: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Fecha inválida')
@@ -304,6 +315,30 @@ const newsFields = z.object({
   sortOrder: z.number().int().optional(),
   published: z.boolean().optional(),
 })
+
+type NewsInput = Partial<z.infer<typeof newsFields>>
+
+/**
+ * Una novedad con entrada propia necesita slug (es su URL) y cuerpo. Se valida
+ * sobre el resultado de fusionar lo que llega con lo que ya está guardado, para
+ * que un PUT parcial no dé un falso error.
+ */
+function revisarModo(datos: NewsInput): string | null {
+  if (datos.mode !== 'entry') return null
+  if (!datos.slug) return 'La entrada necesita una URL (slug).'
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(datos.slug)) {
+    return 'La URL (slug) sólo admite minúsculas, números y guiones.'
+  }
+  if (!datos.bodyMd?.trim()) return 'La entrada necesita contenido.'
+  return null
+}
+
+/** Traduce el choque de slug repetido (23505) en un mensaje entendible. */
+function esSlugDuplicado(err: unknown): boolean {
+  const code = (err as { code?: string })?.code
+  const msg = (err as { message?: string })?.message ?? ''
+  return code === '23505' || /news_slug_unique|duplicate key/i.test(msg)
+}
 
 adminRouter.get('/news', async (_req, res) => {
   res.json(await db.select().from(schema.news).orderBy(schema.news.sortOrder, desc(schema.news.date)))
@@ -315,8 +350,21 @@ adminRouter.post('/news', async (req, res) => {
     res.status(400).json({ error: 'Datos inválidos' })
     return
   }
-  const [row] = await db.insert(schema.news).values(parsed.data).returning()
-  res.status(201).json(row)
+  const problema = revisarModo(parsed.data)
+  if (problema) {
+    res.status(400).json({ error: problema })
+    return
+  }
+  try {
+    const [row] = await db.insert(schema.news).values(parsed.data).returning()
+    res.status(201).json(row)
+  } catch (err) {
+    if (esSlugDuplicado(err)) {
+      res.status(409).json({ error: 'Ya existe una novedad con esa URL (slug).' })
+      return
+    }
+    throw err
+  }
 })
 
 adminRouter.put('/news/:id', async (req, res) => {
@@ -325,16 +373,31 @@ adminRouter.put('/news/:id', async (req, res) => {
     res.status(400).json({ error: 'Datos inválidos' })
     return
   }
-  const [row] = await db
-    .update(schema.news)
-    .set({ ...parsed.data, updatedAt: new Date() })
-    .where(eq(schema.news.id, Number(req.params.id)))
-    .returning()
-  if (!row) {
+  const id = Number(req.params.id)
+  const [actual] = await db.select().from(schema.news).where(eq(schema.news.id, id)).limit(1)
+  if (!actual) {
     res.status(404).json({ error: 'Novedad no encontrada' })
     return
   }
-  res.json(row)
+  const problema = revisarModo({ ...actual, ...parsed.data } as NewsInput)
+  if (problema) {
+    res.status(400).json({ error: problema })
+    return
+  }
+  try {
+    const [row] = await db
+      .update(schema.news)
+      .set({ ...parsed.data, updatedAt: new Date() })
+      .where(eq(schema.news.id, id))
+      .returning()
+    res.json(row)
+  } catch (err) {
+    if (esSlugDuplicado(err)) {
+      res.status(409).json({ error: 'Ya existe una novedad con esa URL (slug).' })
+      return
+    }
+    throw err
+  }
 })
 
 adminRouter.delete('/news/:id', async (req, res) => {

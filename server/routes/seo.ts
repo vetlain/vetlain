@@ -44,9 +44,11 @@ export async function sitemapHandler(_req: Request, res: Response): Promise<void
   const entries: Entry[] = staticPaths.map((p) => ({ loc: base + p }))
 
   try {
-    const [services, products, posts] = await Promise.all([
+    const [services, products, novedades, posts] = await Promise.all([
       db.select().from(schema.services).where(eq(schema.services.published, true)),
       db.select().from(schema.products).where(eq(schema.products.published, true)),
+      // Sólo las novedades con entrada propia tienen URL; las de modo "link" no.
+      db.select().from(schema.news).where(eq(schema.news.published, true)),
       db
         .select()
         .from(schema.blogPosts)
@@ -58,6 +60,10 @@ export async function sitemapHandler(_req: Request, res: Response): Promise<void
     }
     for (const p of products) {
       entries.push({ loc: `${base}/productos/${p.slug}`, lastmod: p.updatedAt?.toISOString?.() })
+    }
+    for (const n of novedades) {
+      if (n.mode !== 'entry' || !n.slug) continue
+      entries.push({ loc: `${base}/novedades/${n.slug}`, lastmod: n.updatedAt?.toISOString?.() })
     }
     for (const p of posts) {
       entries.push({ loc: `${base}/blog/${p.slug}`, lastmod: (p.updatedAt ?? p.publishedAt)?.toISOString?.() })

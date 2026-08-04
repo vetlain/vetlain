@@ -39,6 +39,7 @@ import {
 } from './content.js'
 import { SiteContentProvider } from '../src/lib/site-content'
 import { Prototipo3Body } from '../src/pages/Prototipo3'
+import { NewsDetailBody } from '../src/pages/site/NewsDetail'
 import { PageViewBody } from '../src/pages/site/PageView'
 import { ServiciosIndexBody } from '../src/pages/site/ServiciosIndex'
 import { ServiceDetailBody } from '../src/pages/site/ServiceDetail'
@@ -120,6 +121,13 @@ async function main() {
 
   const routes: Route[] = [
     { path: '/', element: wrap(<Prototipo3Body news={news} />) },
+    // Sólo las novedades con entrada propia tienen página que generar.
+    ...news
+      .filter((n) => n.mode === 'entry' && n.slug)
+      .map((n) => ({
+        path: `/novedades/${n.slug}`,
+        element: wrap(<NewsDetailBody slug={n.slug!} data={n} />),
+      })),
     {
       path: '/servicios',
       element: wrap(

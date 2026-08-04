@@ -74,20 +74,38 @@ export type BlogPost = {
   updatedAt: string
 }
 
+/**
+ * Cómo se comporta una novedad:
+ *  - 'link'  → la tarjeta lleva a una página que ya existe (o a una URL externa).
+ *  - 'entry' → la novedad es una entrada propia, con página en /novedades/:slug.
+ */
+export type NewsMode = 'link' | 'entry'
+
 /** Novedad de la portada (tarjeta entre el hero y "Qué eliminamos"). */
 export type News = {
   id: number
+  mode: NewsMode
   title: string
   excerpt: string | null
   image: string | null
   link: string | null
   linkLabel: string | null
+  slug: string | null
+  bodyMd: string | null
+  seoTitle: string | null
+  seoDescription: string | null
   /** Fecha simple 'YYYY-MM-DD' (sin hora). */
   date: string | null
   sortOrder: number
   published: boolean
   createdAt: string
   updatedAt: string
+}
+
+/** A dónde lleva la tarjeta de una novedad; null si no lleva a ninguna parte. */
+export function newsHref(n: News): string | null {
+  if (n.mode === 'entry') return n.slug ? `/novedades/${n.slug}` : null
+  return n.link || null
 }
 
 export type Lead = {

@@ -12,6 +12,7 @@ import {
   getPublishedProducts,
   getProductBySlug,
   getPublishedNews,
+  getNewsBySlug,
   getPublishedBlogPosts,
   getBlogPostBySlug,
 } from '../content.js'
@@ -59,6 +60,15 @@ publicRouter.get('/products/:slug', async (req, res) => {
 
 publicRouter.get('/news', async (_req, res) => {
   res.json(await getPublishedNews())
+})
+
+publicRouter.get('/news/:slug', async (req, res) => {
+  const item = await getNewsBySlug(req.params.slug)
+  if (!item) {
+    res.status(404).json({ error: 'Novedad no encontrada' })
+    return
+  }
+  res.json(item)
 })
 
 publicRouter.get('/blog', async (_req, res) => {

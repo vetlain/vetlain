@@ -15,6 +15,7 @@ import { useSiteContent, useHomeContent } from '../lib/site-content'
 import { useApi } from '../lib/useApi'
 import { formatDay } from '../lib/format'
 import type { News } from '../lib/types'
+import { newsHref } from '../lib/types'
 import type { HomeContent } from '../lib/home-content'
 import { ServiceIcon } from '../site/service-icons'
 import {
@@ -170,6 +171,7 @@ function NewsLink({ href, label }: { href: string; label: string }) {
 
 function NewsCard({ item }: { item: News }) {
   const img = assetUrl(item.image)
+  const href = newsHref(item)
   return (
     <article className="group flex flex-col border-2 border-neutral-200 bg-white transition-colors hover:border-vetlain-green">
       {img && (
@@ -197,7 +199,12 @@ function NewsCard({ item }: { item: News }) {
         {item.excerpt && (
           <p className="mt-2 text-sm leading-relaxed text-neutral-600">{item.excerpt}</p>
         )}
-        {item.link && <NewsLink href={item.link} label={item.linkLabel || 'Ver más'} />}
+        {href && (
+          <NewsLink
+            href={href}
+            label={item.linkLabel || (item.mode === 'entry' ? 'Leer más' : 'Ver más')}
+          />
+        )}
       </div>
     </article>
   )

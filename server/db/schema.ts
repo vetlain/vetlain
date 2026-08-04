@@ -120,17 +120,32 @@ export const blogPosts = pgTable('blog_posts', {
 
 /**
  * Novedades de la portada: tarjetas cortas entre el hero y "Qué eliminamos".
- * No tienen página propia; `link` (opcional) apunta a una ruta del sitio o a
- * una URL externa. `date` es una fecha simple (sin hora ni zona horaria):
- * lo que se muestra es "3 ago 2026", no un instante exacto.
+ *
+ * `mode` decide a dónde lleva la tarjeta y qué campos se usan:
+ *  - 'link'  → apunta a `link` (una ruta del sitio o una URL externa).
+ *  - 'entry' → tiene página propia en /novedades/:slug, con `bodyMd` en
+ *              Markdown y sus campos SEO, igual que una entrada del blog.
+ * Es un varchar y no un enum de Postgres para que sumar un modo nuevo más
+ * adelante no exija una migración (mismo criterio que products.category).
+ *
+ * `slug` sólo se usa en modo 'entry'; en modo 'link' queda NULL (Postgres
+ * admite varios NULL en una columna única).
+ *
+ * `date` es una fecha simple (sin hora ni zona horaria): lo que se muestra es
+ * "3 de agosto de 2026", no un instante exacto.
  */
 export const news = pgTable('news', {
   id: serial('id').primaryKey(),
+  mode: varchar('mode', { length: 20 }).default('link').notNull(),
   title: text('title').notNull(),
   excerpt: text('excerpt'),
   image: text('image'),
   link: text('link'),
   linkLabel: text('link_label'),
+  slug: varchar('slug', { length: 200 }).unique(),
+  bodyMd: text('body_md'),
+  seoTitle: text('seo_title'),
+  seoDescription: text('seo_description'),
   date: date('date'),
   sortOrder: integer('sort_order').default(0).notNull(),
   published: boolean('published').default(true).notNull(),

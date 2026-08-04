@@ -8,6 +8,7 @@ import ServiceDetail from './pages/site/ServiceDetail'
 import ProductosIndex from './pages/site/ProductosIndex'
 import ProductDetail from './pages/site/ProductDetail'
 import PageView from './pages/site/PageView'
+import NewsDetail from './pages/site/NewsDetail'
 import BlogList from './pages/site/BlogList'
 import BlogPost from './pages/site/BlogPost'
 import NotFound from './pages/site/NotFound'
@@ -31,6 +32,8 @@ export default function App() {
       <Route path="/cobertura" element={<PageView slug="cobertura" />} />
       <Route path="/preguntas-frecuentes" element={<PageView slug="preguntas-frecuentes" />} />
       <Route path="/contacto" element={<PageView slug="contacto" />} />
+      {/* Novedades con entrada propia (las que sólo enlazan no tienen página). */}
+      <Route path="/novedades/:slug" element={<NewsDetail />} />
       <Route path="/blog" element={<BlogList />} />
       <Route path="/blog/:slug" element={<BlogPost />} />
 

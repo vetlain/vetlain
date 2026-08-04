@@ -57,6 +57,15 @@ export function getPublishedNews() {
     .orderBy(schema.news.sortOrder, desc(schema.news.date))
 }
 
+/**
+ * Novedad con página propia (/novedades/:slug). Sólo existe para las del modo
+ * 'entry': las de modo 'link' apuntan a otra parte y no tienen página.
+ */
+export async function getNewsBySlug(slug: string) {
+  const [item] = await db.select().from(schema.news).where(eq(schema.news.slug, slug)).limit(1)
+  return item && item.published && item.mode === 'entry' ? item : null
+}
+
 export function getPublishedBlogPosts() {
   return db
     .select()

@@ -100,6 +100,12 @@ En Vercel, donde no hay terminal, el equivalente es visitar una vez:
 /api/setup?token=EL_SETUP_TOKEN&overwrite=1
 ```
 
+Ese endpoint hay que volver a visitarlo **después de cada despliegue que cambie
+el esquema**: crea las tablas nuevas (`DDL`) y aplica los cambios sobre las que
+ya existen (`ALTERS`, en `server/db/ddl.ts` — hay que mantenerlo al día junto
+con cada migración). Para ver qué falta: `/api/debug-env` lista las tablas
+existentes y las que faltan.
+
 Después conviene pulsar **Publicar cambios** en el panel para que el prerender
 regenere el HTML estático de `/productos` y las fichas nuevas.
 
@@ -123,6 +129,24 @@ con el valor por defecto.
 
 Las novedades sólo aparecen si hay al menos una publicada y la sección está
 activada en *Contenido → Novedades (encabezado)*.
+
+### Los dos modos de una novedad
+
+El campo `news.mode` decide qué pide el formulario y a dónde lleva la tarjeta:
+
+| Modo | Qué hace | Campos que usa |
+|---|---|---|
+| `link` | La tarjeta lleva a una página que ya existe o a una URL externa. | `link`, `linkLabel` |
+| `entry` | La novedad se escribe en el panel y tiene página propia en `/novedades/:slug`, con Markdown y SEO. | `slug`, `bodyMd`, `seoTitle`, `seoDescription` |
+
+Al guardar, **cada modo limpia los campos del otro**: así una tarjeta no queda
+apuntando a una URL vieja ni deja viva una página que ya no corresponde. Si una
+entrada se pasa a modo enlace, su `/novedades/:slug` deja de existir (el panel
+lo avisa antes de guardar).
+
+Las páginas de novedad se prerenderizan y entran al `sitemap.xml`; las de modo
+enlace no, porque no tienen URL propia. No hay índice `/novedades`: el listado
+es la sección de la portada, y la página de detalle vuelve ahí.
 
 ### Subida de imágenes
 
