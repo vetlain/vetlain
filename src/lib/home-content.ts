@@ -99,12 +99,36 @@ export const DEFAULT_HOME: HomeContent = {
     titleAccent: 'eliminamos',
     note: '06 servicios',
     items: [
-      { icon: 'rodent', title: 'Ratas y ratones', desc: 'Desratización con estaciones certificadas y sellado de accesos.' },
-      { icon: 'insect', title: 'Insectos y cucarachas', desc: 'Desinsectación de bajo impacto para casa y negocio.' },
-      { icon: 'bird', title: 'Aves', desc: 'Disuasión y captura para fachadas, techos y patios.' },
-      { icon: 'spray', title: 'Desinfección', desc: 'Sanitización de superficies y ambientes de trabajo.' },
-      { icon: 'building', title: 'Plantas y bodegas', desc: 'Programas a medida bajo norma sanitaria.' },
-      { icon: 'shield', title: 'Garantía', desc: 'Trabajo certificado ISO 9001 y con respaldo por escrito.' },
+      {
+        icon: 'rodent',
+        title: 'Ratas y ratones',
+        desc: 'Instalamos estaciones certificadas en los puntos críticos, sellamos los accesos por donde entran y volvemos a revisar para confirmar que no queden focos activos.',
+      },
+      {
+        icon: 'insect',
+        title: 'Insectos y cucarachas',
+        desc: 'Cucarachas, hormigas, moscas y pulgas. Aplicamos productos de bajo impacto, seguros para tu familia y mascotas, y atacamos también los nidos que no se ven.',
+      },
+      {
+        icon: 'bird',
+        title: 'Aves',
+        desc: 'Palomas y otras aves fuera de fachadas, techos y patios. Usamos sistemas de disuasión y exclusión que no dañan la construcción ni lastiman al animal.',
+      },
+      {
+        icon: 'spray',
+        title: 'Desinfección',
+        desc: 'Sanitización de superficies y ambientes con productos autorizados. Ideal para oficinas, locales y salas de trabajo que necesitan dejar registro del procedimiento.',
+      },
+      {
+        icon: 'building',
+        title: 'Plantas y bodegas',
+        desc: 'Programas de control continuo diseñados para tu operación, con estaciones mapeadas e informes listos para tus procesos de fiscalización sanitaria.',
+      },
+      {
+        icon: 'shield',
+        title: 'Garantía',
+        desc: 'Trabajamos bajo norma ISO 9001 y te entregamos todo por escrito: qué aplicamos, dónde y con qué producto, con garantía sobre el trabajo realizado.',
+      },
     ],
   },
   steps: {

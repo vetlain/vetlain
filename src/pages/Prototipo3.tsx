@@ -264,13 +264,18 @@ function Services({ services }: { services: HomeContent['services'] }) {
           {services.items.map((item, i) => (
             <div
               key={`${item.title}-${i}`}
-              className="group border-2 border-neutral-200 bg-white p-6 transition-colors hover:border-vetlain-green"
+              className="group relative overflow-hidden border-2 border-neutral-200 bg-white p-6 transition-[border-color,transform] duration-200 ease-out hover:-translate-y-0.5 hover:border-vetlain-green motion-reduce:transition-none motion-reduce:hover:translate-y-0"
             >
-              <div className="flex h-12 w-12 items-center justify-center bg-vetlain-green text-white">
+              {/* La cinta de marca se despliega desde la izquierda al pasar el cursor. */}
+              <span
+                aria-hidden="true"
+                className="p3-tape absolute inset-x-0 top-0 h-1.5 origin-left scale-x-0 transition-transform duration-500 ease-out group-hover:scale-x-100 motion-reduce:transition-none"
+              />
+              <div className="p3-clip-tag flex h-12 w-12 items-center justify-center bg-vetlain-green text-white transition-colors duration-200 group-hover:bg-vetlain-green-deep">
                 <ServiceIcon icon={item.icon} className="h-6 w-6" />
               </div>
               <h3 className="p3-display mt-5 text-xl uppercase text-vetlain-ink">{item.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-neutral-600">{item.desc}</p>
+              <p className="mt-2.5 text-sm leading-relaxed text-neutral-600">{item.desc}</p>
             </div>
           ))}
         </div>
@@ -284,12 +289,14 @@ function Services({ services }: { services: HomeContent['services'] }) {
 function Steps({ steps }: { steps: HomeContent['steps'] }) {
   return (
     <section className="bg-vetlain-green-tint">
-      <div className="mx-auto max-w-6xl px-5 py-16 sm:py-20">
+      {/* Más ancha que el resto de las secciones (max-w-6xl) para dar aire a los
+          tres pasos: el bloque respira y el texto de cada uno deja de apretarse. */}
+      <div className="mx-auto max-w-7xl px-5 py-16 sm:py-20">
         <h2 className="p3-display text-[clamp(2rem,5vw,3.25rem)] uppercase leading-none text-vetlain-ink">
           <Lines text={steps.title} />{' '}
           <span className="text-vetlain-green"><Lines text={steps.titleAccent} /></span>
         </h2>
-        <div className="mt-10 grid gap-6 md:grid-cols-3">
+        <div className="mt-10 grid gap-6 md:grid-cols-3 lg:gap-8">
           {steps.items.map((p, i) => (
             <div key={`${p.n}-${i}`} className="border-t-2 border-vetlain-green/40 pt-5">
               <span className="p3-clip-tag inline-block bg-vetlain-green-dark px-4 py-2 font-bold text-white">
