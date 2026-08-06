@@ -6,7 +6,7 @@ import { PRODUCT_CATEGORIES } from '../../lib/types'
 import { Seo } from '../../components/Seo'
 import { Markdown } from '../../components/Markdown'
 import { ChevronGlyph, assetUrl } from '../../site/chrome'
-import { SiteShell, PageHero, ClosingCta, PageState } from './parts'
+import { SiteShell, PageHero, ClosingCta, PageState, StoreCta } from './parts'
 
 /** Presentación pura: la usan tanto el cliente (tras el fetch) como el prerender. */
 export function ProductosIndexBody({
@@ -38,7 +38,13 @@ export function ProductosIndexBody({
         description={page?.seoDescription ?? description}
         path="/productos"
       />
-      <PageHero crumbs={[{ label: 'Productos' }]} kicker={kicker} title={title} description={description}>
+      <PageHero
+        crumbs={[{ label: 'Productos' }]}
+        kicker={kicker}
+        title={title}
+        description={description}
+        aside={<StoreCta />}
+      >
         {groups.length > 0 && (
           <nav aria-label="Categorías de producto" className="mt-7 flex flex-wrap gap-2">
             {groups.map((g) => (

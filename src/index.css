@@ -88,6 +88,16 @@ body {
   clip-path: polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
 }
 
+/* La cinta de la tarjeta de tienda avanza un ciclo completo del rayado al
+   pasar el cursor: el patrón queda igual, el recorrido es lo que se ve. */
+.p3-tape-shift {
+  background-position: 0 0;
+  transition: background-position 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.p3-store-card:hover .p3-tape-shift {
+  background-position: 50.9px 0;
+}
+
 @keyframes p3-rise {
   from {
     opacity: 0;
@@ -105,6 +115,11 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .p3-rise {
     animation: none;
+  }
+  .p3-tape-shift,
+  .p3-store-card:hover .p3-tape-shift {
+    background-position: 0 0;
+    transition: none;
   }
 }
 

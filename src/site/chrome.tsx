@@ -53,6 +53,14 @@ export const ChevronGlyph = (p: SVGProps<SVGSVGElement>) => (
   <Glyph {...p}><path d="M9 6l6 6-6 6" /></Glyph>
 )
 
+export const CartGlyph = (p: SVGProps<SVGSVGElement>) => (
+  <Glyph {...p}>
+    <path d="M3 4h2.2l2.3 10.3a1.8 1.8 0 001.8 1.4h7.6a1.8 1.8 0 001.7-1.3L21 7.5H6.2" />
+    <circle cx="10" cy="19.5" r="1.3" />
+    <circle cx="17" cy="19.5" r="1.3" />
+  </Glyph>
+)
+
 const MenuGlyph = (p: SVGProps<SVGSVGElement>) => (
   <Glyph {...p}><path d="M4 7h16M4 12h16M4 17h16" /></Glyph>
 )

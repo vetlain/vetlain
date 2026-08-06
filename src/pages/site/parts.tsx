@@ -9,7 +9,9 @@ import {
   WhatsappBtn,
   ChevronGlyph,
   PhoneGlyph,
+  CartGlyph,
   Glyph,
+  Tape,
   A,
 } from '../../site/chrome'
 import { useSiteContent } from '../../lib/site-content'
@@ -38,18 +40,24 @@ export function SiteShell({ scrollKey, children }: { scrollKey?: string; childre
 
 export type Crumb = { label: string; to?: string }
 
-/** Encabezado de página: migas + kicker + título + descripción. */
+/**
+ * Encabezado de página: migas + kicker + título + descripción.
+ * Con `aside` el bloque de texto pasa a media columna y la pieza recibida se
+ * coloca a su derecha (bajo el texto en móvil). Sin `aside`, layout de siempre.
+ */
 export function PageHero({
   crumbs = [],
   kicker,
   title,
   description,
+  aside,
   children,
 }: {
   crumbs?: Crumb[]
   kicker?: string | null
   title: string
   description?: string | null
+  aside?: ReactNode
   children?: ReactNode
 }) {
   return (
@@ -76,22 +84,65 @@ export function PageHero({
           ))}
         </nav>
 
-        {kicker && (
-          <span className="p3-clip-slash mt-6 inline-block bg-vetlain-green-tint px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-vetlain-green-deep">
-            {kicker}
-          </span>
-        )}
-        <h1 className="p3-display mt-5 text-balance text-[clamp(2.2rem,6vw,4rem)] uppercase leading-[0.95] text-vetlain-ink">
-          {title}
-        </h1>
-        {description && (
-          <p className="mt-5 max-w-2xl text-pretty text-base leading-relaxed text-neutral-600 sm:text-lg">
-            {description}
-          </p>
-        )}
-        {children}
+        <div className={aside ? 'gap-10 lg:grid lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start' : undefined}>
+          <div>
+            {kicker && (
+              <span className="p3-clip-slash mt-6 inline-block bg-vetlain-green-tint px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-vetlain-green-deep">
+                {kicker}
+              </span>
+            )}
+            <h1 className="p3-display mt-5 text-balance text-[clamp(2.2rem,6vw,4rem)] uppercase leading-[0.95] text-vetlain-ink">
+              {title}
+            </h1>
+            {description && (
+              <p className="mt-5 max-w-2xl text-pretty text-base leading-relaxed text-neutral-600 sm:text-lg">
+                {description}
+              </p>
+            )}
+            {children}
+          </div>
+          {aside && <div className="mt-9 lg:mt-6">{aside}</div>}
+        </div>
       </div>
     </section>
+  )
+}
+
+/** Tienda online: el catálogo comprable vive fuera del sitio. */
+export const STORE_URL = 'https://vzgroups.com/ols/products'
+
+/**
+ * Tarjeta de tienda, al costado del título en /productos. En carbón sobre el
+ * hero blanco para que corte de inmediato, con la cinta de marca arriba y el
+ * botón de compra como pieza dominante.
+ */
+export function StoreCta() {
+  return (
+    <a
+      href={STORE_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Compra los productos del catálogo en la tienda online (se abre en vzgroups.com)"
+      className="p3-store-card group block border-2 border-vetlain-ink bg-vetlain-ink text-white transition-transform duration-300 ease-out hover:-translate-y-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vetlain-green motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+    >
+      <Tape className="p3-tape-shift" />
+      <div className="p-6">
+        <p className="p3-display text-[1.7rem] uppercase leading-[0.95]">Compra en línea</p>
+        <p className="mt-2.5 text-sm leading-relaxed text-neutral-300">
+          Los mismos productos de este catálogo, disponibles para comprar directo.
+        </p>
+
+        <span className="mt-6 flex items-center gap-3 bg-vetlain-green px-4 py-3.5 text-left text-sm font-bold uppercase leading-snug tracking-wide text-white transition-colors duration-200 group-hover:bg-white group-hover:text-vetlain-green-deep">
+          <CartGlyph className="h-5 w-5 shrink-0" />
+          <span className="flex-1">Compra los productos del catálogo aquí</span>
+          <ChevronGlyph className="h-5 w-5 shrink-0 transition-transform duration-200 group-hover:translate-x-1 motion-reduce:transform-none" />
+        </span>
+
+        <span className="mt-3 block text-[0.7rem] font-bold uppercase tracking-widest text-neutral-400">
+          Se abre en vzgroups.com ↗
+        </span>
+      </div>
+    </a>
   )
 }
 
