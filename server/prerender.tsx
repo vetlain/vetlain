@@ -71,7 +71,7 @@ async function main() {
   }
   const template = readFileSync(templatePath, 'utf-8')
 
-  // Shell del SPA para las rutas sin HTML propio (/admin, 404…). Se escribe
+  // Shell del SPA para las rutas sin HTML propio (/vzgroups, 404…). Se escribe
   // SIEMPRE y antes que nada: vercel.json redirige ahí todo lo que no tenga
   // fichero propio, así que debe existir aunque el prerender no llegue a correr.
   writeFileSync(join(DIST, 'app.html'), template, 'utf-8')

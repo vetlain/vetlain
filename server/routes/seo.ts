@@ -18,7 +18,7 @@ export function robotsHandler(_req: Request, res: Response): void {
   const body = [
     'User-agent: *',
     'Allow: /',
-    'Disallow: /admin',
+    'Disallow: /vzgroups',
     'Disallow: /api',
     '',
     `Sitemap: ${baseUrl()}/sitemap.xml`,

@@ -1,5 +1,5 @@
 /**
- * Raíz del panel de administración (montado en /admin/*).
+ * Raíz del panel de administración (montado en /vzgroups/*).
  * - Consulta la sesión; si no hay, muestra Login.
  * - Si hay sesión, muestra el layout con navegación lateral y las rutas.
  */
@@ -18,14 +18,14 @@ import BlogEditor from './BlogEditor'
 import LeadsPanel from './LeadsPanel'
 
 const sections = [
-  { to: '/admin', label: 'Inicio', end: true },
-  { to: '/admin/mensajes', label: 'Contactos', end: false },
-  { to: '/admin/portada', label: 'Portada', end: false },
-  { to: '/admin/contacto', label: 'Contacto y redes', end: false },
-  { to: '/admin/paginas', label: 'Páginas', end: false },
-  { to: '/admin/servicios', label: 'Servicios', end: false },
-  { to: '/admin/productos', label: 'Productos', end: false },
-  { to: '/admin/blog', label: 'Blog', end: false },
+  { to: '/vzgroups', label: 'Inicio', end: true },
+  { to: '/vzgroups/mensajes', label: 'Contactos', end: false },
+  { to: '/vzgroups/portada', label: 'Portada', end: false },
+  { to: '/vzgroups/contacto', label: 'Contacto y redes', end: false },
+  { to: '/vzgroups/paginas', label: 'Páginas', end: false },
+  { to: '/vzgroups/servicios', label: 'Servicios', end: false },
+  { to: '/vzgroups/productos', label: 'Productos', end: false },
+  { to: '/vzgroups/blog', label: 'Blog', end: false },
 ]
 
 function Shell() {
@@ -114,7 +114,7 @@ function Shell() {
               <Route path="servicios" element={<ServicesEditor />} />
               <Route path="productos" element={<ProductsEditor />} />
               <Route path="blog/*" element={<BlogEditor />} />
-              <Route path="*" element={<Navigate to="/admin" replace />} />
+              <Route path="*" element={<Navigate to="/vzgroups" replace />} />
             </Routes>
           </main>
         </div>

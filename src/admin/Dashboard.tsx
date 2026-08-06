@@ -80,17 +80,17 @@ export default function Dashboard() {
 
   const tiles = [
     {
-      to: '/admin/portada',
+      to: '/vzgroups/portada',
       label: 'Portada',
       value: counts?.novedades,
       unit: counts?.novedades === 1 ? 'novedad' : 'novedades',
     },
-    { to: '/admin/contacto', label: 'Contacto y redes', value: counts?.contacto, unit: 'datos' },
-    { to: '/admin/paginas', label: 'Páginas', value: counts?.paginas, unit: 'páginas' },
-    { to: '/admin/servicios', label: 'Servicios', value: counts?.servicios, unit: 'servicios' },
-    { to: '/admin/productos', label: 'Productos', value: counts?.productos, unit: 'productos' },
+    { to: '/vzgroups/contacto', label: 'Contacto y redes', value: counts?.contacto, unit: 'datos' },
+    { to: '/vzgroups/paginas', label: 'Páginas', value: counts?.paginas, unit: 'páginas' },
+    { to: '/vzgroups/servicios', label: 'Servicios', value: counts?.servicios, unit: 'servicios' },
+    { to: '/vzgroups/productos', label: 'Productos', value: counts?.productos, unit: 'productos' },
     {
-      to: '/admin/blog',
+      to: '/vzgroups/blog',
       label: 'Blog',
       value: counts?.blog,
       unit: counts?.borradores ? `entradas · ${counts.borradores} borrador(es)` : 'entradas',
@@ -111,7 +111,7 @@ export default function Dashboard() {
       )}
 
       {counts && counts.leadsPendientes > 0 && (
-        <Link to="/admin/mensajes" className="mb-6 block">
+        <Link to="/vzgroups/mensajes" className="mb-6 block">
           <div className="flex items-center justify-between border-2 border-vetlain-green bg-vetlain-green-tint px-5 py-4 transition-colors hover:bg-vetlain-green-tint/70">
             <span className="text-sm font-bold uppercase tracking-wide text-vetlain-green-deep">
               Tienes {counts.leadsPendientes} contacto{counts.leadsPendientes === 1 ? '' : 's'} sin atender

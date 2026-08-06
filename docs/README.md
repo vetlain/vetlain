@@ -111,7 +111,7 @@ regenere el HTML estático de `/productos` y las fichas nuevas.
 
 ## Portada editable (sección «Portada» del panel)
 
-Desde `/admin/portada` el cliente edita **toda** la home, sin tocar código.
+Desde `/vzgroups/portada` el cliente edita **toda** la home, sin tocar código.
 
 **Dónde vive cada cosa**
 
@@ -169,7 +169,7 @@ propósito (puede contener scripts y se serviría desde el propio dominio).
 Desde que su contenido sale de la base, `/` se genera como HTML estático en cada
 build, igual que el resto de páginas. Como el resultado pisa `dist/index.html`,
 el build guarda antes una copia intacta de la plantilla en **`dist/app.html`**, y
-`vercel.json` manda ahí las rutas sin fichero propio (`/admin`, 404…). Si se
+`vercel.json` manda ahí las rutas sin fichero propio (`/vzgroups`, 404…). Si se
 toca `vercel.json` o `server/prerender.tsx`, hay que mantener esa pareja:
 
 - `dist/index.html` → portada prerenderizada (lo que ve Google).

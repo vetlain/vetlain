@@ -39,7 +39,7 @@ export default function App() {
 
       {/* Panel de administración (privado). Maneja su propio login y rutas. */}
       <Route
-        path="/admin/*"
+        path="/vzgroups/*"
         element={
           <Suspense fallback={null}>
             <AdminApp />

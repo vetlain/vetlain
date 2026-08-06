@@ -1,7 +1,7 @@
 /**
  * Portada del sitio (/). Todo su contenido es editable desde el panel:
  *  - Textos, imagen del hero, tarjetas y franjas → site_content, grupo "home"
- *    (ver src/lib/home-content.ts y /admin/portada).
+ *    (ver src/lib/home-content.ts y /vzgroups/portada).
  *  - Novedades → tabla `news` (/api/news).
  *
  * `Prototipo3Body` es la presentación pura, con las novedades ya cargadas: la
