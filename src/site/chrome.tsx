@@ -134,7 +134,16 @@ export function Header() {
     <header className="sticky top-0 z-40 border-b-2 border-vetlain-green bg-white">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3">
         <Link to="/" className="flex shrink-0 items-center" aria-label="Vetlain, inicio">
-          <img src={A + 'brand/logo-recortado.png'} alt="Vetlain" className="h-9 w-auto" width={327} height={107} />
+          {/* En escritorio el logo va un 10% sobre el botón de WhatsApp: ese mide
+              48px (20px de contenido + py-3.5), así que 3.3rem = 52.8px. Desde lg
+              y no md porque a 768px la barra ya va justa con los cinco enlaces. */}
+          <img
+            src={A + 'brand/logo-recortado.png'}
+            alt="Vetlain"
+            className="h-9 w-auto lg:h-[3.3rem]"
+            width={327}
+            height={107}
+          />
         </Link>
 
         {/* Navegación de escritorio */}
