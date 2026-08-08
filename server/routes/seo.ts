@@ -9,9 +9,10 @@ import type { Request, Response } from 'express'
 import { eq, desc } from 'drizzle-orm'
 import { db, schema } from '../db/index.js'
 
-// Dominio canónico del sitio. Fijo a vetlain.cl (override con SITE_URL en Vercel).
+// Dominio canónico del sitio (override con SITE_URL en Vercel). Con www: el
+// apex vetlain.cl responde 308 hacia www, el sitemap debe listar el host final.
 function baseUrl(): string {
-  return (process.env.SITE_URL || 'https://vetlain.cl').replace(/\/$/, '')
+  return (process.env.SITE_URL || 'https://www.vetlain.cl').replace(/\/$/, '')
 }
 
 export function robotsHandler(_req: Request, res: Response): void {

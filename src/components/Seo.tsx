@@ -8,10 +8,11 @@
 import { Helmet } from 'react-helmet-async'
 
 const SITE_NAME = 'Vetlain'
-// Dominio canónico (override con VITE_SITE_URL en build). Así el canonical y el
-// Open Graph apuntan a vetlain.cl aunque se acceda por la URL de vercel.app.
+// Dominio canónico (override con VITE_SITE_URL en build). Con www: en Vercel el
+// apex vetlain.cl responde 308 hacia www.vetlain.cl, así que canonical, og:url y
+// og:image deben apuntar directo al host final, sin hacer saltar al scraper.
 const SITE_URL = (
-  (import.meta as { env?: Record<string, string | undefined> }).env?.VITE_SITE_URL || 'https://vetlain.cl'
+  (import.meta as { env?: Record<string, string | undefined> }).env?.VITE_SITE_URL || 'https://www.vetlain.cl'
 ).replace(/\/$/, '')
 
 /**
