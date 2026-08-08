@@ -6,6 +6,7 @@ import { Seo } from '../../components/Seo'
 import { Markdown } from '../../components/Markdown'
 import { ChevronGlyph } from '../../site/chrome'
 import { ServiceIcon } from '../../site/service-icons'
+import { Reveal } from '../../site/Reveal'
 import {
   SiteShell,
   PageHero,
@@ -66,11 +67,11 @@ export function ServiciosIndexBody({
           )}
           {services && services.length > 0 && (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {services.map((s) => (
+              {services.map((s, i) => (
+                <Reveal key={s.id} delay={(i % 3) * 90} className="flex">
                 <Link
-                  key={s.id}
                   to={`/servicios/${s.slug}`}
-                  className="group flex flex-col border-2 border-neutral-200 p-5 transition-colors hover:border-vetlain-green"
+                  className="group flex w-full flex-col border-2 border-neutral-200 p-5 transition-colors hover:border-vetlain-green"
                 >
                   <ServiceIcon icon={s.icon} className="h-9 w-9 text-vetlain-green-dark" />
                   <h3 className="mt-4 text-lg font-extrabold uppercase tracking-tight text-vetlain-ink">
@@ -84,6 +85,7 @@ export function ServiciosIndexBody({
                     <ChevronGlyph className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                   </span>
                 </Link>
+                </Reveal>
               ))}
             </div>
           )}

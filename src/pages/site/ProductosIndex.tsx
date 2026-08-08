@@ -7,6 +7,7 @@ import { Seo } from '../../components/Seo'
 import { Markdown } from '../../components/Markdown'
 import { ChevronGlyph, assetUrl } from '../../site/chrome'
 import { SiteShell, PageHero, ClosingCta, PageState, StoreCta } from './parts'
+import { Reveal } from '../../site/Reveal'
 
 /** Presentación pura: la usan tanto el cliente (tras el fetch) como el prerender. */
 export function ProductosIndexBody({
@@ -83,13 +84,13 @@ export function ProductosIndexBody({
                 {g.heading}
               </h2>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {g.items.map((p) => {
+                {g.items.map((p, i) => {
                   const img = assetUrl(p.image)
                   return (
+                    <Reveal key={p.id} delay={(i % 3) * 90} className="flex">
                     <Link
-                      key={p.id}
                       to={`/productos/${p.slug}`}
-                      className="group flex flex-col border-2 border-neutral-200 transition-colors hover:border-vetlain-green"
+                      className="group flex w-full flex-col border-2 border-neutral-200 transition-colors hover:border-vetlain-green"
                     >
                       {img && (
                         <div className="flex h-44 items-center justify-center border-b-2 border-neutral-100 bg-neutral-50 p-4">
@@ -114,6 +115,7 @@ export function ProductosIndexBody({
                         </span>
                       </div>
                     </Link>
+                    </Reveal>
                   )
                 })}
               </div>

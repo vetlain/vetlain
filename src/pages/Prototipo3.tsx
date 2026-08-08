@@ -18,6 +18,7 @@ import type { News } from '../lib/types'
 import { newsHref } from '../lib/types'
 import type { HomeContent } from '../lib/home-content'
 import { ServiceIcon } from '../site/service-icons'
+import { Reveal } from '../site/Reveal'
 import {
   WHATSAPP,
   TEL_MOVIL,
@@ -173,7 +174,7 @@ function NewsCard({ item }: { item: News }) {
   const img = assetUrl(item.image)
   const href = newsHref(item)
   return (
-    <article className="group flex flex-col border-2 border-neutral-200 bg-white transition-colors hover:border-vetlain-green">
+    <article className="group flex h-full flex-col border-2 border-neutral-200 bg-white transition-colors hover:border-vetlain-green">
       {img && (
         <div className="relative">
           <img
@@ -233,8 +234,10 @@ function Novedades({
           </p>
         )}
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((n) => (
-            <NewsCard key={n.id} item={n} />
+          {items.map((n, i) => (
+            <Reveal key={n.id} delay={(i % 3) * 90}>
+              <NewsCard item={n} />
+            </Reveal>
           ))}
         </div>
       </div>
@@ -262,9 +265,9 @@ function Services({ services }: { services: HomeContent['services'] }) {
 
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {services.items.map((item, i) => (
+            <Reveal key={`${item.title}-${i}`} delay={(i % 3) * 90}>
             <div
-              key={`${item.title}-${i}`}
-              className="group relative overflow-hidden border-2 border-neutral-200 bg-white p-6 transition-[border-color,transform] duration-200 ease-out hover:-translate-y-0.5 hover:border-vetlain-green motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+              className="group relative h-full overflow-hidden border-2 border-neutral-200 bg-white p-6 transition-[border-color,transform] duration-200 ease-out hover:-translate-y-0.5 hover:border-vetlain-green motion-reduce:transition-none motion-reduce:hover:translate-y-0"
             >
               {/* La cinta de marca se despliega desde la izquierda al pasar el cursor. */}
               <span
@@ -277,6 +280,7 @@ function Services({ services }: { services: HomeContent['services'] }) {
               <h3 className="p3-display mt-5 text-xl uppercase text-vetlain-ink">{item.title}</h3>
               <p className="mt-2.5 text-sm leading-relaxed text-neutral-600">{item.desc}</p>
             </div>
+            </Reveal>
           ))}
         </div>
       </div>
@@ -298,13 +302,13 @@ function Steps({ steps }: { steps: HomeContent['steps'] }) {
         </h2>
         <div className="mt-10 grid gap-6 md:grid-cols-3 lg:gap-8">
           {steps.items.map((p, i) => (
-            <div key={`${p.n}-${i}`} className="border-t-2 border-vetlain-green/40 pt-5">
+            <Reveal key={`${p.n}-${i}`} delay={i * 110} className="border-t-2 border-vetlain-green/40 pt-5">
               <span className="p3-clip-tag inline-block bg-vetlain-green-dark px-4 py-2 font-bold text-white">
                 <span className="p3-display text-2xl">{p.n}</span>
               </span>
               <h3 className="p3-display mt-4 text-xl uppercase text-vetlain-ink">{p.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-neutral-600">{p.desc}</p>
-            </div>
+            </Reveal>
           ))}
         </div>
       </div>

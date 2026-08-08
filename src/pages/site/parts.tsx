@@ -62,7 +62,10 @@ export function PageHero({
 }) {
   return (
     <section className="relative overflow-hidden bg-white">
-      <div className="mx-auto max-w-6xl px-5 pt-10 pb-8 sm:pt-14 sm:pb-10">
+      {/* p3-rise replica en las páginas internas la entrada del hero de la
+          portada: cada navegación remonta el componente y el ascenso se repite,
+          haciendo de transición de página. Es CSS puro: corre igual sin JS. */}
+      <div className="p3-rise mx-auto max-w-6xl px-5 pt-10 pb-8 sm:pt-14 sm:pb-10">
         <nav
           aria-label="Migas de pan"
           className="flex flex-wrap items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-neutral-500"
