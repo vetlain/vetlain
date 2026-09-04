@@ -68,7 +68,7 @@ function Hero({ hero }: { hero: HomeContent['hero'] }) {
   const img = assetUrl(hero.image)
   return (
     <section id="top" className="relative overflow-hidden bg-white">
-      <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-14 sm:py-20 md:grid-cols-2 md:items-stretch lg:gap-14">
+      <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-14 sm:py-20 md:grid-cols-2 lg:items-stretch lg:gap-14">
         <div className="p3-rise">
           {hero.badge && (
             <span className="p3-clip-slash inline-block bg-vetlain-green-tint px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-vetlain-green-deep">
@@ -102,16 +102,16 @@ function Hero({ hero }: { hero: HomeContent['hero'] }) {
 
         {/* Angular photo */}
         {img && (
-          <div className="relative p3-rise md:h-full" style={{ animationDelay: '120ms' }}>
+          <div className="relative p3-rise lg:h-full" style={{ animationDelay: '120ms' }}>
             <div className="absolute inset-0 translate-x-3 translate-y-3 bg-vetlain-green" aria-hidden="true" />
             <div
-              className="relative h-full border-2 border-vetlain-ink"
+              className="relative border-2 border-vetlain-ink lg:h-full"
               style={{ clipPath: 'polygon(0 0, 100% 0, 100% 92%, 0 100%)' }}
             >
               <img
                 src={img}
                 alt={hero.imageAlt}
-                className="aspect-[4/3] w-full object-cover md:absolute md:inset-0 md:aspect-auto md:h-full"
+                className="aspect-[4/3] w-full object-cover md:aspect-[4/5] lg:absolute lg:inset-0 lg:aspect-auto lg:h-full"
                 width={976}
                 height={720}
               />
