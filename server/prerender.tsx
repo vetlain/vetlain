@@ -51,7 +51,17 @@ import type { Page, Service, Product, News, BlogPost } from '../src/lib/types'
 
 const DIST = join(process.cwd(), 'dist')
 
-type Route = { path: string; element: ReactElement }
+type Route = {
+  path: string
+  element: ReactElement
+  /**
+   * Respuestas de /api que esta página pediría al montar, ya resueltas. Se
+   * incrustan en el HTML para que el cliente arranque con ellas en vez de
+   * partir en blanco y pisar por un instante el contenido ya renderizado
+   * (ver src/lib/bootstrap.ts).
+   */
+  api?: Record<string, unknown>
+}
 
 /**
  * Los tipos del frontend (Page/Service/BlogPost) esperan fechas como string,
@@ -120,52 +130,60 @@ async function main() {
   const wrap = (children: ReactElement) => <SiteContentProvider initial={siteContentMap}>{children}</SiteContentProvider>
 
   const routes: Route[] = [
-    { path: '/', element: wrap(<Prototipo3Body news={news} />) },
+    { path: '/', element: wrap(<Prototipo3Body news={news} />), api: { '/news': news } },
     // Sólo las novedades con entrada propia tienen página que generar.
     ...news
       .filter((n) => n.mode === 'entry' && n.slug)
       .map((n) => ({
         path: `/novedades/${n.slug}`,
         element: wrap(<NewsDetailBody slug={n.slug!} data={n} />),
+        api: { [`/news/${n.slug}`]: n },
       })),
     {
       path: '/servicios',
       element: wrap(
         <ServiciosIndexBody page={pagesBySlug.get('servicios') ?? null} services={services} loading={false} error={null} />,
       ),
+      api: { '/pages/servicios': pagesBySlug.get('servicios') ?? null, '/services': services },
     },
     ...services.map((s) => ({
       path: `/servicios/${s.slug}`,
       element: wrap(<ServiceDetailBody slug={s.slug} data={s} />),
+      api: { [`/services/${s.slug}`]: s },
     })),
     {
       path: '/productos',
       element: wrap(
         <ProductosIndexBody page={pagesBySlug.get('productos') ?? null} products={products} loading={false} error={null} />,
       ),
+      api: { '/pages/productos': pagesBySlug.get('productos') ?? null, '/products': products },
     },
     ...products.map((p) => ({
       path: `/productos/${p.slug}`,
       element: wrap(<ProductDetailBody slug={p.slug} data={p} />),
+      api: { [`/products/${p.slug}`]: p },
     })),
     ...['nosotros', 'cobertura', 'preguntas-frecuentes', 'contacto'].map((slug) => ({
       path: `/${slug}`,
       element: wrap(<PageViewBody slug={slug} data={pagesBySlug.get(slug) ?? null} loading={false} />),
+      api: { [`/pages/${slug}`]: pagesBySlug.get(slug) ?? null },
     })),
     {
       path: '/blog',
       element: wrap(<BlogListBody page={pagesBySlug.get('blog') ?? null} posts={posts} loading={false} error={null} />),
+      api: { '/pages/blog': pagesBySlug.get('blog') ?? null, '/blog': posts },
     },
     ...posts.map((p) => ({
       path: `/blog/${p.slug}`,
       element: wrap(<BlogPostBody slug={p.slug} data={p} />),
+      api: { [`/blog/${p.slug}`]: p },
     })),
   ]
 
   let written = 0
   for (const route of routes) {
     try {
-      written += renderRoute(route, template) ? 1 : 0
+      written += renderRoute(route, template, siteContentMap) ? 1 : 0
     } catch (err) {
       console.error(`[prerender] Falló ${route.path}, se omite esa página:`, err)
     }
@@ -174,7 +192,15 @@ async function main() {
   console.log(`[prerender] ${written}/${routes.length} páginas generadas como HTML estático.`)
 }
 
-function renderRoute(route: Route, template: string): boolean {
+/**
+ * Serializa el payload para incrustarlo en un <script>. Escapar `<` evita que
+ * un `</script>` dentro de los textos del panel corte la etiqueta.
+ */
+function serialize(data: unknown): string {
+  return JSON.stringify(data).replace(/</g, '\\u003c')
+}
+
+function renderRoute(route: Route, template: string, content: Record<string, unknown>): boolean {
   const helmetContext: { helmet?: HelmetServerState } = {}
   const app = (
     <StaticRouter location={route.path}>
@@ -193,6 +219,14 @@ function renderRoute(route: Route, template: string): boolean {
     .replace(/<meta\s+name="description"[^>]*\/?>/s, '')
     .replace('<div id="root"></div>', `<div id="root">${html}</div>`)
   if (headExtra) out = out.replace('</head>', `${headExtra}\n  </head>`)
+
+  // Estado inicial para el cliente: exactamente el contenido que este HTML ya
+  // muestra, para que al montar no parpadee con los valores por defecto.
+  const bootstrap = serialize({ path: route.path, content, api: route.api ?? {} })
+  out = out.replace(
+    '</body>',
+    `  <script id="__vetlain_data__" type="application/json">${bootstrap}</script>\n  </body>`,
+  )
 
   const outDir = join(DIST, route.path)
   mkdirSync(outDir, { recursive: true })

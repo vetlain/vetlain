@@ -6,6 +6,7 @@
  */
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
+import { getBootstrapContent } from './bootstrap'
 import { buildHomeContent } from './home-content'
 import type { HomeContent } from './home-content'
 
@@ -34,7 +35,13 @@ export function SiteContentProvider({
   /** Usado solo por el script de prerender: datos ya cargados, sin fetch. */
   initial?: ContentMap
 }) {
-  const [map, setMap] = useState<ContentMap>(() => (initial ? { ...DEFAULTS, ...initial } : DEFAULTS))
+  // Estado de partida: lo que pase el prerender, o lo que ese mismo prerender
+  // dejó incrustado en el HTML. Sin esto el cliente arrancaba en DEFAULTS y
+  // pisaba durante un instante el contenido real que ya estaba en pantalla.
+  const [map, setMap] = useState<ContentMap>(() => {
+    const preloaded = initial ?? getBootstrapContent()
+    return preloaded ? { ...DEFAULTS, ...preloaded } : DEFAULTS
+  })
 
   useEffect(() => {
     if (initial) return // ya vino precargado (prerender): no repetir la carga.
