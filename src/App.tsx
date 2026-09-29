@@ -12,11 +12,16 @@ import NewsDetail from './pages/site/NewsDetail'
 import BlogList from './pages/site/BlogList'
 import BlogPost from './pages/site/BlogPost'
 import NotFound from './pages/site/NotFound'
+import Offline404 from './pages/Offline404'
+import { SITE_OFFLINE } from './lib/offline'
 
 // El panel se carga aparte (lazy): no lastra el bundle del sitio público.
 const AdminApp = lazy(() => import('./admin/AdminApp'))
 
 export default function App() {
+  // Sitio suspendido: cualquier ruta, incluido el panel, responde con el 404.
+  if (SITE_OFFLINE) return <Offline404 />
+
   return (
     <Routes>
       {/* La raíz muestra directamente el Prototipo 3 (decisión del cliente). */}

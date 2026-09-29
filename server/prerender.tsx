@@ -38,6 +38,7 @@ import {
   getPublishedBlogPosts,
 } from './content.js'
 import { SiteContentProvider } from '../src/lib/site-content'
+import { SITE_OFFLINE } from '../src/lib/offline'
 import { Prototipo3Body } from '../src/pages/Prototipo3'
 import { NewsDetailBody } from '../src/pages/site/NewsDetail'
 import { PageViewBody } from '../src/pages/site/PageView'
@@ -85,6 +86,12 @@ async function main() {
   // SIEMPRE y antes que nada: vercel.json redirige ahí todo lo que no tenga
   // fichero propio, así que debe existir aunque el prerender no llegue a correr.
   writeFileSync(join(DIST, 'app.html'), template, 'utf-8')
+
+  // Sitio suspendido: sin HTML estático, todas las rutas caen en app.html (404).
+  if (SITE_OFFLINE) {
+    console.warn('[prerender] SITE_OFFLINE activo: se omite el prerender.')
+    return
+  }
 
   // Sin conexión a la base: se omite el prerender, el sitio sigue 100% client-rendered.
   try {
