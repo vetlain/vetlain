@@ -6,4 +6,4 @@
  * Es sólo visual: la API sigue funcionando. Para reactivar el sitio basta con
  * volver a `false`, commitear y pushear (Vercel redespliega desde main).
  */
-export const SITE_OFFLINE = true
+export const SITE_OFFLINE = false
