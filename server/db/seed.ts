@@ -60,6 +60,7 @@ export async function runSeed({ overwrite = false }: { overwrite?: boolean } = {
     seo: 'Portada · Título y descripción en Google',
     hero: 'Portada · Encabezado principal',
     trust: 'Portada · Cinta de garantías',
+    clients: 'Portada · Clientes y certificación',
     novedades: 'Portada · Novedades (encabezado)',
     services: 'Portada · Qué eliminamos',
     steps: 'Portada · Cómo trabajamos',

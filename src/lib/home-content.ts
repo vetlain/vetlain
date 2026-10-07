@@ -17,6 +17,10 @@
 
 /* ── Tipos ───────────────────────────────────────────────────────────── */
 
+/** Encuadre de una foto del carrusel: qué parte queda a la vista al recortarla. */
+export type HeroFocus = 'left' | 'center' | 'right'
+export type HeroSlide = { image: string; alt: string; focus: HeroFocus }
+
 export type HomeHero = {
   badge: string
   title: string
@@ -25,10 +29,15 @@ export type HomeHero = {
   ctaWhatsapp: string
   ctaCall: string
   note: string
-  image: string
-  imageAlt: string
-  imageBadge: string
+  /** Fotos del carrusel de fondo, en orden. La primera es la que carga primero. */
+  slides: HeroSlide[]
+  /** Formato antiguo (una sola foto). Solo se lee para migrar filas guardadas
+   *  antes del carrusel: ver `withLegacyHeroImage`. El panel ya no lo edita. */
+  image?: string
+  imageAlt?: string
 }
+
+export type ClientLogo = { image: string; name: string }
 
 export type HomeCard = { icon: string; title: string; desc: string }
 export type HomeStep = { n: string; title: string; desc: string }
@@ -37,6 +46,13 @@ export type HomeContent = {
   seo: { title: string; description: string }
   hero: HomeHero
   trust: { items: string[] }
+  clients: {
+    visible: boolean
+    title: string
+    logos: ClientLogo[]
+    isoImage: string
+    isoText: string
+  }
   novedades: { visible: boolean; title: string; titleAccent: string; intro: string }
   services: { title: string; titleAccent: string; note: string; items: HomeCard[] }
   steps: { title: string; titleAccent: string; items: HomeStep[] }
@@ -49,6 +65,7 @@ export const HOME_BLOCKS = [
   'seo',
   'hero',
   'trust',
+  'clients',
   'novedades',
   'services',
   'steps',
@@ -76,9 +93,23 @@ export const DEFAULT_HOME: HomeContent = {
     ctaWhatsapp: 'Escríbenos por WhatsApp',
     ctaCall: 'Llamar ahora',
     note: 'Sin costo de visita · cotización al toque',
-    image: 'brand/foto-desinsectacion.jpg',
-    imageAlt: 'Técnico de Vetlain aplicando control de plagas en terreno',
-    imageBadge: 'Respuesta el mismo día',
+    slides: [
+      {
+        image: 'brand/foto-desinsectacion.jpg',
+        alt: 'Técnico de Vetlain con traje de protección aplicando control de plagas en una bodega',
+        focus: 'center',
+      },
+      {
+        image: 'brand/foto-tecnico.jpg',
+        alt: 'Técnico de Vetlain con equipo de aplicación en una planta de procesos',
+        focus: 'center',
+      },
+      {
+        image: 'brand/foto-planta-fruta.jpg',
+        alt: 'Línea de selección de fruta en una planta alimentaria, con operarios trabajando junto a las cintas',
+        focus: 'center',
+      },
+    ],
   },
   trust: {
     items: [
@@ -87,6 +118,19 @@ export const DEFAULT_HOME: HomeContent = {
       'Talagante y alrededores',
       '+20 años de oficio',
     ],
+  },
+  clients: {
+    visible: true,
+    title: 'Empresas que confían en Vetlain',
+    logos: [
+      { image: 'brand/cliente-aristia.png', name: 'Ariztía' },
+      { image: 'brand/cliente-bruggen.png', name: 'Brüggen' },
+      { image: 'brand/cliente-huentelauquen.png', name: 'Huentelauquén' },
+      { image: 'brand/cliente-pacifico-sur.png', name: 'Pacífico Sur' },
+      { image: 'brand/cliente-puratos.png', name: 'Puratos' },
+    ],
+    isoImage: 'brand/iso-9001.png',
+    isoText: 'Certificación ISO 9001:2015',
   },
   novedades: {
     visible: true,
@@ -175,14 +219,30 @@ function mergeBlock<T extends object>(defaults: T, value: unknown): T {
   return out as T
 }
 
+/**
+ * Las filas guardadas antes del carrusel traen una sola foto (`image`) y no
+ * `slides`, así que el merge les pone las fotos por defecto. Para no perder la
+ * foto que el cliente eligió, va primera; las demás por defecto la siguen.
+ */
+function withLegacyHeroImage(hero: HomeHero): HomeHero {
+  const { image, imageAlt } = hero
+  if (!image || hero.slides !== DEFAULT_HOME.hero.slides) return hero
+  if (hero.slides.some((s) => s.image === image)) return hero
+  return {
+    ...hero,
+    slides: [{ image, alt: imageAlt ?? '', focus: 'center' }, ...hero.slides],
+  }
+}
+
 /** Arma el contenido de la portada a partir del mapa de site_content. */
 export function buildHomeContent(map: Record<string, unknown>): HomeContent {
   const block = <K extends HomeBlock>(k: K): HomeContent[K] =>
     mergeBlock(DEFAULT_HOME[k] as object, map[homeKey(k)]) as HomeContent[K]
   return {
     seo: block('seo'),
-    hero: block('hero'),
+    hero: withLegacyHeroImage(block('hero')),
     trust: block('trust'),
+    clients: block('clients'),
     novedades: block('novedades'),
     services: block('services'),
     steps: block('steps'),

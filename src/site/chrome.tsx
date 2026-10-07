@@ -173,7 +173,8 @@ export function Header() {
             <PhoneGlyph className="h-4 w-4" />
             Llamar
           </a>
-          <WhatsappBtn className="px-4 py-2">WhatsApp</WhatsappBtn>
+          {/* En móvil la barra fija inferior ya lleva WhatsApp: aquí sobraría. */}
+          <WhatsappBtn className="hidden px-4 py-2 md:inline-flex">WhatsApp</WhatsappBtn>
 
           {/* Botón de menú (mobile) */}
           <button

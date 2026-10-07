@@ -114,6 +114,77 @@ body {
   transition-delay: var(--reveal-delay, 0ms);
 }
 
+/* Hero con carrusel de fondo (portada). La foto ocupa la derecha y se funde
+   hacia la izquierda con una máscara, de modo que el texto siempre queda sobre
+   blanco puro: el contraste no depende de qué foto suba el cliente. En móvil la
+   foto va arriba y se funde hacia abajo. */
+.p3-hero {
+  --hero-media-h: clamp(230px, 36svh, 340px);
+}
+@media (min-width: 1024px) {
+  /* En horizontal el hero se reparte 40/60 sobre todo el ancho de la ventana:
+     el texto queda anclado al borde izquierdo y la foto gana espacio a medida
+     que la pantalla crece. */
+  .p3-hero {
+    --hero-split: 40vw;
+    --hero-pad: clamp(1.25rem, 4.5vw, 6rem);
+    --hero-text-w: calc(var(--hero-split) - var(--hero-pad) - 2rem);
+    /* La foto empieza 8rem antes del corte, bajo el tramo transparente de la
+       máscara, para que el fundido termine de abrirse ya dentro de su 60%. */
+    --hero-media-left: calc(var(--hero-split) - 8rem);
+  }
+}
+.p3-hero-copy {
+  padding-top: 3.5rem;
+}
+.p3-hero.has-media .p3-hero-copy {
+  padding-top: calc(var(--hero-media-h) - 3.5rem);
+}
+.p3-hero-mask {
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 42%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 0%, #000 42%, transparent 100%);
+}
+@media (min-width: 1024px) {
+  .p3-hero-copy,
+  .p3-hero.has-media .p3-hero-copy {
+    min-height: clamp(560px, calc(100svh - 150px), 720px);
+    padding-top: 5rem;
+  }
+  .p3-hero-mask {
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, transparent 6rem, rgba(0, 0, 0, 0.18) 10rem, rgba(0, 0, 0, 0.55) 15rem, rgba(0, 0, 0, 0.88) 21rem, #000 28rem);
+    mask-image: linear-gradient(90deg, transparent 0, transparent 6rem, rgba(0, 0, 0, 0.18) 10rem, rgba(0, 0, 0, 0.55) 15rem, rgba(0, 0, 0, 0.88) 21rem, #000 28rem);
+  }
+}
+/* Cambio de foto: fundido cruzado y un acercamiento lento mientras está a la
+   vista. Al salir, la escala vuelve a 1 recién cuando ya es invisible. */
+.p3-hero-slide {
+  opacity: 0;
+  transform: scale(1);
+  transition:
+    opacity 1400ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0s linear 1400ms;
+}
+.p3-hero-slide.is-on {
+  opacity: 1;
+}
+.p3-hero-slide.is-on.is-moving {
+  transform: scale(1.06);
+  transition:
+    opacity 1400ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 9000ms cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+@keyframes p3-hero-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.p3-hero-progress {
+  animation: p3-hero-progress linear both;
+}
+
 @keyframes p3-rise {
   from {
     opacity: 0;
@@ -131,6 +202,11 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .p3-rise {
     animation: none;
+  }
+  .p3-hero-slide,
+  .p3-hero-slide.is-on.is-moving {
+    transform: none;
+    transition: opacity 200ms linear;
   }
   .p3-tape-shift,
   .p3-store-card:hover .p3-tape-shift {

@@ -13,7 +13,7 @@ import type { ReactNode } from 'react'
 import { api, ApiError } from '../lib/api'
 import type { SiteContentRow } from '../lib/types'
 import { buildHomeContent, homeKey, HOME_BLOCKS } from '../lib/home-content'
-import type { HomeContent, HomeBlock, HomeCard, HomeStep } from '../lib/home-content'
+import type { HomeContent, HomeBlock, HomeCard, HomeStep, HeroSlide, HeroFocus, ClientLogo } from '../lib/home-content'
 import { SERVICE_ICONS } from '../site/service-icons'
 import { PageHeading, Card, Field, Input, Textarea, Select, Button, Notice, Loading } from './ui'
 import { ImageField } from './ImageField'
@@ -24,6 +24,7 @@ const BLOCK_LABELS: Record<HomeBlock, string> = {
   seo: 'Portada · Título y descripción en Google',
   hero: 'Portada · Encabezado principal',
   trust: 'Portada · Cinta de garantías',
+  clients: 'Portada · Clientes y certificación',
   novedades: 'Portada · Novedades (encabezado)',
   services: 'Portada · Qué eliminamos',
   steps: 'Portada · Cómo trabajamos',
@@ -261,7 +262,7 @@ function ContentTab() {
       <div className="space-y-5">
         <Block
           title="Encabezado principal (hero)"
-          hint="Lo primero que se ve al entrar: titular, texto, botones y foto."
+          hint="Lo primero que se ve al entrar: titular, texto, botones y fotos de fondo."
         >
           <Field label="Etiqueta superior" hint="La pastilla verde sobre el titular.">
             <Input value={draft.hero.badge} onChange={(e) => set('hero', { badge: e.target.value })} />
@@ -286,23 +287,40 @@ function ContentTab() {
           <Field label="Nota bajo los botones">
             <Input value={draft.hero.note} onChange={(e) => set('hero', { note: e.target.value })} />
           </Field>
-          <ImageField
-            label="Foto del hero"
-            hint="Se recorta a un formato apaisado (4:3). Ideal: 1200 × 900 px o más."
-            value={draft.hero.image}
-            onChange={(v) => set('hero', { image: v })}
-          />
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field
-              label="Descripción de la foto"
-              hint="Para buscadores y lectores de pantalla. Describe lo que se ve."
-            >
-              <Input value={draft.hero.imageAlt} onChange={(e) => set('hero', { imageAlt: e.target.value })} />
-            </Field>
-            <Field label="Etiqueta sobre la foto">
-              <Input value={draft.hero.imageBadge} onChange={(e) => set('hero', { imageBadge: e.target.value })} />
-            </Field>
-          </div>
+          <Field
+            label="Fotos de fondo (carrusel)"
+            hint="Van a la derecha y se funden hacia el texto; cambian solas cada 6 segundos. La primera es la que se ve al cargar. Ideal: fotos apaisadas de 1600 px de ancho o más."
+          >
+            <ListEditor<HeroSlide>
+              items={draft.hero.slides}
+              onChange={(slides) => set('hero', { slides })}
+              blank={() => ({ image: '', alt: '', focus: 'center' })}
+              addLabel="Añadir foto"
+              render={(slide, update) => (
+                <div className="space-y-4">
+                  <ImageField label="Foto" value={slide.image} onChange={(v) => update({ image: v })} />
+                  <div className="grid gap-4 sm:grid-cols-[1fr_12rem]">
+                    <Field
+                      label="Descripción de la foto"
+                      hint="Para buscadores y lectores de pantalla. Describe lo que se ve."
+                    >
+                      <Input value={slide.alt} onChange={(e) => update({ alt: e.target.value })} />
+                    </Field>
+                    <Field label="Encuadre" hint="Qué parte de la foto se prioriza al recortarla.">
+                      <Select
+                        value={slide.focus}
+                        onChange={(e) => update({ focus: e.target.value as HeroFocus })}
+                      >
+                        <option value="left">Izquierda</option>
+                        <option value="center">Centro</option>
+                        <option value="right">Derecha</option>
+                      </Select>
+                    </Field>
+                  </div>
+                </div>
+              )}
+            />
+          </Field>
         </Block>
 
         <Block title="Cinta de garantías" hint="La franja verde clara justo debajo del hero.">
@@ -311,6 +329,48 @@ function ContentTab() {
             onChange={(items) => set('trust', { items })}
             addLabel="Añadir garantía"
           />
+        </Block>
+
+        <Block
+          title="Clientes y certificación"
+          hint="La franja blanca con logos de clientes y el sello ISO, bajo la cinta de garantías."
+        >
+          <label className="flex items-center gap-2 text-sm font-medium text-vetlain-ink">
+            <input
+              type="checkbox"
+              checked={draft.clients.visible}
+              onChange={(e) => set('clients', { visible: e.target.checked })}
+              className="h-4 w-4 accent-vetlain-green-dark"
+            />
+            Mostrar la franja de clientes en la portada
+          </label>
+          <Field label="Título">
+            <Input value={draft.clients.title} onChange={(e) => set('clients', { title: e.target.value })} />
+          </Field>
+          <Field label="Logos de clientes" hint="Se muestran a color, todos a la misma altura. Ideal: PNG con fondo transparente.">
+            <ListEditor<ClientLogo>
+              items={draft.clients.logos}
+              onChange={(logos) => set('clients', { logos })}
+              blank={() => ({ image: '', name: '' })}
+              addLabel="Añadir logo"
+              render={(logo, update) => (
+                <div className="space-y-4">
+                  <ImageField label="Logo" value={logo.image} onChange={(v) => update({ image: v })} />
+                  <Field label="Nombre de la empresa" hint="Para buscadores y lectores de pantalla.">
+                    <Input value={logo.name} onChange={(e) => update({ name: e.target.value })} />
+                  </Field>
+                </div>
+              )}
+            />
+          </Field>
+          <ImageField
+            label="Sello de certificación"
+            value={draft.clients.isoImage}
+            onChange={(v) => set('clients', { isoImage: v })}
+          />
+          <Field label="Texto junto al sello">
+            <Input value={draft.clients.isoText} onChange={(e) => set('clients', { isoText: e.target.value })} />
+          </Field>
         </Block>
 
         <Block

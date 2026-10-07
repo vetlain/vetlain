@@ -7,7 +7,7 @@
  * `Prototipo3Body` es la presentación pura, con las novedades ya cargadas: la
  * usan tanto el cliente (tras el fetch) como el script de prerender.
  */
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { FormEvent, SVGProps } from 'react'
 import { Link } from 'react-router-dom'
 import { Seo } from '../components/Seo'
@@ -16,12 +16,11 @@ import { useApi } from '../lib/useApi'
 import { formatDay } from '../lib/format'
 import type { News } from '../lib/types'
 import { newsHref } from '../lib/types'
-import type { HomeContent } from '../lib/home-content'
+import type { HomeContent, HeroFocus, HeroSlide } from '../lib/home-content'
 import { ServiceIcon } from '../site/service-icons'
 import { Reveal } from '../site/Reveal'
 import {
   WHATSAPP,
-  TEL_MOVIL,
   Glyph,
   PhoneGlyph,
   WhatsappGlyph,
@@ -40,6 +39,12 @@ const ArrowGlyph = (p: SVGProps<SVGSVGElement>) => (
 )
 const CheckGlyph = (p: SVGProps<SVGSVGElement>) => (
   <Glyph {...p}><path d="M4 12l5 5L20 6" /></Glyph>
+)
+const PauseGlyph = (p: SVGProps<SVGSVGElement>) => (
+  <Glyph {...p}><path d="M8 5v14M16 5v14" /></Glyph>
+)
+const PlayGlyph = (p: SVGProps<SVGSVGElement>) => (
+  <Glyph {...p}><path d="M7 4.5v15l12.5-7.5z" /></Glyph>
 )
 
 /* ── Utilidades de presentación ───────────────────────────────────── */
@@ -64,33 +69,147 @@ function Lines({ text }: { text: string }) {
 
 /* ── Hero ─────────────────────────────────────────────────────────── */
 
-function Hero({ hero }: { hero: HomeContent['hero'] }) {
-  const img = assetUrl(hero.image)
+/** Cada cuánto avanza el carrusel. La barra de progreso usa el mismo valor. */
+const SLIDE_MS = 6500
+
+const FOCUS_CLASS: Record<HeroFocus, string> = {
+  left: 'object-[30%_center]',
+  center: 'object-center',
+  right: 'object-[70%_center]',
+}
+
+function prefersReducedMotion() {
+  return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
+/**
+ * Fotos de fondo del hero. Solo rotan las imágenes: el titular y los botones
+ * viven fuera, fijos y prerenderizados. La primera foto se pinta sin animación
+ * y con prioridad (es el LCP); las demás se montan recién en el cliente.
+ */
+function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
+  const [index, setIndex] = useState(0)
+  const [playing, setPlaying] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  const count = slides.length
+
+  // Autoplay solo en el cliente y nunca con movimiento reducido.
+  useEffect(() => {
+    setMounted(true)
+    setPlaying(!prefersReducedMotion())
+  }, [])
+
+  useEffect(() => {
+    if (!playing || count < 2) return
+    const t = window.setTimeout(() => setIndex((i) => (i + 1) % count), SLIDE_MS)
+    return () => window.clearTimeout(t)
+  }, [playing, index, count])
+
+  // Si el panel deja menos fotos que el índice actual, volver a la primera.
+  const active = index < count ? index : 0
+
   return (
-    <section id="top" className="relative overflow-hidden bg-white">
-      <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-14 sm:py-20 md:grid-cols-2 lg:items-stretch lg:gap-14">
-        <div className="p3-rise">
+    <div className="absolute inset-x-0 top-0 h-[var(--hero-media-h)] lg:bottom-3 lg:left-[var(--hero-media-left)] lg:right-0 lg:h-auto">
+      <div
+        role="group"
+        aria-roledescription="carrusel"
+        aria-label="Fotos de Vetlain en terreno"
+        className="p3-hero-mask absolute inset-0 overflow-hidden bg-neutral-100"
+      >
+        {slides.map((s, i) => {
+          if (i > 0 && !mounted) return null
+          const src = assetUrl(s.image)
+          if (!src) return null
+          const on = i === active
+          return (
+            <img
+              key={`${s.image}-${i}`}
+              src={src}
+              alt={s.alt}
+              aria-hidden={!on}
+              fetchPriority={i === 0 ? 'high' : 'low'}
+              loading={i === 0 ? 'eager' : 'lazy'}
+              decoding={i === 0 ? 'sync' : 'async'}
+              className={`p3-hero-slide absolute inset-0 h-full w-full object-cover ${FOCUS_CLASS[s.focus] ?? 'object-center'} ${
+                on ? 'is-on' : ''
+              } ${on && playing ? 'is-moving' : ''}`}
+            />
+          )
+        })}
+      </div>
+
+      {count > 1 && (
+        <div className="absolute right-3 top-2 z-10 flex items-center gap-2 lg:bottom-8 lg:right-8 lg:top-auto">
+          <ol className="flex items-center">
+            {slides.map((_, i) => (
+              <li key={i}>
+                <button
+                  type="button"
+                  onClick={() => setIndex(i)}
+                  aria-label={`Ver foto ${i + 1} de ${count}`}
+                  aria-current={i === active ? 'true' : undefined}
+                  className="group flex h-11 items-center px-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-white"
+                >
+                  <span className="relative block h-1.5 w-8 overflow-hidden bg-white/60 shadow-[0_1px_4px_rgba(0,0,0,0.4)] ring-1 ring-black/30 transition-colors group-hover:bg-white/80 sm:w-10">
+                    {i === active && (
+                      <span
+                        key={`${active}-${playing}`}
+                        className={`absolute inset-0 origin-left bg-vetlain-green ${playing ? 'p3-hero-progress' : ''}`}
+                        style={{ animationDuration: `${SLIDE_MS}ms` }}
+                      />
+                    )}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ol>
+          <button
+            type="button"
+            onClick={() => setPlaying((p) => !p)}
+            aria-label={playing ? 'Pausar carrusel' : 'Reanudar carrusel'}
+            className="flex h-11 w-11 items-center justify-center bg-vetlain-ink/85 text-white transition-colors hover:bg-vetlain-green-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          >
+            {playing ? <PauseGlyph className="h-4 w-4" /> : <PlayGlyph className="h-4 w-4" />}
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function Hero({ hero }: { hero: HomeContent['hero'] }) {
+  const { telUrl } = useSiteContent()
+  const slides = hero.slides.filter((s) => s.image)
+  const hasMedia = slides.length > 0
+  return (
+    <section id="top" className={`p3-hero relative overflow-hidden bg-white ${hasMedia ? 'has-media' : ''}`}>
+      {hasMedia && <HeroCarousel slides={slides} />}
+
+      <div className="p3-hero-copy relative mx-auto flex max-w-6xl items-center px-5 pb-12 sm:pb-16 lg:mx-0 lg:max-w-none lg:py-20 lg:pl-[var(--hero-pad)] lg:pr-0">
+        <div className="p3-rise w-full lg:max-w-[var(--hero-text-w)]">
           {hero.badge && (
             <span className="p3-clip-slash inline-block bg-vetlain-green-tint px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-vetlain-green-deep">
               {hero.badge}
             </span>
           )}
-          <h1 className="p3-display mt-5 text-[clamp(2.8rem,9vw,5.5rem)] uppercase leading-[0.92] text-vetlain-ink">
+          <h1 className="p3-display mt-5 text-balance text-[clamp(2.8rem,9vw,5.5rem)] uppercase leading-[0.92] text-vetlain-ink lg:text-[clamp(3rem,4.8vw,6rem)]">
             <Lines text={hero.title} />{' '}
             <span className="text-vetlain-green"><Lines text={hero.titleAccent} /></span>
           </h1>
           <p className="mt-5 max-w-lg text-base leading-relaxed text-neutral-600 sm:text-lg">
             {hero.text}
           </p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <WhatsappBtn className="px-6 py-4 text-base">{hero.ctaWhatsapp}</WhatsappBtn>
-            <a
-              href={TEL_MOVIL}
-              className="inline-flex items-center justify-center gap-2 border-2 border-vetlain-ink px-6 py-4 text-base font-bold uppercase tracking-wide text-vetlain-ink transition-colors hover:bg-vetlain-ink hover:text-white"
-            >
-              <PhoneGlyph className="h-5 w-5" />
-              {hero.ctaCall}
-            </a>
+          <div className="mt-8 flex flex-wrap items-center gap-x-7 gap-y-3">
+            <WhatsappBtn className="w-full px-6 py-4 text-base sm:w-auto">{hero.ctaWhatsapp}</WhatsappBtn>
+            {hero.ctaCall && (
+              <a
+                href={telUrl}
+                className="inline-flex min-h-11 items-center gap-2 text-sm font-bold uppercase tracking-wide text-vetlain-ink underline decoration-vetlain-green decoration-2 underline-offset-[6px] transition-colors hover:text-vetlain-green-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vetlain-green"
+              >
+                <PhoneGlyph className="h-4 w-4" />
+                {hero.ctaCall}
+              </a>
+            )}
           </div>
           {hero.note && (
             <p className="mt-5 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-vetlain-green-deep">
@@ -99,32 +218,58 @@ function Hero({ hero }: { hero: HomeContent['hero'] }) {
             </p>
           )}
         </div>
+      </div>
+      <Tape className="relative" />
+    </section>
+  )
+}
 
-        {/* Angular photo */}
-        {img && (
-          <div className="relative p3-rise lg:h-full" style={{ animationDelay: '120ms' }}>
-            <div className="absolute inset-0 translate-x-3 translate-y-3 bg-vetlain-green" aria-hidden="true" />
-            <div
-              className="relative border-2 border-vetlain-ink lg:h-full"
-              style={{ clipPath: 'polygon(0 0, 100% 0, 100% 92%, 0 100%)' }}
-            >
-              <img
-                src={img}
-                alt={hero.imageAlt}
-                className="aspect-[4/3] w-full object-cover md:aspect-[4/5] lg:absolute lg:inset-0 lg:aspect-auto lg:h-full"
-                width={976}
-                height={720}
-              />
-            </div>
-            {hero.imageBadge && (
-              <span className="absolute bottom-4 left-0 -translate-x-2 bg-vetlain-green-dark px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-white">
-                {hero.imageBadge}
-              </span>
+/* ── Clientes + certificación ─────────────────────────────────────── */
+
+function Clients({ clients }: { clients: HomeContent['clients'] }) {
+  const logos = clients.logos.filter((l) => l.image)
+  const iso = assetUrl(clients.isoImage)
+  if (!clients.visible || (!logos.length && !iso)) return null
+  return (
+    <section
+      aria-labelledby={clients.title ? 'clientes-titulo' : undefined}
+      aria-label={clients.title ? undefined : 'Clientes y certificación'}
+      className="border-b border-neutral-200 bg-white"
+    >
+      <div className="mx-auto flex max-w-6xl flex-col gap-8 px-5 py-10 sm:py-12 lg:flex-row lg:items-center lg:gap-12">
+        {clients.title && (
+          <h2
+            id="clientes-titulo"
+            className="p3-display text-balance text-2xl uppercase leading-tight text-vetlain-ink lg:w-44 lg:shrink-0"
+          >
+            {clients.title}
+          </h2>
+        )}
+        {logos.length > 0 && (
+          <ul className="grid flex-1 grid-cols-3 items-center gap-x-6 gap-y-7 sm:grid-cols-5 sm:gap-x-8">
+            {logos.map((l, i) => (
+              <li key={`${l.image}-${i}`} className="flex h-14 items-center justify-center">
+                <img
+                  src={assetUrl(l.image) ?? undefined}
+                  alt={l.name}
+                  loading="lazy"
+                  className="max-h-full max-w-full object-contain mix-blend-multiply"
+                />
+              </li>
+            ))}
+          </ul>
+        )}
+        {iso && (
+          <div className="flex items-center gap-4 border-t-2 border-neutral-200 pt-7 lg:border-l-2 lg:border-t-0 lg:pl-10 lg:pt-0">
+            <img src={iso} alt="" loading="lazy" className="h-16 w-16 shrink-0 object-contain" />
+            {clients.isoText && (
+              <p className="max-w-[11rem] text-sm font-bold uppercase leading-snug tracking-wide text-vetlain-ink">
+                {clients.isoText}
+              </p>
             )}
           </div>
         )}
       </div>
-      <Tape />
     </section>
   )
 }
@@ -490,6 +635,7 @@ export function Prototipo3Body({ news }: { news: News[] | null }) {
       <main className="pb-14 md:pb-0">
         <Hero hero={home.hero} />
         <Trust trust={home.trust} />
+        <Clients clients={home.clients} />
         <Novedades novedades={home.novedades} items={news} />
         <Services services={home.services} />
         <Steps steps={home.steps} />
