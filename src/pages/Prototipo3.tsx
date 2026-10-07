@@ -8,7 +8,7 @@
  * usan tanto el cliente (tras el fetch) como el script de prerender.
  */
 import { useEffect, useState } from 'react'
-import type { FormEvent, SVGProps } from 'react'
+import type { FocusEvent, FormEvent, SVGProps } from 'react'
 import { Link } from 'react-router-dom'
 import { Seo } from '../components/Seo'
 import { useSiteContent, useHomeContent } from '../lib/site-content'
@@ -17,6 +17,8 @@ import { formatDay } from '../lib/format'
 import type { News } from '../lib/types'
 import { newsHref } from '../lib/types'
 import type { HomeContent, HeroFocus, HeroSlide } from '../lib/home-content'
+import { CONTACT_LIMITS, normalizeChileanPhone, validateContact } from '../lib/contact-validation'
+import type { ContactErrors, ContactField } from '../lib/contact-validation'
 import { ServiceIcon } from '../site/service-icons'
 import { Reveal } from '../site/Reveal'
 import {
@@ -494,30 +496,70 @@ function Urgency({ urgency }: { urgency: HomeContent['urgency'] }) {
 const inputClass =
   'w-full border-2 border-neutral-300 bg-white px-3.5 py-2.5 text-sm text-vetlain-ink placeholder:text-neutral-400 transition-colors focus:border-vetlain-green focus:outline-none'
 
+/** ids de los campos del formulario (para foco y mensajes de error). */
+const FIELD_IDS: Record<ContactField, string> = {
+  name: 'p3-nombre',
+  phone: 'p3-tel',
+  comuna: 'p3-comuna',
+  message: 'p3-msg',
+}
+
 function Contact({ contact }: { contact: HomeContent['contact'] }) {
   const { telUrl, phone, phoneFijo, email, address, hours } = useSiteContent()
   const [sent, setSent] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [fieldErrors, setFieldErrors] = useState<ContactErrors>({})
+
+  const clearFieldError = (field: ContactField) =>
+    setFieldErrors((prev) => {
+      if (!prev[field]) return prev
+      const next = { ...prev }
+      delete next[field]
+      return next
+    })
+
+  /** Al salir del campo, deja el teléfono en formato estándar si es válido. */
+  function formatPhone(e: FocusEvent<HTMLInputElement>) {
+    const formatted = normalizeChileanPhone(e.currentTarget.value)
+    if (formatted) e.currentTarget.value = formatted
+  }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setError(null)
-    setBusy(true)
     const form = e.currentTarget
     const data = new FormData(form)
+    const str = (k: string) => String(data.get(k) ?? '')
+
+    const result = validateContact({
+      name: str('nombre'),
+      phone: str('telefono'),
+      comuna: str('comuna'),
+      message: str('mensaje'),
+    })
+    if (!result.ok) {
+      setFieldErrors(result.errors)
+      // Llevar el foco al primer campo con error.
+      const first = (['name', 'phone', 'comuna', 'message'] as const).find((f) => result.errors[f])
+      if (first) form.querySelector<HTMLElement>(`#${FIELD_IDS[first]}`)?.focus()
+      return
+    }
+    setFieldErrors({})
+    setBusy(true)
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: data.get('nombre'),
-          phone: data.get('telefono'),
-          comuna: data.get('comuna'),
-          message: data.get('mensaje'),
-          website: data.get('website'), // honeypot
-        }),
+        body: JSON.stringify({ ...result.value, website: str('website') }), // website = honeypot
       })
+      if (res.status === 400) {
+        const body = (await res.json().catch(() => ({}))) as { fields?: ContactErrors }
+        if (body.fields) {
+          setFieldErrors(body.fields)
+          return
+        }
+      }
       if (!res.ok) throw new Error('fallo')
       setSent(true)
       form.reset()
@@ -527,6 +569,22 @@ function Contact({ contact }: { contact: HomeContent['contact'] }) {
       setBusy(false)
     }
   }
+
+  /** Atributos de accesibilidad y estilo de error de un campo. */
+  const fieldProps = (field: ContactField) => ({
+    id: FIELD_IDS[field],
+    'aria-invalid': fieldErrors[field] ? true : undefined,
+    'aria-describedby': fieldErrors[field] ? `${FIELD_IDS[field]}-error` : undefined,
+    onInput: () => clearFieldError(field),
+  })
+  const fieldClass = (field: ContactField) =>
+    `${inputClass} ${fieldErrors[field] ? 'border-red-600 focus:border-red-600' : ''}`
+  const fieldError = (field: ContactField) =>
+    fieldErrors[field] ? (
+      <span id={`${FIELD_IDS[field]}-error`} className="mt-1.5 block text-xs font-semibold text-red-700">
+        {fieldErrors[field]}
+      </span>
+    ) : null
 
   return (
     <section id="contacto" className="scroll-mt-20 bg-white">
@@ -576,24 +634,28 @@ function Contact({ contact }: { contact: HomeContent['contact'] }) {
               </button>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <label htmlFor="p3-nombre" className="block">
+            <form onSubmit={handleSubmit} noValidate className="space-y-4">
+              <label htmlFor={FIELD_IDS.name} className="block">
                 <span className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-neutral-600">Nombre</span>
-                <input id="p3-nombre" name="nombre" type="text" required autoComplete="name" placeholder="Tu nombre" className={inputClass} />
+                <input {...fieldProps('name')} name="nombre" type="text" required maxLength={CONTACT_LIMITS.nameMax} autoComplete="name" placeholder="Tu nombre" className={fieldClass('name')} />
+                {fieldError('name')}
               </label>
               <div className="grid gap-4 sm:grid-cols-2">
-                <label htmlFor="p3-tel" className="block">
+                <label htmlFor={FIELD_IDS.phone} className="block">
                   <span className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-neutral-600">Teléfono</span>
-                  <input id="p3-tel" name="telefono" type="tel" required autoComplete="tel" placeholder="+56 9 …" className={inputClass} />
+                  <input {...fieldProps('phone')} name="telefono" type="tel" inputMode="tel" required maxLength={20} autoComplete="tel" placeholder="+56 9 1234 5678" onBlur={formatPhone} className={fieldClass('phone')} />
+                  {fieldError('phone')}
                 </label>
-                <label htmlFor="p3-comuna" className="block">
+                <label htmlFor={FIELD_IDS.comuna} className="block">
                   <span className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-neutral-600">Comuna</span>
-                  <input id="p3-comuna" name="comuna" type="text" placeholder="Talagante…" className={inputClass} />
+                  <input {...fieldProps('comuna')} name="comuna" type="text" maxLength={CONTACT_LIMITS.comunaMax} autoComplete="address-level2" placeholder="Talagante…" className={fieldClass('comuna')} />
+                  {fieldError('comuna')}
                 </label>
               </div>
-              <label htmlFor="p3-msg" className="block">
+              <label htmlFor={FIELD_IDS.message} className="block">
                 <span className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-neutral-600">¿Qué viste?</span>
-                <textarea id="p3-msg" name="mensaje" required rows={3} placeholder="Ratones en la cocina, cucarachas en la bodega…" className={`${inputClass} resize-none`} />
+                <textarea {...fieldProps('message')} name="mensaje" required rows={3} maxLength={CONTACT_LIMITS.messageMax} placeholder="Ratones en la cocina, cucarachas en la bodega…" className={`${fieldClass('message')} resize-none`} />
+                {fieldError('message')}
               </label>
               {/* Honeypot anti-spam: oculto para humanos, tentador para bots. */}
               <input
@@ -605,7 +667,7 @@ function Contact({ contact }: { contact: HomeContent['contact'] }) {
                 className="absolute left-[-9999px] h-0 w-0 opacity-0"
               />
               {error && (
-                <p className="border-2 border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
+                <p role="alert" className="border-2 border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
               )}
               <button
                 type="submit"

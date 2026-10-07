@@ -13,6 +13,7 @@
  * la base y visible en el panel, que es la fuente de verdad.
  */
 import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import nodemailer from 'nodemailer'
 import type { Lead } from './db/schema.js'
 import { leadWhatsappUrl } from '../src/lib/whatsapp.js'
@@ -24,8 +25,12 @@ const DEFAULT_RECIPIENTS = [
   'jennyp@vzgroups.com',
 ]
 
-/** Ruta de la plantilla. En Vercel se incluye en la función vía vercel.json. */
+/** Plantilla y logo. En Vercel se incluyen en la función vía vercel.json. */
 const TEMPLATE_URL = new URL('./emails/lead.html', import.meta.url)
+const LOGO_PATH = fileURLToPath(new URL('./emails/logo.png', import.meta.url))
+/** El logo viaja adjunto e incrustado (CID): Outlook bloquea las imágenes
+ *  remotas por defecto, pero muestra las incrustadas sin pedir permiso. */
+export const LOGO_CID = 'vetlain-logo'
 
 function recipients(): string[] {
   const raw = process.env.CONTACT_NOTIFY_TO
@@ -58,7 +63,7 @@ export function leadVars(lead: Lead): Record<string, string> {
     telefono_url: `tel:${lead.phone.replace(/[^\d+]/g, '')}`,
     panel_url: `${site}/admin`,
     sitio_url: site,
-    logo_url: `${site}/brand/logo-email.png`,
+    logo_url: `cid:${LOGO_CID}`,
   }
 }
 
@@ -80,6 +85,11 @@ export function renderTemplate(template: string, vars: Record<string, string>): 
   return out.replace(/\{\{(\w+)\}\}/g, (_, key: string) =>
     escapeHtml(vars[key] ?? '').replace(/\r?\n/g, '<br>'),
   )
+}
+
+/** Adjunto del logo incrustado, referenciado en la plantilla como cid:vetlain-logo. */
+export function logoAttachment() {
+  return { filename: 'vetlain.png', path: LOGO_PATH, cid: LOGO_CID, contentDisposition: 'inline' as const }
 }
 
 /** Arma asunto, HTML y texto plano del aviso de un lead. */
@@ -142,7 +152,14 @@ export async function notifyLead(lead: Lead): Promise<boolean> {
       greetingTimeout: 8000,
       socketTimeout: 10000,
     })
-    await transport.sendMail({ from: { name: 'Sitio Vetlain', address: user }, to, subject, html, text })
+    await transport.sendMail({
+      from: { name: 'Sitio Vetlain', address: user },
+      to,
+      subject,
+      html,
+      text,
+      attachments: [logoAttachment()],
+    })
     return true
   } catch (err) {
     console.error('[mailer] No se pudo enviar el aviso del lead', lead.id, err)

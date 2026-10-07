@@ -13,7 +13,7 @@ import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { exec } from 'node:child_process'
 import nodemailer from 'nodemailer'
-import { buildLeadEmail } from './mailer.js'
+import { buildLeadEmail, logoAttachment, LOGO_CID } from './mailer.js'
 import type { Lead } from './db/schema.js'
 
 const samples: Record<string, Lead> = {
@@ -40,13 +40,13 @@ const samples: Record<string, Lead> = {
 
 const dir = resolve('.email-preview')
 mkdirSync(dir, { recursive: true })
-// En local el logo de producción puede no existir aún: usar el archivo del repo.
-const localLogo = pathToFileURL(resolve('public/brand/logo-email.png')).href
+// En el correo el logo va incrustado (cid:); en el navegador se usa el archivo.
+const localLogo = pathToFileURL(resolve('server/emails/logo.png')).href
 
 for (const [name, lead] of Object.entries(samples)) {
   const { subject, html } = buildLeadEmail(lead)
   const file = resolve(dir, `${name}.html`)
-  writeFileSync(file, html.replace(/https?:\/\/[^"]+\/brand\/logo-email\.png/g, localLogo))
+  writeFileSync(file, html.replaceAll(`cid:${LOGO_CID}`, localLogo))
   console.log(`✓ ${name}: «${subject}» → ${file}`)
 }
 
@@ -65,6 +65,6 @@ if (sendIdx !== -1) {
   const { subject, html, text } = buildLeadEmail(samples.completo)
   await nodemailer
     .createTransport({ host: 'smtp.gmail.com', port: 465, secure: true, auth: { user, pass } })
-    .sendMail({ from: { name: 'Sitio Vetlain', address: user }, to, subject: `[Prueba] ${subject}`, html, text })
+    .sendMail({ from: { name: 'Sitio Vetlain', address: user }, to, subject: `[Prueba] ${subject}`, html, text, attachments: [logoAttachment()] })
   console.log(`✓ Prueba enviada a ${to}`)
 }
