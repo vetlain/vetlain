@@ -15,6 +15,7 @@
 import { readFileSync } from 'node:fs'
 import nodemailer from 'nodemailer'
 import type { Lead } from './db/schema.js'
+import { leadWhatsappUrl } from '../src/lib/whatsapp.js'
 
 const DEFAULT_RECIPIENTS = [
   'echan@vzgroups.com',
@@ -38,18 +39,6 @@ function recipients(): string[] {
 const escapeHtml = (s: string) =>
   s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!)
 
-/**
- * Teléfono → enlace de WhatsApp (solo dígitos; asume Chile si viene sin código)
- * con el saludo ya escrito, para que quien responde solo complete el resto.
- */
-function whatsappLink(phone: string, name: string): string {
-  let digits = phone.replace(/\D/g, '')
-  if (digits.length === 9 && digits.startsWith('9')) digits = '56' + digits
-  if (digits.length < 8) return ''
-  const greeting = `Hola ${name.trim().replace(/\s+/g, ' ')}, `
-  return `https://wa.me/${digits}?text=${encodeURIComponent(greeting)}`
-}
-
 /** Valores de la plantilla para un lead, sin escapar. */
 export function leadVars(lead: Lead): Record<string, string> {
   const site = (process.env.SITE_URL || 'https://vetlain.cl').replace(/\/$/, '')
@@ -65,7 +54,7 @@ export function leadVars(lead: Lead): Record<string, string> {
     })
       // "2:50 p. m." no debe partirse entre líneas.
       .replace(/(\d)\s+([ap])\.\s?m\./, '$1\u00a0$2.\u00a0m.'),
-    whatsapp_url: whatsappLink(lead.phone, lead.name),
+    whatsapp_url: leadWhatsappUrl(lead.phone, lead.name),
     telefono_url: `tel:${lead.phone.replace(/[^\d+]/g, '')}`,
     panel_url: `${site}/admin`,
     sitio_url: site,

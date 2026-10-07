@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { api, ApiError } from '../lib/api'
 import type { Lead } from '../lib/types'
+import { leadWhatsappUrl } from '../lib/whatsapp'
 import { PageHeading, Card, Button, Notice, Loading } from './ui'
 
 function formatWhen(iso: string): string {
@@ -73,14 +74,16 @@ export default function LeadsPanel() {
                   </p>
                 </div>
                 <div className="flex shrink-0 gap-2">
-                  <a
-                    href={`https://wa.me/${lead.phone.replace(/[^\d]/g, '')}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 border-2 border-vetlain-green px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-vetlain-green-dark hover:bg-vetlain-green-tint"
-                  >
-                    WhatsApp
-                  </a>
+                  {leadWhatsappUrl(lead.phone, lead.name) && (
+                    <a
+                      href={leadWhatsappUrl(lead.phone, lead.name)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 border-2 border-vetlain-green px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-vetlain-green-dark hover:bg-vetlain-green-tint"
+                    >
+                      WhatsApp
+                    </a>
+                  )}
                   <a
                     href={`tel:${lead.phone.replace(/[^\d+]/g, '')}`}
                     className="inline-flex items-center gap-1 border-2 border-neutral-300 px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-vetlain-ink hover:border-vetlain-ink"
