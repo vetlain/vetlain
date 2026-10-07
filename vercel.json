@@ -1,8 +1,25 @@
 {
   "rewrites": [
-    { "source": "/robots.txt", "destination": "/api/robots" },
-    { "source": "/sitemap.xml", "destination": "/api/sitemap" },
-    { "source": "/api/(.*)", "destination": "/api" },
-    { "source": "/((?!api).*)", "destination": "/app.html" }
-  ]
+    {
+      "source": "/robots.txt",
+      "destination": "/api/robots"
+    },
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "/api"
+    },
+    {
+      "source": "/((?!api).*)",
+      "destination": "/app.html"
+    }
+  ],
+  "functions": {
+    "api/index.ts": {
+      "includeFiles": "server/emails/**"
+    }
+  }
 }

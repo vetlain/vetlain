@@ -1,11 +1,13 @@
 /**
  * Recepción de contactos del formulario del sitio (público).
  *   POST /api/contact
- * Guarda el lead en la base para que el cliente lo vea en el panel.
+ * Guarda el lead en la base para que el cliente lo vea en el panel y avisa
+ * por correo (server/mailer.ts).
  */
 import { Router } from 'express'
 import { z } from 'zod'
 import { db, schema } from '../db/index.js'
+import { notifyLead } from '../mailer.js'
 
 export const contactRouter = Router()
 
@@ -33,11 +35,17 @@ contactRouter.post('/', async (req, res) => {
     return
   }
 
-  await db.insert(schema.leads).values({
-    name,
-    phone,
-    comuna: comuna || null,
-    message: message || null,
-  })
+  const [lead] = await db
+    .insert(schema.leads)
+    .values({
+      name,
+      phone,
+      comuna: comuna || null,
+      message: message || null,
+    })
+    .returning()
+  // Se espera el envío antes de responder: en Vercel la función se congela al
+  // responder y un envío pendiente se perdería. notifyLead nunca lanza.
+  await notifyLead(lead)
   res.json({ ok: true })
 })

@@ -26,3 +26,6 @@ public/uploads
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Vista previa local del correo de contacto (npm run email:preview)
+.email-preview/
