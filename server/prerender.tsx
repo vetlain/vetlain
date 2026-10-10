@@ -1,6 +1,6 @@
 /**
- * Genera HTML estático para las páginas de contenido (servicios, nosotros,
- * cobertura, FAQ, contacto, blog) a partir de la base de datos. Se ejecuta como
+ * Genera HTML estático para las páginas de contenido (servicios, pestología,
+ * nosotros —con cobertura al final—, FAQ, contacto, blog) a partir de la base de datos. Se ejecuta como
  * parte de `npm run build`, DESPUÉS de `vite build` (necesita dist/index.html
  * como plantilla).
  *
@@ -46,6 +46,9 @@ import { ServiciosIndexBody } from '../src/pages/site/ServiciosIndex'
 import { ServiceDetailBody } from '../src/pages/site/ServiceDetail'
 import { ProductosIndexBody } from '../src/pages/site/ProductosIndex'
 import { ProductDetailBody } from '../src/pages/site/ProductDetail'
+import PestologiaIndex from '../src/pages/site/PestologiaIndex'
+import { PestDetailBody } from '../src/pages/site/PestDetail'
+import { pests } from '../src/site/pests'
 import { BlogListBody } from '../src/pages/site/BlogList'
 import { BlogPostBody } from '../src/pages/site/BlogPost'
 import type { Page, Service, Product, News, BlogPost } from '../src/lib/types'
@@ -170,7 +173,24 @@ async function main() {
       element: wrap(<ProductDetailBody slug={p.slug} data={p} />),
       api: { [`/products/${p.slug}`]: p },
     })),
-    ...['nosotros', 'cobertura', 'preguntas-frecuentes', 'contacto'].map((slug) => ({
+    { path: '/pestologia', element: wrap(<PestologiaIndex />) },
+    ...pests.map((p) => ({ path: `/pestologia/${p.slug}`, element: wrap(<PestDetailBody slug={p.slug} />) })),
+    {
+      path: '/nosotros',
+      element: wrap(
+        <PageViewBody
+          slug="nosotros"
+          data={pagesBySlug.get('nosotros') ?? null}
+          loading={false}
+          coverage={pagesBySlug.get('cobertura') ?? null}
+        />,
+      ),
+      api: {
+        '/pages/nosotros': pagesBySlug.get('nosotros') ?? null,
+        '/pages/cobertura': pagesBySlug.get('cobertura') ?? null,
+      },
+    },
+    ...['preguntas-frecuentes', 'contacto'].map((slug) => ({
       path: `/${slug}`,
       element: wrap(<PageViewBody slug={slug} data={pagesBySlug.get(slug) ?? null} loading={false} />),
       api: { [`/pages/${slug}`]: pagesBySlug.get(slug) ?? null },

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import type { ReactNode, SVGProps } from 'react'
 import { mainNav, footerGroups } from './nav'
-import type { SocialName } from './nav'
+import type { NavItem, SocialName } from './nav'
 import { useSiteContent } from '../lib/site-content'
 
 /* ── Constantes ───────────────────────────────────────────────────── */
@@ -126,6 +126,116 @@ export function WhatsappBtn({ className = '', children }: { className?: string; 
 const navLinkBase =
   'text-sm font-bold uppercase tracking-wide transition-colors'
 
+const desktopLinkClass = (isActive: boolean) =>
+  `${navLinkBase} ${
+    isActive ? 'text-vetlain-green-dark' : 'text-vetlain-ink hover:text-vetlain-green-dark'
+  } border-b-2 pb-0.5 ${isActive ? 'border-vetlain-green' : 'border-transparent'}`
+
+/**
+ * Enlace con desplegable (escritorio). Se abre con hover y con foco dentro
+ * (teclado: al tabular por el enlace aparecen sus hijos en orden); el enlace
+ * padre sigue llevando a la página índice, útil en pantallas táctiles.
+ */
+function NavDropdown({ item }: { item: NavItem }) {
+  // Tras elegir una opción se suelta el foco: si no, focus-within dejaría el
+  // panel abierto sobre la página nueva (la misma ruta no remonta el header).
+  const close = () => (document.activeElement as HTMLElement | null)?.blur()
+  return (
+    <div className="group relative">
+      <NavLink
+        to={item.to}
+        className={({ isActive }) => `${desktopLinkClass(isActive)} inline-flex items-center gap-1`}
+      >
+        {item.label}
+        <ChevronGlyph className="h-3.5 w-3.5 rotate-90 text-vetlain-green transition-transform group-hover:-rotate-90 group-focus-within:-rotate-90" />
+      </NavLink>
+      {/* pt-3 hace de puente: el puntero cruza al panel sin cerrar el menú. */}
+      <div className="invisible absolute left-1/2 top-full z-50 -translate-x-1/2 pt-3 opacity-0 transition-opacity duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+        <ul className="w-60 border-2 border-vetlain-ink bg-white py-2 shadow-[6px_6px_0_0_rgba(0,0,0,0.08)]">
+          {item.children!.map((child) => (
+            <li key={child.to}>
+              <NavLink
+                to={child.to}
+                onClick={close}
+                className={({ isActive }) =>
+                  `flex items-center gap-2.5 px-4 py-2.5 text-sm font-bold uppercase tracking-wide transition-colors ${
+                    isActive
+                      ? 'bg-vetlain-green-tint text-vetlain-green-deep'
+                      : 'text-vetlain-ink hover:bg-vetlain-green-tint hover:text-vetlain-green-deep'
+                  }`
+                }
+              >
+                <span className="h-2 w-2 shrink-0 bg-vetlain-green" aria-hidden="true" />
+                {child.label}
+              </NavLink>
+            </li>
+          ))}
+          <li className="mt-1 border-t-2 border-neutral-100 pt-1">
+            <Link
+              to={item.to}
+              onClick={close}
+              className="flex items-center justify-between px-4 py-2.5 text-xs font-bold uppercase tracking-wide text-vetlain-green-dark transition-colors hover:text-vetlain-green-deep"
+            >
+              Ver todas
+              <ChevronGlyph className="h-4 w-4" />
+            </Link>
+          </li>
+        </ul>
+      </div>
+    </div>
+  )
+}
+
+/** Enlace con submenú (móvil): el enlace navega, el botón despliega los hijos. */
+function MobileSubmenu({ item, onNavigate }: { item: NavItem; onNavigate: () => void }) {
+  const [expanded, setExpanded] = useState(false)
+  const id = `submenu-${item.to.replace(/\W+/g, '')}`
+  return (
+    <div className="border-b border-neutral-200">
+      <div className="flex items-center justify-between">
+        <NavLink
+          to={item.to}
+          onClick={onNavigate}
+          className={({ isActive }) =>
+            `flex-1 py-3.5 ${navLinkBase} ${isActive ? 'text-vetlain-green-dark' : 'text-vetlain-ink'}`
+          }
+        >
+          {item.label}
+        </NavLink>
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          aria-expanded={expanded}
+          aria-controls={id}
+          aria-label={expanded ? `Ocultar ${item.label}` : `Ver ${item.label}`}
+          className="-mr-2 inline-flex h-11 w-11 items-center justify-center text-vetlain-green"
+        >
+          <ChevronGlyph className={`h-4 w-4 transition-transform ${expanded ? '-rotate-90' : 'rotate-90'}`} />
+        </button>
+      </div>
+      {expanded && (
+        <ul id={id} className="mb-3 border-l-2 border-vetlain-green pl-4">
+          {item.children!.map((child) => (
+            <li key={child.to}>
+              <NavLink
+                to={child.to}
+                onClick={onNavigate}
+                className={({ isActive }) =>
+                  `block py-2.5 text-sm font-semibold uppercase tracking-wide ${
+                    isActive ? 'text-vetlain-green-dark' : 'text-neutral-700'
+                  }`
+                }
+              >
+                {child.label}
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
+
 export function Header() {
   const [open, setOpen] = useState(false)
   const { telUrl } = useSiteContent()
@@ -136,7 +246,7 @@ export function Header() {
         <Link to="/" className="flex shrink-0 items-center" aria-label="Vetlain, inicio">
           {/* En escritorio el logo va un 10% sobre el botón de WhatsApp: ese mide
               48px (20px de contenido + py-3.5), así que 3.3rem = 52.8px. Desde lg
-              y no md porque a 768px la barra ya va justa con los cinco enlaces. */}
+              y no md porque a 768px la barra ya va justa con los enlaces. */}
           <img
             src={A + 'brand/logo-recortado.png'}
             alt="Vetlain"
@@ -148,21 +258,15 @@ export function Header() {
 
         {/* Navegación de escritorio */}
         <nav aria-label="Principal" className="hidden md:flex md:items-center md:gap-7">
-          {mainNav.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={({ isActive }) =>
-                `${navLinkBase} ${
-                  isActive
-                    ? 'text-vetlain-green-dark'
-                    : 'text-vetlain-ink hover:text-vetlain-green-dark'
-                } border-b-2 pb-0.5 ${isActive ? 'border-vetlain-green' : 'border-transparent'}`
-              }
-            >
-              {item.label}
-            </NavLink>
-          ))}
+          {mainNav.map((item) =>
+            item.children ? (
+              <NavDropdown key={item.to} item={item} />
+            ) : (
+              <NavLink key={item.to} to={item.to} className={({ isActive }) => desktopLinkClass(isActive)}>
+                {item.label}
+              </NavLink>
+            ),
+          )}
         </nav>
 
         <div className="flex items-center gap-2">
@@ -198,21 +302,25 @@ export function Header() {
           className="border-t-2 border-vetlain-green/40 bg-white md:hidden"
         >
           <div className="mx-auto flex max-w-6xl flex-col px-5 py-2">
-            {[...mainNav, { label: 'Contacto', to: '/contacto' }].map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                onClick={() => setOpen(false)}
-                className={({ isActive }) =>
-                  `flex items-center justify-between border-b border-neutral-200 py-3.5 ${navLinkBase} ${
-                    isActive ? 'text-vetlain-green-dark' : 'text-vetlain-ink'
-                  }`
-                }
-              >
-                {item.label}
-                <ChevronGlyph className="h-4 w-4 text-vetlain-green" />
-              </NavLink>
-            ))}
+            {[...mainNav, { label: 'Contacto', to: '/contacto' }].map((item) =>
+              item.children ? (
+                <MobileSubmenu key={item.to} item={item} onNavigate={() => setOpen(false)} />
+              ) : (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  onClick={() => setOpen(false)}
+                  className={({ isActive }) =>
+                    `flex items-center justify-between border-b border-neutral-200 py-3.5 ${navLinkBase} ${
+                      isActive ? 'text-vetlain-green-dark' : 'text-vetlain-ink'
+                    }`
+                  }
+                >
+                  {item.label}
+                  <ChevronGlyph className="h-4 w-4 text-vetlain-green" />
+                </NavLink>
+              ),
+            )}
             <a
               href={telUrl}
               className="mt-3 inline-flex items-center justify-center gap-2 border-2 border-vetlain-ink px-4 py-3 text-sm font-bold uppercase tracking-wide text-vetlain-ink"

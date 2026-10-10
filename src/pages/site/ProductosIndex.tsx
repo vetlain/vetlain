@@ -38,6 +38,7 @@ export function ProductosIndexBody({
         title={page?.seoTitle ?? title}
         description={page?.seoDescription ?? description}
         path="/productos"
+        noindex
       />
       <PageHero
         crumbs={[{ label: 'Productos' }]}

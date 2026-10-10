@@ -47,6 +47,7 @@ export function ProductDetailBody({ slug, data }: { slug: string; data: Product 
         title={data.seoTitle ?? data.name}
         description={data.seoDescription ?? data.summary ?? undefined}
         path={`/productos/${slug}`}
+        noindex
         jsonLd={jsonLd}
       />
       <PageHero

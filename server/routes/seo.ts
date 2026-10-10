@@ -8,6 +8,7 @@
 import type { Request, Response } from 'express'
 import { eq, desc } from 'drizzle-orm'
 import { db, schema } from '../db/index.js'
+import { pests } from '../../src/site/pests.js'
 
 // Dominio canónico del sitio (override con SITE_URL en Vercel). Con www: el
 // apex vetlain.cl responde 308 hacia www, el sitemap debe listar el host final.
@@ -33,9 +34,9 @@ export async function sitemapHandler(_req: Request, res: Response): Promise<void
   const staticPaths = [
     '/',
     '/servicios',
-    '/productos',
+    '/pestologia',
+    ...pests.map((p) => `/pestologia/${p.slug}`),
     '/nosotros',
-    '/cobertura',
     '/preguntas-frecuentes',
     '/contacto',
     '/blog',
@@ -45,9 +46,9 @@ export async function sitemapHandler(_req: Request, res: Response): Promise<void
   const entries: Entry[] = staticPaths.map((p) => ({ loc: base + p }))
 
   try {
-    const [services, products, novedades, posts] = await Promise.all([
+    // Productos queda fuera: está oculto hasta tener su propia web.
+    const [services, novedades, posts] = await Promise.all([
       db.select().from(schema.services).where(eq(schema.services.published, true)),
-      db.select().from(schema.products).where(eq(schema.products.published, true)),
       // Sólo las novedades con entrada propia tienen URL; las de modo "link" no.
       db.select().from(schema.news).where(eq(schema.news.published, true)),
       db
@@ -58,9 +59,6 @@ export async function sitemapHandler(_req: Request, res: Response): Promise<void
     ])
     for (const s of services) {
       entries.push({ loc: `${base}/servicios/${s.slug}`, lastmod: s.updatedAt?.toISOString?.() })
-    }
-    for (const p of products) {
-      entries.push({ loc: `${base}/productos/${p.slug}`, lastmod: p.updatedAt?.toISOString?.() })
     }
     for (const n of novedades) {
       if (n.mode !== 'entry' || !n.slug) continue

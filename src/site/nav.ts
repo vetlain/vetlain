@@ -5,14 +5,22 @@
  * vive en su propia URL para SEO; se irán llenando más adelante.
  */
 
-export type NavItem = { label: string; to: string }
+import { pests } from './pests'
 
-/** Navegación principal (barra superior). */
+export type NavItem = { label: string; to: string; children?: NavItem[] }
+
+/** Enlaces a cada ficha de Pestología (desplegable del header y footer). */
+const pestLinks: NavItem[] = pests.map((p) => ({ label: p.name, to: `/pestologia/${p.slug}` }))
+
+/**
+ * Navegación principal (barra superior). El sitio se enfoca en servicios y
+ * pestología: Productos queda oculto (rutas vivas, fuera del menú y del
+ * sitemap) a la espera de su propia web, y Cobertura pasó al final de Nosotros.
+ */
 export const mainNav: NavItem[] = [
-  { label: 'Servicios', to: '/servicios' },
-  { label: 'Productos', to: '/productos' },
   { label: 'Nosotros', to: '/nosotros' },
-  { label: 'Cobertura', to: '/cobertura' },
+  { label: 'Servicios', to: '/servicios' },
+  { label: 'Pestología', to: '/pestologia', children: pestLinks },
   { label: 'Blog', to: '/blog' },
 ]
 
@@ -30,19 +38,14 @@ export const footerGroups: { title: string; links: NavItem[] }[] = [
     ],
   },
   {
-    title: 'Productos',
-    links: [
-      { label: 'Control de roedores', to: '/productos#roedores' },
-      { label: 'Control de insectos', to: '/productos#insectos' },
-      { label: 'Control de aves', to: '/productos#aves' },
-      { label: 'Ver catálogo completo', to: '/productos' },
-    ],
+    title: 'Pestología',
+    links: [...pestLinks, { label: 'Ver todas las plagas', to: '/pestologia' }],
   },
   {
     title: 'Empresa',
     links: [
       { label: 'Nosotros', to: '/nosotros' },
-      { label: 'Zonas de cobertura', to: '/cobertura' },
+      { label: 'Zonas de cobertura', to: '/nosotros#cobertura' },
       { label: 'Preguntas frecuentes', to: '/preguntas-frecuentes' },
       { label: 'Blog', to: '/blog' },
       { label: 'Contacto', to: '/contacto' },
@@ -75,6 +78,13 @@ export const sitePages: SitePageDef[] = [
     title: 'Servicios',
     description:
       'Desratización, desinsectación, control de aves, desinfección y programas para empresas. Cobertura en Talagante y alrededores con certificación ISO 9001.',
+  },
+  {
+    path: '/pestologia',
+    kicker: 'Conoce a tu plaga',
+    title: 'Pestología',
+    description:
+      'Las plagas que combatimos: cómo reconocerlas, qué riesgos implican para tu salud y tu propiedad, y qué hacer para prevenirlas.',
   },
   {
     path: '/productos',

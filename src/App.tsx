@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import Prototipo1 from './pages/Prototipo1'
 import Prototipo2 from './pages/Prototipo2'
 import Prototipo3 from './pages/Prototipo3'
@@ -7,6 +7,8 @@ import ServiciosIndex from './pages/site/ServiciosIndex'
 import ServiceDetail from './pages/site/ServiceDetail'
 import ProductosIndex from './pages/site/ProductosIndex'
 import ProductDetail from './pages/site/ProductDetail'
+import PestologiaIndex from './pages/site/PestologiaIndex'
+import PestDetail from './pages/site/PestDetail'
 import PageView from './pages/site/PageView'
 import NewsDetail from './pages/site/NewsDetail'
 import BlogList from './pages/site/BlogList'
@@ -31,10 +33,15 @@ export default function App() {
       {/* Páginas internas: contenido servido desde la API (editable en el panel). */}
       <Route path="/servicios" element={<ServiciosIndex />} />
       <Route path="/servicios/:slug" element={<ServiceDetail />} />
+      <Route path="/pestologia" element={<PestologiaIndex />} />
+      <Route path="/pestologia/:slug" element={<PestDetail />} />
+      {/* Productos: oculto (fuera del menú y del sitemap, noindex) hasta que
+          tenga su propia web. Las rutas siguen vivas para no romper enlaces. */}
       <Route path="/productos" element={<ProductosIndex />} />
       <Route path="/productos/:slug" element={<ProductDetail />} />
       <Route path="/nosotros" element={<PageView slug="nosotros" />} />
-      <Route path="/cobertura" element={<PageView slug="cobertura" />} />
+      {/* Cobertura ahora vive al final de Nosotros. */}
+      <Route path="/cobertura" element={<Navigate to="/nosotros#cobertura" replace />} />
       <Route path="/preguntas-frecuentes" element={<PageView slug="preguntas-frecuentes" />} />
       <Route path="/contacto" element={<PageView slug="contacto" />} />
       {/* Novedades con entrada propia (las que sólo enlazan no tienen página). */}
