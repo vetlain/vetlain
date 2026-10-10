@@ -31,6 +31,7 @@ import {
   Header,
   Footer,
   StickyCta,
+  CartGlyph,
   assetUrl,
 } from '../site/chrome'
 
@@ -289,6 +290,49 @@ function Trust({ trust }: { trust: HomeContent['trust'] }) {
             {t}
           </span>
         ))}
+      </div>
+    </section>
+  )
+}
+
+/* ── VZ Groups ────────────────────────────────────────────────────── */
+
+/** Sitio de productos (catálogo y tienda), separado de Vetlain. */
+const VZGROUPS_URL = 'https://vzgroups.com'
+
+/**
+ * Franja hacia VZ Groups, antes de Novedades. El sitio de Vetlain quedó
+ * enfocado en servicios; los productos viven en vzgroups. Visible pero sin
+ * competir con el CTA de WhatsApp del hero: banda carbón compacta y botón
+ * con borde, no relleno.
+ */
+function VzGroupsBand() {
+  return (
+    <section aria-label="Productos en VZ Groups" className="bg-vetlain-ink text-white">
+      <div className="mx-auto flex max-w-6xl flex-col gap-5 px-5 py-7 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
+        <div className="flex items-start gap-4">
+          <span className="mt-0.5 inline-flex h-11 w-11 shrink-0 items-center justify-center bg-vetlain-green" aria-hidden="true">
+            <CartGlyph className="h-6 w-6" />
+          </span>
+          <div>
+            <p className="p3-display text-xl uppercase leading-tight sm:text-2xl">
+              ¿Buscas productos para el control de plagas?
+            </p>
+            <p className="mt-1 text-sm leading-relaxed text-neutral-300">
+              Trampas, estaciones de cebo, lámparas UV y atrayentes profesionales en VZ Groups.
+            </p>
+          </div>
+        </div>
+        <a
+          href={VZGROUPS_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group inline-flex shrink-0 items-center justify-center gap-2 border-2 border-vetlain-green px-5 py-3 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-vetlain-green focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vetlain-green"
+        >
+          Ver productos en vzgroups.com
+          <ArrowGlyph className="h-4 w-4 transition-transform group-hover:translate-x-0.5 motion-reduce:transform-none" />
+          <span className="sr-only">(se abre en una pestaña nueva)</span>
+        </a>
       </div>
     </section>
   )
@@ -698,6 +742,7 @@ export function Prototipo3Body({ news }: { news: News[] | null }) {
         <Hero hero={home.hero} />
         <Trust trust={home.trust} />
         <Clients clients={home.clients} />
+        <VzGroupsBand />
         <Novedades novedades={home.novedades} items={news} />
         <Services services={home.services} />
         <Steps steps={home.steps} />
