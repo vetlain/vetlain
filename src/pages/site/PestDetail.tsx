@@ -1,8 +1,7 @@
 /** /pestologia/:slug — ficha de una plaga (contenido en src/site/pests.ts). */
 import { Link, useParams } from 'react-router-dom'
 import { Seo } from '../../components/Seo'
-import { ChevronGlyph } from '../../site/chrome'
-import { ServiceIcon } from '../../site/service-icons'
+import { ChevronGlyph, A } from '../../site/chrome'
 import { pests } from '../../site/pests'
 import { SiteShell, PageHero, TrustChips, ServiceAside, ClosingCta, PageState } from './parts'
 
@@ -59,6 +58,23 @@ export function PestDetailBody({ slug }: { slug: string }) {
       <section className="bg-white">
         <div className="mx-auto grid max-w-6xl gap-10 px-5 pb-16 lg:grid-cols-[minmax(0,1fr)_19rem] lg:gap-14">
           <div className="max-w-2xl space-y-12">
+            <figure>
+              <img
+                src={A + pest.photo.src}
+                alt={pest.photo.alt}
+                width={960}
+                height={720}
+                className="aspect-[4/3] w-full border-2 border-vetlain-ink object-cover"
+              />
+              <figcaption className="mt-2 text-xs text-neutral-500">
+                Foto:{' '}
+                <a href={pest.photo.sourceUrl} target="_blank" rel="noopener noreferrer" className="underline hover:text-vetlain-green-dark">
+                  {pest.photo.credit}
+                </a>{' '}
+                · {pest.photo.license} · Wikimedia Commons
+              </figcaption>
+            </figure>
+
             <p className="text-pretty text-lg leading-relaxed text-neutral-700">{pest.intro}</p>
 
             <div>
@@ -109,9 +125,16 @@ export function PestDetailBody({ slug }: { slug: string }) {
               <li key={p.slug} className="flex">
                 <Link
                   to={`/pestologia/${p.slug}`}
-                  className="group flex w-full items-center gap-3 border-2 border-neutral-200 p-4 transition-colors hover:border-vetlain-green"
+                  className="group flex w-full items-center gap-3 border-2 border-neutral-200 p-2 pr-4 transition-colors hover:border-vetlain-green"
                 >
-                  <ServiceIcon icon={p.icon} className="h-7 w-7 shrink-0 text-vetlain-green-dark" />
+                  <img
+                    src={A + p.photo.src}
+                    alt=""
+                    width={64}
+                    height={48}
+                    loading="lazy"
+                    className="h-12 w-16 shrink-0 object-cover"
+                  />
                   <span className="text-sm font-extrabold uppercase tracking-tight text-vetlain-ink">{p.name}</span>
                 </Link>
               </li>

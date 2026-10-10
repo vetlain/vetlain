@@ -9,8 +9,12 @@ export type Pest = {
   slug: string
   /** Nombre corto (desplegable del nav, tarjetas, migas). */
   name: string
-  /** Icono de service-icons.tsx. */
-  icon: 'rodent' | 'insect' | 'bird'
+  /**
+   * Foto de la plaga (public/brand/plagas, 960×720). Vienen de Wikimedia
+   * Commons con licencia libre; las CC BY exigen mostrar autor y licencia,
+   * por eso el crédito se imprime junto a la foto en la ficha.
+   */
+  photo: { src: string; alt: string; credit: string; license: string; sourceUrl: string }
   summary: string
   intro: string
   species: { name: string; sci: string; note: string }[]
@@ -27,7 +31,13 @@ export const pests: Pest[] = [
   {
     slug: 'roedores',
     name: 'Roedores',
-    icon: 'rodent',
+    photo: {
+      src: 'brand/plagas/roedores.jpg',
+      alt: 'Rata café entre hiedra junto a un muro',
+      credit: 'Jethro Busby',
+      license: 'CC BY 4.0',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Brown_rat_brighton.jpg',
+    },
     summary: 'Ratas y ratones: la plaga urbana más dañina para la salud y la infraestructura.',
     intro:
       'Los roedores urbanos están altamente adaptados a convivir con las personas: se reproducen rápido, aprenden a evitar trampas mal ubicadas y aprovechan cualquier acceso de pocos centímetros. Una pareja de ratas puede originar decenas de crías en un año, por eso el control debe combinar eliminación, sellado de accesos y monitoreo.',
@@ -63,7 +73,13 @@ export const pests: Pest[] = [
   {
     slug: 'cucarachas',
     name: 'Cucarachas',
-    icon: 'insect',
+    photo: {
+      src: 'brand/plagas/cucarachas.jpg',
+      alt: 'Cucaracha sobre una superficie de piedra',
+      credit: 'gailhampshire',
+      license: 'CC BY 2.0',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:German_cockroach_(Blattella_germanica)_probably_(43118262090).jpg',
+    },
     summary: 'Insectos nocturnos que contaminan alimentos y se multiplican en cocinas y baños.',
     intro:
       'Las cucarachas buscan calor, humedad y restos de comida. Pasan el día escondidas en grietas, motores de electrodomésticos y cañerías, y salen de noche. Verlas de día suele indicar una población grande: los refugios ya no alcanzan.',
@@ -97,7 +113,13 @@ export const pests: Pest[] = [
   {
     slug: 'hormigas',
     name: 'Hormigas',
-    icon: 'insect',
+    photo: {
+      src: 'brand/plagas/hormigas.jpg',
+      alt: 'Hormigas argentinas en primer plano',
+      credit: 'R1bonpnk',
+      license: 'CC0',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Linepithema_humile_-_Argentine_ant.jpg',
+    },
     summary: 'Colonias que forman senderos hacia la comida y reaparecen si no se trata el nido.',
     intro:
       'Lo que vemos es sólo una fracción de la colonia: obreras que buscan alimento y marcan el camino con feromonas. Rociar los senderos las dispersa, pero el nido sigue activo. El control efectivo apunta a la colonia completa, incluidas las reinas.',
@@ -129,7 +151,13 @@ export const pests: Pest[] = [
   {
     slug: 'moscas-y-mosquitos',
     name: 'Moscas y mosquitos',
-    icon: 'insect',
+    photo: {
+      src: 'brand/plagas/moscas-y-mosquitos.jpg',
+      alt: 'Mosca doméstica posada sobre una superficie',
+      credit: 'TheYellowFellow',
+      license: 'CC0',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Stubenfliege_-_Musca_domestica.jpg',
+    },
     summary: 'Insectos voladores que trasladan bacterias y se crían en basura y aguas estancadas.',
     intro:
       'Las moscas se crían en materia orgánica en descomposición y los mosquitos en cualquier acumulación de agua quieta. En pocos días completan su ciclo, por eso el control combina eliminar los focos de crianza con barreras y equipos de captura en los recintos.',
@@ -163,7 +191,13 @@ export const pests: Pest[] = [
   {
     slug: 'pulgas',
     name: 'Pulgas',
-    icon: 'insect',
+    photo: {
+      src: 'brand/plagas/pulgas.jpg',
+      alt: 'Modelo ampliado de una pulga',
+      credit: 'Anagoria',
+      license: 'CC BY 3.0',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:2013_Naturkundemuseum_Berlin_pulex_irritans_anagoria.JPG',
+    },
     summary: 'Parásitos que viven en mascotas y alfombras; sus huevos pueden esperar meses.',
     intro:
       'La pulga adulta vive sobre el animal, pero la mayor parte de la población (huevos, larvas y pupas) está en alfombras, camas de mascotas y grietas del piso. Por eso tratar sólo a la mascota no basta: hay que tratar también el ambiente.',
@@ -194,7 +228,13 @@ export const pests: Pest[] = [
   {
     slug: 'aves',
     name: 'Aves urbanas',
-    icon: 'bird',
+    photo: {
+      src: 'brand/plagas/aves.jpg',
+      alt: 'Paloma bebiendo de una pileta en la ciudad',
+      credit: 'Dktue',
+      license: 'CC0',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Trinkende_Taube_am_Neptunbrunnen_in_T%C3%BCbingen_2019_cropped.jpg',
+    },
     summary: 'Palomas y otras aves que anidan en techos y fachadas, ensuciando y dañando estructuras.',
     intro:
       'Las aves urbanas son móviles, persistentes y vuelven a los mismos puntos de descanso y anidación. Sus fecas son corrosivas y focos de hongos y ácaros. El control efectivo no las daña: se basa en impedir que se posen y aniden mediante disuasión y exclusión.',
